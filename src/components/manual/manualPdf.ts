@@ -6,7 +6,8 @@ import { renderPartIcon, renderStep, STEP_SIZE } from "./stepRenderer";
 /**
  * Builds the instruction manual as a PDF: one A4-landscape page per build step,
  * laid out like the on-screen page (design units are px on a 980-wide page,
- * converted to mm). Step renders come from the same cache as the Manual tab.
+ * converted to mm). Step renders come from the same cache as the Manual tab and
+ * are embedded as transparent PNGs.
  */
 
 const PAGE_W = 297;
@@ -29,15 +30,16 @@ async function loadImage(url: string): Promise<HTMLImageElement> {
   return img;
 }
 
-/** Step render flattened onto the panel colour with a soft floor shadow, as JPEG (keeps the PDF small). */
-async function stepJpeg(url: string): Promise<string> {
+/**
+ * Step render with a soft floor shadow, kept on a transparent background (PNG)
+ * so it blends into the panel with no visible box around it.
+ */
+async function stepPng(url: string): Promise<Uint8Array> {
   const img = await loadImage(url);
   const c = document.createElement("canvas");
   c.width = img.naturalWidth;
   c.height = img.naturalHeight;
   const g = c.getContext("2d")!;
-  g.fillStyle = PANEL;
-  g.fillRect(0, 0, c.width, c.height);
   const cx = c.width / 2, cy = c.height * 0.9, rx = c.width * 0.31, ry = c.height * 0.035;
   const grad = g.createRadialGradient(cx, cy, 0, cx, cy, rx);
   grad.addColorStop(0, "rgba(90,60,20,0.22)");
@@ -52,7 +54,9 @@ async function stepJpeg(url: string): Promise<string> {
   g.fill();
   g.restore();
   g.drawImage(img, 0, 0);
-  return c.toDataURL("image/jpeg", 0.9);
+  const blob = await new Promise<Blob | null>((res) => c.toBlob(res, "image/png"));
+  if (!blob) throw new Error("Couldn't encode the step image");
+  return new Uint8Array(await blob.arrayBuffer());
 }
 
 async function iconPng(url: string): Promise<Uint8Array> {
@@ -87,7 +91,7 @@ export async function buildManualPdf(model: BrickModel, steps: BuildStep[], onPr
     const area = { x: panel.x + panel.w * 0.27, y: panel.y + panel.h * 0.04, w: panel.w * 0.69, h: panel.h * 0.9 };
     const aspect = STEP_SIZE.w / STEP_SIZE.h;
     const iw = Math.min(area.w, area.h * aspect), ih = iw / aspect;
-    doc.addImage(await stepJpeg(url), "JPEG", area.x + (area.w - iw) / 2, area.y + (area.h - ih) / 2, iw, ih, `step${page.n}`, "FAST");
+    doc.addImage(await stepPng(url), "PNG", area.x + (area.w - iw) / 2, area.y + (area.h - ih) / 2, iw, ih, `step${page.n}`, "FAST");
 
     // Step number
     doc.setTextColor(INK);
