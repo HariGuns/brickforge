@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { exportLdr, exportMpd, partLine, yawMatrix } from "./export";
+import { exportFileNames, exportLdr, exportMpd, partLine, yawMatrix } from "./export";
 import { buildSteps } from "../steps/steps";
 import { SAMPLE_HOUSE, SAMPLE_STACK, P } from "../fixtures/samples";
 import { COLORS } from "../parts/colors";
@@ -42,6 +42,14 @@ describe("LDraw export", () => {
     const back = lines.map(parseLine);
     const key = (p: Placement) => `${p.part}|${p.color}|${p.x}|${p.y}|${p.z}|${p.rot}`;
     expect(back.map(key).sort()).toEqual(SAMPLE_HOUSE.parts.map(key).sort());
+  });
+
+  it("converts accented letters in file names instead of dropping them", () => {
+    const names = (name: string) => exportFileNames({ ...SAMPLE_STACK, name });
+    expect(names("Red Lamborghini Huracán")).toEqual({ ldr: "Red_Lamborghini_Huracan.ldr", mpd: "Red_Lamborghini_Huracan.mpd" });
+    expect(names("Crème Brûlée Café").ldr).toBe("Creme_Brulee_Cafe.ldr");
+    expect(names("Rock & Roll!").ldr).toBe("Rock_Roll.ldr");
+    expect(names("★★★").ldr).toBe("model.ldr");
   });
 
   it("emits one STEP per build step and wraps .mpd", () => {

@@ -55,3 +55,29 @@ Each run writes `debug/<timestamp>-<slug>/`, containing:
 - `summary.json` and `final-model.json`
 
 Token usage and estimated cost are logged per round and in total. They appear in the server console, the UI and `summary.json`. To view a debug model in the app, use **Open model JSON**.
+
+## Test results (phase 6)
+
+These are end-to-end runs with `claude-opus-5-5` at effort `high`, using the tuned prompt. Every model was opened and rendered in LeoCAD.
+
+| Input | Valid | Repair rounds | Parts | Cost |
+|---|---|---|---|---|
+| "a small red house with a door and two windows" | yes | 0 | 37 | $0.12 |
+| "a blue pickup truck" | yes | 1 | 78 | $0.34 |
+| "a lighthouse on a rocky base" | yes | 0 | 92 | $0.23 |
+| "a sitting cat" | yes | 0 | 62 | $0.23 |
+| Photo of a red sports car | yes | 1 | 87 | $0.46 |
+
+- **Time:** a generation takes 45–150 s. A repair round adds about 25 s.
+- **Repairs seen:** every repair so far fixed `UNSUPPORTED` plates (plates placed at a height where nothing sits under them), and each took one round.
+- **Prompt tuning:** after the first pass, two rules were added to `system.ts`, and the four text prompts were re-run to check for regressions. The rules:
+  - close gable ends and other visible openings (the first house had an open gable)
+  - make wheels stick out from the body (the first truck hid them underneath)
+
+## Known limitations (v1)
+
+- **No hanging parts:** a part can't be attached only to the underside of a part above it. Every part must rest on studs below it, which is what makes bottom-up build steps possible.
+- **Slopes block their whole box:** collision treats a slope as filling its full bounding box, so nothing can sit in the empty space above a sloped face.
+- **Structure isn't simulated:** the validator checks stud connections only. It doesn't check balance, weight or clutch strength. A part held by a single stud gets a warning, not an error.
+- **Small library:** v1 has bricks, plates, tiles and 45° slopes only. There are no curved, inverted, SNOT or Technic parts.
+- **Simple step grouping:** steps are grouped by layer and position (up to 6 parts each). No build-order optimisation is done beyond that.

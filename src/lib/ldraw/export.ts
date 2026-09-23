@@ -49,7 +49,9 @@ export function partLine(pl: Placement): string {
 }
 
 function safeName(name: string): string {
-  return (name.trim().replace(/[^\w\- ]+/g, "").replace(/\s+/g, "_") || "model").slice(0, 60);
+  // Decompose accented letters (á → a + ◌́) and drop the combining marks, so they convert instead of vanishing.
+  const ascii = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
+  return (ascii.trim().replace(/[^\w\- ]+/g, "").replace(/\s+/g, "_") || "model").slice(0, 60);
 }
 
 /** Model body: header + part lines, with `0 STEP` after each build step. */
