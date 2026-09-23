@@ -1,6 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generateModel, type GenerateEvent, type ImageMediaType } from "@/lib/claude/generate";
 import type { BuildSize } from "@/lib/prompts/design";
+import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
+import { CONFIG } from "@/lib/config";
 
 const IMAGE_TYPES: ImageMediaType[] = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -14,9 +16,9 @@ function friendly(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
-/** POST { text?, image?: { mediaType, data(base64) }, size? } → text/event-stream of GenerateEvent. */
+/** POST { text?, image?: { mediaType, data(base64) }, size?, base? } → text/event-stream of GenerateEvent. `base` = model to edit. */
 export async function POST(req: Request) {
-  let body: { text?: string; image?: { mediaType: string; data: string }; size?: string };
+  let body: { text?: string; image?: { mediaType: string; data: string }; size?: string; base?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -31,6 +33,13 @@ export async function POST(req: Request) {
   }
   if (!text?.trim() && !image) return Response.json({ error: "Provide a description or a photo" }, { status: 400 });
   const size = SIZES.includes(body.size as BuildSize) ? (body.size as BuildSize) : undefined;
+  let base: BrickModel | undefined;
+  if (body.base !== undefined) {
+    const parsed = BrickModelSchema.safeParse(body.base);
+    if (!parsed.success) return Response.json({ error: "The model to edit isn't valid JSON for this app" }, { status: 400 });
+    if (parsed.data.parts.length > CONFIG.maxParts) return Response.json({ error: `The model to edit has more than ${CONFIG.maxParts} parts` }, { status: 400 });
+    base = parsed.data;
+  }
 
   const encoder = new TextEncoder();
   const abort = new AbortController();
@@ -46,7 +55,7 @@ export async function POST(req: Request) {
         }
       };
       try {
-        await generateModel({ text, image, size }, send, { signal: abort.signal });
+        await generateModel({ text, image, size, base }, send, { signal: abort.signal });
       } catch (err) {
         if (!abort.signal.aborted) {
           console.error("[generate] failed:", err);

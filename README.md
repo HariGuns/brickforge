@@ -18,6 +18,7 @@ npm run dev                                         # http://localhost:3000
 | `npm test` | Unit tests (validator, steps, LDraw export, repair loop with a fake Claude) |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
+| `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
 | `npm run gen -- --size small "a rubber duck"` | Target size: `small`, `medium` or `large` (the same choice as the size buttons in the chat) |
 | `npm run verify-ldraw` | Check every part in the library against the official LDraw library (needs `ldraw-lib/`, see below) |
 | `npm run export-sample` | Export the hand-built sample models to `exports/` |
@@ -29,7 +30,7 @@ LDraw library for `verify-ldraw` and LeoCAD rendering:
 ## The app
 
 The UI follows `design/brickforge-v2.html`.
-- **Chat:** describe a model or attach a photo, pick a size, and build. Progress and repair rounds show inline with a running cost.
+- **Chat:** describe a model or attach a photo, pick a size, and build. Progress and repair rounds show inline with a running cost. With a model loaded, messages **edit** it by default (toggle "Editing ⟨model⟩" off to start a new build). Claude gets the current parts list and your request, returns the full updated model, and it goes through the same validate/repair loop. The reply shows how many parts were added, removed and kept. The edit prompt is `src/lib/prompts/edit.ts`.
 - **Library:** your saved runs from `debug/` and any `.ldr` files in `exports/`. `.ldr` files are read back with `src/lib/ldraw/import.ts`.
 - **Tabs:**
   - **Model:** 3D view with 3/4, front and top cameras, full screen and spin. It includes the Issues card (errors outlined in red, warnings in amber) and a playback bar that animates the build step by step.
@@ -37,7 +38,7 @@ The UI follows `design/brickforge-v2.html`.
   - **Parts:** parts list grouped by category.
   - **Design:** the model JSON plus stats.
 - **Other:** dark mode, and the Download menu (.ldr, .mpd, Open model JSON).
-- **Not built yet:** undo/redo, versions, Save, Showcase, editing a model from the chat, sub-builds and shared builds are disabled placeholders.
+- **Not built yet:** undo/redo, versions, Save, Showcase, sub-builds and shared builds are disabled placeholders.
 
 ## Where to tune things
 

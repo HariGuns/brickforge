@@ -91,6 +91,23 @@ describe("generate/repair loop (fake Claude)", () => {
   });
 });
 
+describe("edit mode (fake Claude)", () => {
+  it("sends the current model and the change request, and records the base in debug", async () => {
+    const edited = { ...SAMPLE_HOUSE, parts: [...SAMPLE_HOUSE.parts, P("brick_1x1", "white", 0, 17, 2)] };
+    const { client, requests } = fakeClient([JSON.stringify(edited)]);
+    const r = await generateModel({ text: "add a chimney", base: SAMPLE_HOUSE }, () => {}, { client });
+    dirs.push(r.debugDir);
+    const first = requests[0].messages[0].content as string;
+    expect(first).toContain("Change request: add a chimney");
+    expect(first).toContain(`#0 ${JSON.stringify(SAMPLE_HOUSE.parts[0])}`);
+    expect(first).toContain(`Parts (${SAMPLE_HOUSE.parts.length})`);
+    expect(r.valid).toBe(true);
+    expect(r.model?.parts).toHaveLength(SAMPLE_HOUSE.parts.length + 1);
+    expect(fs.readdirSync(r.debugDir)).toContain("base-model.json");
+    expect(JSON.parse(fs.readFileSync(path.join(r.debugDir, "input.json"), "utf8")).mode).toBe("edit");
+  });
+});
+
 describe("parseModel", () => {
   it("reports schema problems as issues", () => {
     const r = parseModel(JSON.stringify({ name: "x", description: "x", parts: [{ part: "brick_2x2", color: "red", x: 0.5, y: 0, z: 0, rot: 45 }] }));

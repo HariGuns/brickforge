@@ -18,12 +18,15 @@ export interface RoundState {
 
 export interface Turn {
   id: number;
+  kind: "build" | "edit";
+  /** Name of the model being edited (edit turns). */
+  baseName?: string;
   text: string;
   size: BuildSize;
   image?: { name: string; previewUrl: string };
   status: "running" | "done" | "error" | "cancelled";
   rounds: RoundState[];
-  result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string };
+  result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string };
   error?: string;
 }
 
@@ -121,7 +124,10 @@ export function ChatPanel(props: {
   turns: Turn[];
   draft: Draft;
   running: boolean;
-  hasModel: boolean;
+  /** Name of the loaded model, if any; enables edit mode. */
+  modelName: string | null;
+  editing: boolean;
+  onToggleEdit: () => void;
   onDraft: (d: Partial<Draft>) => void;
   onAttach: (file: File) => void;
   onSend: () => void;
@@ -131,6 +137,7 @@ export function ChatPanel(props: {
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const canSend = !props.running && (draft.text.trim().length > 0 || !!draft.image);
+  const editing = props.editing && !!props.modelName;
 
   // Keep the newest message in view as the tracker updates.
   const last = props.turns.at(-1);
@@ -157,15 +164,23 @@ export function ChatPanel(props: {
                 </div>
               )}
               <div className="bubble">
-                {t.text || (t.image ? "Build the subject of this photo." : "")}
-                <span className="size-tag"> · {SIZES.find((s) => s.id === t.size)?.label}</span>
+                {t.kind === "edit" && <span className="edit-tag">Edit · {t.baseName}</span>}
+                {t.text || (t.image ? (t.kind === "edit" ? "Match the photo more closely." : "Build the subject of this photo.") : "")}
+                {t.kind === "build" && <span className="size-tag"> · {SIZES.find((s) => s.id === t.size)?.label}</span>}
               </div>
             </div>
             <div className="msg-ai">
-              {t.status === "running" && <p>Working on it. I&apos;ll design the model, check every stud connection and repair anything that doesn&apos;t hold together.</p>}
+              {t.status === "running" && (
+                <p>
+                  {t.kind === "edit"
+                    ? "Working on the change. I'll keep the rest of the model as it is, then check every connection again."
+                    : "Working on it. I'll design the model, check every stud connection and repair anything that doesn't hold together."}
+                </p>
+              )}
               {t.status === "done" && t.result && (
                 <p>
-                  Here&apos;s <b>{t.result.name}</b>. {t.result.description}
+                  {t.kind === "edit" ? <>Updated <b>{t.result.name}</b>: {t.result.change}. </> : <>Here&apos;s <b>{t.result.name}</b>. </>}
+                  {t.kind === "build" && t.result.description}
                   {!t.result.valid && <span className="err"> It still has {t.result.problems} problem{t.result.problems === 1 ? "" : "s"}, shown in red.</span>}
                 </p>
               )}
@@ -192,7 +207,7 @@ export function ChatPanel(props: {
           <textarea
             id="composer"
             rows={2}
-            placeholder="Describe what you want to build, or attach a photo…"
+            placeholder={editing ? `Describe a change to ${props.modelName}…` : "Describe what you want to build, or attach a photo…"}
             value={draft.text}
             onChange={(e) => props.onDraft({ text: e.target.value })}
             onKeyDown={(e) => {
@@ -217,17 +232,24 @@ export function ChatPanel(props: {
                 if (f) props.onAttach(f);
               }}
             />
-            <div className="seg small" role="radiogroup" aria-label="Model size">
-              {SIZES.map((s) => (
-                <button key={s.id} role="radio" aria-checked={draft.size === s.id} className={draft.size === s.id ? "on" : ""} onClick={() => props.onDraft({ size: s.id })}>
-                  {s.label}
-                </button>
-              ))}
-            </div>
-            {props.hasModel && (
-              <button className="edit-toggle" disabled title="Coming soon: describe changes to the current model in chat">
+            {!editing && (
+              <div className="seg small" role="radiogroup" aria-label="Model size">
+                {SIZES.map((s) => (
+                  <button key={s.id} role="radio" aria-checked={draft.size === s.id} className={draft.size === s.id ? "on" : ""} onClick={() => props.onDraft({ size: s.id })}>
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {props.modelName && (
+              <button
+                className={`edit-toggle ${editing ? "on" : ""}`}
+                aria-pressed={editing}
+                onClick={props.onToggleEdit}
+                title={editing ? "Messages change the current model. Click to start a new build instead." : "Click to make messages change the current model."}
+              >
                 <I.Pencil size={12} />
-                Edit model
+                <span className="edit-name">{editing ? `Editing ${props.modelName}` : "Edit model"}</span>
               </button>
             )}
             {props.running ? (
@@ -235,8 +257,8 @@ export function ChatPanel(props: {
                 Stop
               </button>
             ) : (
-              <button className="send-btn" disabled={!canSend} onClick={props.onSend} aria-label="Build it">
-                Build it
+              <button className="send-btn" disabled={!canSend} onClick={props.onSend} aria-label={editing ? "Apply change" : "Build it"}>
+                {editing ? "Apply" : "Build it"}
                 <I.ArrowUp size={14} />
               </button>
             )}

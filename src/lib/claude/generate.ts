@@ -5,6 +5,7 @@ import { brickModelJsonSchema } from "../model/jsonSchema";
 import { systemPrompt } from "../prompts/system";
 import { photoDesignPrompt, textDesignPrompt, type BuildSize } from "../prompts/design";
 import { repairPrompt } from "../prompts/repair";
+import { editPrompt } from "../prompts/edit";
 import { validate, type Issue, type ValidationResult } from "../validate/validator";
 import { buildSteps, type BuildStep } from "../steps/steps";
 import { DebugRun } from "./debug";
@@ -16,6 +17,8 @@ export interface GenerateInput {
   text?: string;
   image?: { mediaType: ImageMediaType; data: string /* base64 */ };
   size?: BuildSize;
+  /** Current model to edit; `text` is then the change request. */
+  base?: BrickModel;
 }
 
 export interface RoundSummary {
@@ -85,15 +88,20 @@ export interface GenerateOptions {
  * Returns the first valid model, or the attempt with the fewest errors.
  */
 export async function generateModel(input: GenerateInput, onEvent: (e: GenerateEvent) => void = () => {}, opts: GenerateOptions = {}): Promise<GenerateResult> {
-  if (!input.text?.trim() && !input.image) throw new Error("Provide a description or a photo.");
+  if (!input.text?.trim() && !input.image) throw new Error(input.base ? "Describe the change you want." : "Provide a description or a photo.");
   const anthropic = opts.client ?? getClient();
   const signal = opts.signal;
-  const debug = new DebugRun(input.text?.trim() || "photo");
+  const debug = new DebugRun(`${input.base ? "edit-" : ""}${input.text?.trim() || "photo"}`);
   onEvent({ type: "start", debugDir: debug.dir });
 
   const system = systemPrompt();
-  const firstText = input.image ? photoDesignPrompt(input.text, input.size) : textDesignPrompt(input.text!, input.size);
-  debug.write("input.json", { text: input.text ?? null, size: input.size ?? null, hasImage: !!input.image, config: CONFIG });
+  const firstText = input.base
+    ? editPrompt(input.base, input.text ?? "", !!input.image)
+    : input.image
+      ? photoDesignPrompt(input.text, input.size)
+      : textDesignPrompt(input.text!, input.size);
+  debug.write("input.json", { mode: input.base ? "edit" : "build", text: input.text ?? null, size: input.size ?? null, hasImage: !!input.image, config: CONFIG });
+  if (input.base) debug.write("base-model.json", input.base);
   debug.write("system-prompt.md", system);
   if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
 

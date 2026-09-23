@@ -6,6 +6,7 @@ import type { LibraryEntry } from "@/lib/library/scan";
 import { validate } from "@/lib/validate/validator";
 import { buildSteps } from "@/lib/steps/steps";
 import { modelStats } from "@/lib/model/stats";
+import { describeDiff, diffModels } from "@/lib/model/diff";
 import { exportFileNames, exportLdr, exportMpd } from "@/lib/ldraw/export";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { streamGenerate } from "@/lib/client/sse";
@@ -37,6 +38,7 @@ export default function Page() {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState<Draft>({ text: "", size: "medium", image: null });
   const [running, setRunning] = useState(false);
+  const [editing, setEditing] = useState(true);
   const [library, setLibrary] = useState<LibraryEntry[] | null>(null);
   const [libraryError, setLibraryError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -114,15 +116,19 @@ export default function Page() {
   async function send() {
     const d = draft;
     const id = Date.now();
-    setTurns((ts) => [...ts, { id, text: d.text.trim(), size: d.size, image: d.image ? { name: d.image.name, previewUrl: d.image.previewUrl } : undefined, status: "running", rounds: [] }]);
+    const base = editing && model ? model : undefined;
+    setTurns((ts) => [
+      ...ts,
+      { id, kind: base ? "edit" : "build", baseName: base?.name, text: d.text.trim(), size: d.size, image: d.image ? { name: d.image.name, previewUrl: d.image.previewUrl } : undefined, status: "running", rounds: [] },
+    ]);
     setDraft((x) => ({ ...x, text: "", image: null }));
     setRunning(true);
     setNotice(null);
     const ac = new AbortController();
     abortRef.current = ac;
     try {
-      const body = { text: d.text, size: d.size, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined };
-      for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev);
+      const body = { text: d.text, size: d.size, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined, base };
+      for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev, base);
     } catch (e) {
       if (ac.signal.aborted) updateTurn(id, (t) => ({ ...t, status: "cancelled" }));
       else updateTurn(id, (t) => ({ ...t, status: "error", error: (e as Error).message }));
@@ -132,7 +138,7 @@ export default function Page() {
     }
   }
 
-  function onEvent(id: number, ev: GenerateEvent) {
+  function onEvent(id: number, ev: GenerateEvent, base?: BrickModel) {
     switch (ev.type) {
       case "round_start":
         updateTurn(id, (t) => ({ ...t, rounds: [...t.rounds, { round: ev.round, thinkingChars: 0, outputChars: 0 }] }));
@@ -152,7 +158,16 @@ export default function Page() {
         updateTurn(id, (t) => ({
           ...t,
           status: "done",
-          result: { name: r.model!.name, description: r.model!.description, valid: r.valid, steps: r.steps.length, problems: r.validation?.errors.length ?? 0, cost: r.usage.cost, debugDir: r.debugDir },
+          result: {
+            name: r.model!.name,
+            description: r.model!.description,
+            valid: r.valid,
+            steps: r.steps.length,
+            problems: r.validation?.errors.length ?? 0,
+            cost: r.usage.cost,
+            debugDir: r.debugDir,
+            change: base ? describeDiff(diffModels(base, r.model!)) : undefined,
+          },
         }));
         show(r.model, `gen-${id}`);
         setSelected(`debug:${r.debugDir.split("/").pop()}`);
@@ -218,7 +233,9 @@ export default function Page() {
                 turns={turns}
                 draft={draft}
                 running={running}
-                hasModel={!!model}
+                modelName={model?.name ?? null}
+                editing={editing}
+                onToggleEdit={() => setEditing((e) => !e)}
                 onDraft={(p) => setDraft((d) => ({ ...d, ...p }))}
                 onAttach={attach}
                 onSend={send}

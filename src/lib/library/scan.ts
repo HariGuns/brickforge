@@ -61,7 +61,7 @@ export function listLibrary(): LibraryEntry[] {
       const model = debugModel(dir);
       if (!model) continue;
       const summary = readJson(path.join(dir, "summary.json")) as { valid?: boolean; rounds?: unknown[]; total?: { cost?: number } } | null;
-      const input = readJson(path.join(dir, "input.json")) as { text?: string | null; hasImage?: boolean } | null;
+      const input = readJson(path.join(dir, "input.json")) as { mode?: string; text?: string | null; hasImage?: boolean } | null;
       seen.add(`${model.name}|${model.parts.length}`);
       out.push({
         kind: "debug",
@@ -73,7 +73,7 @@ export function listLibrary(): LibraryEntry[] {
         rounds: summary?.rounds?.length ?? null,
         cost: summary?.total?.cost ?? null,
         date: debugDate(id),
-        source: input?.hasImage ? `Photo${input.text ? ` · ${input.text}` : ""}` : (input?.text ?? null),
+        source: `${input?.mode === "edit" ? "Edit · " : ""}${input?.hasImage ? `Photo${input.text ? ` · ${input.text}` : ""}` : (input?.text ?? "")}` || null,
       });
     }
   }
