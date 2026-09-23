@@ -1,313 +1,265 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useMemo, useRef, useState } from "react";
-import type { GenerateEvent, GenerateResult, RoundSummary } from "@/lib/claude/generate";
-import type { Issue } from "@/lib/validate/validator";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { GenerateEvent } from "@/lib/claude/generate";
+import type { LibraryEntry } from "@/lib/library/scan";
 import { validate } from "@/lib/validate/validator";
 import { buildSteps } from "@/lib/steps/steps";
+import { modelStats } from "@/lib/model/stats";
 import { exportFileNames, exportLdr, exportMpd } from "@/lib/ldraw/export";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
-import { SAMPLE_HOUSE } from "@/lib/fixtures/samples";
 import { streamGenerate } from "@/lib/client/sse";
 import { download, prepareImage } from "@/lib/client/image";
-import { PartsList } from "@/components/PartsList";
+import { TopBar } from "@/components/TopBar";
+import { ChatPanel, type Draft, type Turn } from "@/components/ChatPanel";
+import { LibraryPanel } from "@/components/LibraryPanel";
+import { ModelTab } from "@/components/ModelTab";
+import { ManualTab } from "@/components/ManualTab";
+import { PartsTab } from "@/components/PartsTab";
+import { DesignTab, compactJson } from "@/components/DesignTab";
+import * as I from "@/components/icons";
 
-const Viewer = dynamic(() => import("@/components/Viewer"), { ssr: false, loading: () => <div className="viewer-loading">Loading 3D viewer…</div> });
-
-interface RoundState {
-  round: number;
-  kind: "design" | "repair";
-  thinkingChars: number;
-  outputChars: number;
-  thinking?: string;
-  summary?: RoundSummary;
-  errors?: Issue[];
-}
-
-const usd = (n: number) => `$${n.toFixed(n < 0.1 ? 4 : 3)}`;
+type Tab = "model" | "manual" | "parts" | "design";
+const TABS: { id: Tab; label: string; Icon: (p: { size?: number }) => React.ReactNode }[] = [
+  { id: "model", label: "Model", Icon: I.Cube },
+  { id: "manual", label: "Manual", Icon: I.Book },
+  { id: "parts", label: "Parts", Icon: I.Bricks },
+  { id: "design", label: "Design", Icon: I.Code },
+];
 
 export default function Page() {
-  const [text, setText] = useState("");
-  const [image, setImage] = useState<{ mediaType: "image/jpeg"; data: string; previewUrl: string } | null>(null);
-  const [running, setRunning] = useState(false);
-  const [rounds, setRounds] = useState<RoundState[]>([]);
-  const [gen, setGen] = useState<Pick<GenerateResult, "usage" | "debugDir" | "valid"> | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [side, setSide] = useState<"chat" | "library">("chat");
+  const [tab, setTab] = useState<Tab>("model");
   const [model, setModel] = useState<BrickModel | null>(null);
-  const [modelKey, setModelKey] = useState("empty");
-  const [mode, setMode] = useState<"model" | "steps">("model");
-  const [step, setStep] = useState(1);
-  const [focus, setFocus] = useState<Set<number> | undefined>();
+  const [modelKey, setModelKey] = useState("none");
+  const [manualStep, setManualStep] = useState(1);
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const [draft, setDraft] = useState<Draft>({ text: "", size: "medium", image: null });
+  const [running, setRunning] = useState(false);
+  const [library, setLibrary] = useState<LibraryEntry[] | null>(null);
+  const [libraryError, setLibraryError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Theme: the layout script already set data-theme before paint; mirror it into state.
+  useEffect(() => {
+    const t = document.documentElement.dataset.theme;
+    if (t === "dark" || t === "light") setTheme(t);
+  }, []);
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("bf-theme", next);
+    } catch {}
+  }
 
   const validation = useMemo(() => (model ? validate(model) : null), [model]);
   const steps = useMemo(() => (model ? buildSteps(model) : []), [model]);
-  const errorParts = useMemo(() => new Set(validation?.errors.flatMap((e) => e.parts) ?? []), [validation]);
+  const stats = useMemo(() => (model ? modelStats(model) : null), [model]);
 
-  const current = steps[Math.min(step, steps.length) - 1];
-  const visible = useMemo(() => {
-    if (mode !== "steps" || !current) return undefined;
-    return new Set(steps.slice(0, current.n).flatMap((s) => s.parts));
-  }, [mode, steps, current]);
-  const highlight = mode === "steps" ? new Set(current?.parts ?? []) : focus;
-
-  function showModel(m: BrickModel, key: string) {
+  function show(m: BrickModel, key: string) {
     setModel(m);
     setModelKey(key);
-    setStep(1);
-    setFocus(undefined);
+    setManualStep(1);
+    // On narrow screens the sidebar sits below the viewer; bring the model into view.
+    if (window.matchMedia("(max-width: 959px)").matches) window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function onPhoto(file: File | undefined) {
-    if (!file) return setImage(null);
+  const loadLibrary = useCallback(async () => {
+    setLibraryError(null);
     try {
-      setImage(await prepareImage(file));
+      const res = await fetch("/api/library");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setLibrary((await res.json()).entries);
     } catch (e) {
-      setError(`Couldn't read that image: ${(e as Error).message}`);
+      setLibraryError(`Couldn't load the library (${(e as Error).message}).`);
+    }
+  }, []);
+  useEffect(() => {
+    loadLibrary();
+  }, [loadLibrary]);
+
+  async function pickEntry(e: LibraryEntry) {
+    const key = `${e.kind}:${e.id}`;
+    setSelected(key);
+    setNotice(null);
+    try {
+      const res = await fetch(`/api/library/model?kind=${e.kind}&id=${encodeURIComponent(e.id)}`);
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+      show(body.model, `lib-${key}`);
+      if (body.skipped) setNotice(`${body.skipped} line(s) in ${e.id} used parts outside the library and were skipped.`);
+    } catch (err) {
+      setNotice(`Couldn't open ${e.name}: ${(err as Error).message}`);
     }
   }
 
-  async function generate() {
-    setError(null);
-    setRounds([]);
-    setGen(null);
+  async function attach(file: File) {
+    try {
+      const img = await prepareImage(file);
+      setDraft((d) => ({ ...d, image: { name: file.name, ...img } }));
+    } catch (e) {
+      setNotice(`Couldn't read that image: ${(e as Error).message}`);
+    }
+  }
+
+  function updateTurn(id: number, fn: (t: Turn) => Turn) {
+    setTurns((ts) => ts.map((t) => (t.id === id ? fn(t) : t)));
+  }
+
+  async function send() {
+    const d = draft;
+    const id = Date.now();
+    setTurns((ts) => [...ts, { id, text: d.text.trim(), size: d.size, image: d.image ? { name: d.image.name, previewUrl: d.image.previewUrl } : undefined, status: "running", rounds: [] }]);
+    setDraft((x) => ({ ...x, text: "", image: null }));
     setRunning(true);
+    setNotice(null);
     const ac = new AbortController();
     abortRef.current = ac;
     try {
-      for await (const ev of streamGenerate({ text, image: image ? { mediaType: image.mediaType, data: image.data } : undefined }, ac.signal)) {
-        handleEvent(ev);
-      }
+      const body = { text: d.text, size: d.size, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined };
+      for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev);
     } catch (e) {
-      if (!ac.signal.aborted) setError((e as Error).message);
+      if (ac.signal.aborted) updateTurn(id, (t) => ({ ...t, status: "cancelled" }));
+      else updateTurn(id, (t) => ({ ...t, status: "error", error: (e as Error).message }));
     } finally {
       setRunning(false);
       abortRef.current = null;
     }
   }
 
-  function handleEvent(ev: GenerateEvent) {
+  function onEvent(id: number, ev: GenerateEvent) {
     switch (ev.type) {
       case "round_start":
-        setRounds((r) => [...r, { round: ev.round, kind: ev.kind, thinkingChars: 0, outputChars: 0 }]);
+        updateTurn(id, (t) => ({ ...t, rounds: [...t.rounds, { round: ev.round, thinkingChars: 0, outputChars: 0 }] }));
         break;
       case "progress":
-        setRounds((r) => r.map((x) => (x.round === ev.round ? { ...x, thinkingChars: ev.thinkingChars, outputChars: ev.outputChars, thinking: ev.thinking } : x)));
+        updateTurn(id, (t) => ({ ...t, rounds: t.rounds.map((r) => (r.round === ev.round ? { ...r, thinkingChars: ev.thinkingChars, outputChars: ev.outputChars, thinking: ev.thinking } : r)) }));
         break;
       case "round_end":
-        setRounds((r) => r.map((x) => (x.round === ev.summary.round ? { ...x, summary: ev.summary, errors: ev.errors } : x)));
+        updateTurn(id, (t) => ({ ...t, rounds: t.rounds.map((r) => (r.round === ev.summary.round ? { ...r, summary: ev.summary, errors: ev.errors } : r)) }));
         break;
-      case "done":
-        setGen({ usage: ev.result.usage, debugDir: ev.result.debugDir, valid: ev.result.valid });
-        if (ev.result.model) showModel(ev.result.model, `gen-${Date.now()}`);
-        else setError("Claude didn't return a usable model. See the debug folder for the raw output.");
+      case "done": {
+        const r = ev.result;
+        if (!r.model) {
+          updateTurn(id, (t) => ({ ...t, status: "error", error: "Claude didn't return a usable model. The raw output is in the debug folder." }));
+          break;
+        }
+        updateTurn(id, (t) => ({
+          ...t,
+          status: "done",
+          result: { name: r.model!.name, description: r.model!.description, valid: r.valid, steps: r.steps.length, problems: r.validation?.errors.length ?? 0, cost: r.usage.cost, debugDir: r.debugDir },
+        }));
+        show(r.model, `gen-${id}`);
+        setSelected(`debug:${r.debugDir.split("/").pop()}`);
+        setTab("model");
+        loadLibrary();
         break;
+      }
       case "error":
-        setError(ev.message);
+        updateTurn(id, (t) => ({ ...t, status: "error", error: ev.message }));
         break;
     }
   }
 
-  async function openJson(file: File | undefined) {
-    if (!file) return;
+  async function openJson(file: File) {
     try {
       const parsed = BrickModelSchema.safeParse(JSON.parse(await file.text()));
       if (!parsed.success) throw new Error(parsed.error.issues.slice(0, 3).map((i) => `${i.path.join(".")}: ${i.message}`).join("; "));
-      setGen(null);
-      setRounds([]);
-      showModel(parsed.data, `file-${file.name}-${Date.now()}`);
+      setSelected(null);
+      setNotice(null);
+      show(parsed.data, `file-${file.name}-${Date.now()}`);
     } catch (e) {
-      setError(`Couldn't load model: ${(e as Error).message}`);
+      setNotice(`Couldn't open ${file.name}: ${(e as Error).message}`);
     }
   }
 
-  function exportFile(kind: "ldr" | "mpd" | "json") {
+  function downloadModel(kind: "ldr" | "mpd" | "json") {
     if (!model) return;
     const names = exportFileNames(model);
     if (kind === "ldr") download(names.ldr, exportLdr(model, steps));
     if (kind === "mpd") download(names.mpd, exportMpd(model, steps));
-    if (kind === "json") download(names.ldr.replace(/\.ldr$/, ".json"), JSON.stringify(model, null, 2), "application/json");
+    if (kind === "json") download(names.ldr.replace(/\.ldr$/, ".json"), compactJson(model), "application/json");
   }
 
-  const canGenerate = !running && (text.trim().length > 0 || !!image);
-  const liveCost = rounds.reduce((s, r) => s + (r.summary?.usage.cost ?? 0), 0);
-
   return (
-    <div className="app">
-      <aside className="sidebar">
-        <header className="brand">
-          <h1>Brick Builder</h1>
-          <p>Describe something or add a photo. Claude designs a buildable model.</p>
-        </header>
-
-        <section className="card">
-          <label className="label" htmlFor="desc">Description</label>
-          <textarea
-            id="desc"
-            rows={3}
-            placeholder="e.g. a red fire truck with a ladder"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && canGenerate) generate();
-            }}
-          />
-          <div className="row">
-            <label className="btn secondary file">
-              {image ? "Change photo" : "Add photo"}
-              <input type="file" accept="image/*" onChange={(e) => onPhoto(e.target.files?.[0])} hidden />
-            </label>
-            {image && (
-              <button className="btn ghost" onClick={() => setImage(null)}>
-                Remove photo
-              </button>
+    <div className="page">
+      <div className="app">
+        <TopBar
+          model={model}
+          stats={stats}
+          steps={steps.length}
+          problems={validation?.errors.length ?? 0}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onDownload={downloadModel}
+          onOpenJson={openJson}
+        />
+        <div className="layout">
+          <aside className="sidebar">
+            <div className="side-head">
+              <div className="seg" role="tablist" aria-label="Sidebar">
+                <button role="tab" aria-selected={side === "chat"} className={side === "chat" ? "on" : ""} onClick={() => setSide("chat")}>
+                  <I.Chat size={15} />
+                  Chat
+                </button>
+                <button role="tab" aria-selected={side === "library"} className={side === "library" ? "on" : ""} onClick={() => setSide("library")}>
+                  <I.Library size={15} />
+                  Library
+                </button>
+              </div>
+            </div>
+            {side === "chat" ? (
+              <ChatPanel
+                turns={turns}
+                draft={draft}
+                running={running}
+                hasModel={!!model}
+                onDraft={(p) => setDraft((d) => ({ ...d, ...p }))}
+                onAttach={attach}
+                onSend={send}
+                onStop={() => abortRef.current?.abort()}
+              />
+            ) : (
+              <LibraryPanel entries={library} error={libraryError} selected={selected} onPick={pickEntry} onRefresh={loadLibrary} />
             )}
-          </div>
-          {image && <img className="preview" src={image.previewUrl} alt="Selected photo" />}
-          <div className="row">
-            <button className="btn primary" disabled={!canGenerate} onClick={generate}>
-              {running ? "Generating…" : "Generate model"}
-            </button>
-            {running && (
-              <button className="btn ghost" onClick={() => abortRef.current?.abort()}>
-                Cancel
-              </button>
-            )}
-          </div>
-          <div className="row small">
-            <button className="link" onClick={() => showModel(SAMPLE_HOUSE, `sample-${Date.now()}`)}>Load sample house</button>
-            <label className="link">
-              Open model JSON
-              <input type="file" accept="application/json,.json" onChange={(e) => openJson(e.target.files?.[0])} hidden />
-            </label>
-          </div>
-        </section>
+          </aside>
 
-        {error && <div className="alert">{error}</div>}
-
-        {rounds.length > 0 && (
-          <section className="card">
-            <h2>Generation</h2>
-            <ol className="rounds">
-              {rounds.map((r) => (
-                <li key={r.round} className={r.summary ? (r.summary.errorCount === 0 ? "ok" : "bad") : "live"}>
-                  <div className="round-head">
-                    <strong>{r.round === 0 ? "Design" : `Repair ${r.round}`}</strong>
-                    {r.summary ? (
-                      <span>
-                        {r.summary.partCount} parts · {r.summary.errorCount === 0 ? "valid" : `${r.summary.errorCount} errors`} · {r.summary.seconds.toFixed(0)}s · {usd(r.summary.usage.cost)}
-                      </span>
-                    ) : (
-                      <span className="muted">
-                        thinking {Math.round(r.thinkingChars / 100) / 10}k chars · output {Math.round(r.outputChars / 100) / 10}k chars
-                      </span>
-                    )}
-                  </div>
-                  {!r.summary && r.thinking && <p className="thinking">{r.thinking.slice(-220)}</p>}
-                  {r.summary && r.summary.errorCount > 0 && (
-                    <div className="codes">
-                      {Object.entries(r.summary.errorCodes).map(([c, n]) => (
-                        <span key={c} className="chip">{n}× {c}</span>
-                      ))}
-                    </div>
-                  )}
-                  {r.summary && (
-                    <div className="tokens muted">
-                      in {r.summary.usage.input.toLocaleString()} · out {r.summary.usage.output.toLocaleString()} · cache read {r.summary.usage.cacheRead.toLocaleString()} · cache write {r.summary.usage.cacheWrite.toLocaleString()}
-                    </div>
-                  )}
-                </li>
+          <main className="main">
+            <div className="tabs" role="tablist" aria-label="View">
+              {TABS.map(({ id, label, Icon }) => (
+                <button key={id} role="tab" aria-selected={tab === id} className={`tab ${tab === id ? "on" : ""}`} onClick={() => setTab(id)} disabled={id !== "model" && !model}>
+                  <span className="tab-icon"><Icon size={15} /></span>
+                  {label}
+                </button>
               ))}
-            </ol>
-            <div className="total">
-              Total: <strong>{usd(gen?.usage.cost ?? liveCost)}</strong>
-              {gen && (
-                <span className="muted">
-                  {" "}· {gen.usage.input.toLocaleString()} in / {gen.usage.output.toLocaleString()} out
+            </div>
+            {notice && (
+              <div className="issues-card" style={{ position: "static", maxWidth: "none" }} role="alert">
+                <span className="issue-icon">
+                  <I.Warning size={15} />
                 </span>
-              )}
-            </div>
-            {gen && <div className="muted small mono">debug: {gen.debugDir}</div>}
-          </section>
-        )}
-
-        {model && validation && (
-          <section className="card">
-            <h2>{model.name}</h2>
-            <p className="muted">{model.description}</p>
-            <div className={`status ${validation.valid ? "ok" : "bad"}`}>
-              {validation.valid ? `Buildable: ${model.parts.length} parts, ${steps.length} steps` : `${validation.errors.length} problems remain (best attempt)`}
-            </div>
-            {!validation.valid && (
-              <ul className="issues">
-                {validation.errors.slice(0, 30).map((e, i) => (
-                  <li key={i}>
-                    <button className="link" onClick={() => (setMode("model"), setFocus(new Set(e.parts)))}>
-                      <span className="chip">{e.code}</span> {e.message}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {validation.warnings.length > 0 && <p className="muted small">{validation.warnings.length} warning(s): single-stud connections.</p>}
-            <div className="row">
-              <button className="btn secondary" onClick={() => exportFile("ldr")}>Download .ldr</button>
-              <button className="btn secondary" onClick={() => exportFile("mpd")}>Download .mpd</button>
-              <button className="btn ghost" onClick={() => exportFile("json")}>JSON</button>
-            </div>
-          </section>
-        )}
-      </aside>
-
-      <main className="stage">
-        {model && (
-          <div className="toolbar">
-            <div className="tabs">
-              <button className={mode === "model" ? "on" : ""} onClick={() => setMode("model")}>3D model</button>
-              <button className={mode === "steps" ? "on" : ""} onClick={() => (setMode("steps"), setFocus(undefined))}>Instructions</button>
-            </div>
-            {mode === "steps" && current && (
-              <div className="stepper">
-                <button className="btn secondary" disabled={step <= 1} onClick={() => setStep((s) => Math.max(1, s - 1))}>◀ Prev</button>
-                <input type="range" min={1} max={steps.length} value={Math.min(step, steps.length)} onChange={(e) => setStep(Number(e.target.value))} />
-                <span className="step-label">Step {current.n} / {steps.length}</span>
-                <button className="btn primary" disabled={step >= steps.length} onClick={() => setStep((s) => Math.min(steps.length, s + 1))}>Next ▶</button>
+                <div className="issues-body">
+                  <span style={{ color: "var(--k-text)" }}>{notice}</span>
+                </div>
+                <button className="icon-btn" style={{ width: 26, height: 26 }} aria-label="Dismiss" onClick={() => setNotice(null)}>
+                  <I.Close size={14} />
+                </button>
               </div>
             )}
-            {mode === "model" && focus && (
-              <button className="btn ghost" onClick={() => setFocus(undefined)}>Clear highlight</button>
+            {(tab === "model" || !model) && (
+              <ModelTab model={model} modelKey={modelKey} steps={steps} errors={validation?.errors ?? []} warnings={validation?.warnings ?? []} theme={theme} />
             )}
-          </div>
-        )}
-        <div className="viewer">
-          {model ? (
-            <Viewer model={model} visible={visible} highlight={highlight} errorParts={mode === "model" ? errorParts : undefined} fitKey={modelKey} />
-          ) : (
-            <div className="empty">
-              <p>No model yet.</p>
-              <p className="muted">Generate one, or load the sample house to try the viewer.</p>
-            </div>
-          )}
+            {tab === "manual" && model && <ManualTab model={model} modelKey={modelKey} steps={steps} step={manualStep} onStep={setManualStep} theme={theme} />}
+            {tab === "parts" && model && <PartsTab model={model} />}
+            {tab === "design" && model && stats && <DesignTab model={model} stats={stats} steps={steps.length} onDownloadJson={() => downloadModel("json")} />}
+          </main>
         </div>
-        {model && (
-          <div className="parts-panel">
-            {mode === "steps" && current ? (
-              <>
-                <h3>Step {current.n}: add these parts</h3>
-                <PartsList model={model} indices={current.parts} />
-                <h3 className="muted">All parts</h3>
-                <PartsList model={model} compact />
-              </>
-            ) : (
-              <>
-                <h3>Parts list · {model.parts.length} pieces</h3>
-                <PartsList model={model} />
-              </>
-            )}
-          </div>
-        )}
-      </main>
+      </div>
     </div>
   );
 }

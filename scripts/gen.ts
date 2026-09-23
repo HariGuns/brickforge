@@ -2,6 +2,7 @@
  * Run the generate → validate → repair loop from the command line.
  *   npm run gen "a red fire truck"
  *   npm run gen -- --image photo.jpg "optional extra instructions"
+ *   npm run gen -- --size small "a rubber duck"      (small | medium | large)
  * Writes exports/<name>.ldr/.mpd and a debug folder under ./debug.
  */
 import fs from "node:fs";
@@ -17,13 +18,16 @@ const args = process.argv.slice(2);
 let imagePath: string | undefined;
 const i = args.indexOf("--image");
 if (i >= 0) [imagePath] = args.splice(i, 2).slice(1);
+let size: "small" | "medium" | "large" | undefined;
+const si = args.indexOf("--size");
+if (si >= 0) size = args.splice(si, 2)[1] as typeof size;
 const text = args.join(" ").trim() || undefined;
 
 const ext = imagePath ? path.extname(imagePath).slice(1).toLowerCase() : "";
 const mediaType = ({ jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" } as const)[ext as "jpg"];
 const image = imagePath ? { mediaType, data: fs.readFileSync(imagePath).toString("base64") } : undefined;
 
-const result = await generateModel({ text, image }, (e) => {
+const result = await generateModel({ text, image, size }, (e) => {
   if (e.type === "round_start") console.log(`→ round ${e.round} (${e.kind})…`);
   if (e.type === "round_end" && e.errors.length) {
     for (const err of e.errors.slice(0, 8)) console.log(`    ${err.code}: ${err.message}`);

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/modernist-fa9cd62e-d23c-4353-b594-9b01beed6a8d/styles.css">
+<script src="_ds/modernist-fa9cd62e-d23c-4353-b594-9b01beed6a8d/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--k-page:#cdd6c6;--k-win:#ffffff;--k-panel:#f4f5f3;--k-sunk:#eceeea;--k-line:#e3e6e1;--k-line2:#d4d8d2;--k-text:#1c1d1c;--k-muted:#686d69;--k-accent:#dd4b25;--k-accent-h:#c83f1c;--k-accent-soft:#fcece6;--k-accent-ink:#a8341a;--k-green:#3a9d58;--k-warn-soft:#fdf4e0;--k-warn:#a86a00;--k-shadow:0 1px 2px rgba(30,40,30,.05),0 2px 8px rgba(30,40,30,.05);--k-shadow-lg:0 2px 6px rgba(30,40,30,.06),0 30px 80px rgba(30,40,30,.18)}
+[data-theme="dark"]{--k-page:#101311;--k-win:#191b1a;--k-panel:#202321;--k-sunk:#282b29;--k-line:#2e3230;--k-line2:#3a3f3c;--k-text:#eef0ee;--k-muted:#a2a8a3;--k-accent:#f0612f;--k-accent-h:#ff7443;--k-accent-soft:#3a1f16;--k-accent-ink:#ff9670;--k-green:#4cc071;--k-warn-soft:#33290f;--k-warn:#f2b64a;--k-shadow:0 1px 2px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.3);--k-shadow-lg:0 2px 6px rgba(0,0,0,.4),0 30px 80px rgba(0,0,0,.55)}
+body{margin:0;font-family:"Archivo",system-ui,sans-serif}
+a{color:var(--k-accent-ink);text-decoration:none}a:hover{color:var(--k-accent)}
+button{font-family:inherit}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--k-accent);outline-offset:2px}
+input[type=range]{accent-color:var(--k-accent)}
+@keyframes kSpin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="min-height:100vh;box-sizing:border-box;background:var(--k-page);padding:{{ pagePad }};font-family:'Archivo',system-ui,sans-serif;color:var(--k-text);font-size:14px">
+<div data-screen-label="BrickForge app" style="height:{{ appH }};min-height:720px;background:var(--k-win);border-radius:22px;box-shadow:var(--k-shadow-lg);display:flex;flex-direction:column;overflow:hidden">
+
+  <!-- TOP BAR -->
+  <header style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 14px 12px 20px;border-bottom:1px solid var(--k-line)">
+    <div style="display:flex;align-items:center;gap:10px;min-width:0">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-label="BrickForge"><rect x="2" y="9" width="20" height="12" rx="3" fill="var(--k-accent)"></rect><rect x="5" y="5" width="5" height="5" rx="1.5" fill="var(--k-accent)"></rect><rect x="14" y="5" width="5" height="5" rx="1.5" fill="var(--k-accent)"></rect></svg>
+      <span style="font-size:17px;font-weight:700;letter-spacing:-0.01em;white-space:nowrap">Stone Castle</span>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <sc-for list="{{ badges }}" as="b" hint-placeholder-count="4">
+        <span style="display:inline-flex;gap:5px;align-items:baseline;border:1px solid var(--k-line2);border-radius:999px;padding:4px 10px;font-size:13px;background:var(--k-panel)"><b style="font-weight:600">{{ b.n }}</b><span style="color:var(--k-muted)">{{ b.l }}</span></span>
+      </sc-for>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
+      <button aria-label="Undo" style="width:34px;height:34px;border:0;border-radius:10px;background:transparent;color:var(--k-muted);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+      <button aria-label="Redo" style="width:34px;height:34px;border:0;border-radius:10px;background:transparent;color:var(--k-muted);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"></path><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"></path></svg></button>
+      <button style="height:34px;border:0;border-radius:10px;background:transparent;color:var(--k-text);display:flex;align-items:center;gap:7px;padding:0 10px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>Versions<span style="font-size:12px;background:var(--k-sunk);border-radius:999px;padding:1px 7px;color:var(--k-muted)">2</span></button>
+      <button style="height:34px;border:0;border-radius:10px;background:transparent;color:var(--k-text);display:flex;align-items:center;gap:7px;padding:0 10px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13v8"></path><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"></path><path d="m8 17 4-4 4 4"></path></svg>Save</button>
+      <button onClick="{{ toggleTheme }}" aria-label="Toggle dark mode" style="width:34px;height:34px;border:0;border-radius:10px;background:transparent;color:var(--k-muted);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button>
+      <div style="position:relative;margin-left:4px">
+        <button onClick="{{ toggleDl }}" style="height:36px;border:0;border-radius:10px;background:var(--k-accent);color:#fff;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:var(--k-accent-h)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Download</button>
+        <sc-if value="{{ dlOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:0;top:42px;z-index:10;width:220px;background:var(--k-win);border:1px solid var(--k-line);border-radius:14px;box-shadow:var(--k-shadow-lg);padding:6px;display:flex;flex-direction:column">
+            <button style="text-align:left;border:0;background:transparent;color:var(--k-text);border-radius:9px;padding:9px 10px;font-size:14px;cursor:pointer;display:flex;flex-direction:column;gap:1px" style-hover="background:var(--k-panel)"><span style="font-weight:600">Download .ldr</span><span style="font-size:12px;color:var(--k-muted)">Single flat model file</span></button>
+            <button style="text-align:left;border:0;background:transparent;color:var(--k-text);border-radius:9px;padding:9px 10px;font-size:14px;cursor:pointer;display:flex;flex-direction:column;gap:1px" style-hover="background:var(--k-panel)"><span style="font-weight:600">Download .mpd</span><span style="font-size:12px;color:var(--k-muted)">With 53 sub-builds</span></button>
+            <div style="height:1px;background:var(--k-line);margin:4px 6px"></div>
+            <a href="#" style="padding:8px 10px;font-size:13px;font-weight:500">Open model JSON</a>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+
+  <div style="flex:1;min-height:0;display:grid;grid-template-columns:{{ cols }};grid-template-rows:{{ rows }}">
+
+    <!-- SIDEBAR -->
+    <aside style="order:{{ sideOrder }};border-right:1px solid var(--k-line);border-top:{{ sideTop }};display:flex;flex-direction:column;min-height:0;max-height:{{ sideMaxH }}">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--k-line)">
+        <div style="display:inline-flex;gap:2px;background:var(--k-sunk);border-radius:11px;padding:3px">
+          <button onClick="{{ showChat }}" style="border:0;border-radius:8px;padding:6px 12px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;cursor:pointer;background:{{ chatTab.bg }};color:{{ chatTab.color }};box-shadow:{{ chatTab.shadow }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>Chat</button>
+          <button onClick="{{ showLib }}" style="border:0;border-radius:8px;padding:6px 12px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;cursor:pointer;background:{{ libTab.bg }};color:{{ libTab.color }};box-shadow:{{ libTab.shadow }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"></path><path d="M12 6v14"></path><path d="M8 8v12"></path><path d="M4 4v16"></path></svg>Library</button>
+        </div>
+      </div>
+
+      <sc-if value="{{ isLib }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;min-height:0;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--k-muted);padding:2px 2px 4px">SHOWCASE</span>
+          <sc-for list="{{ showcase }}" as="c" hint-placeholder-count="5">
+            <button onClick="{{ c.pick }}" style="text-align:left;display:flex;gap:12px;padding:9px;border-radius:12px;border:1px solid {{ c.border }};background:{{ c.bg }};color:var(--k-text);cursor:pointer" style-hover="border-color:var(--k-line2);background:var(--k-panel)">
+              <span style="width:68px;height:68px;border-radius:9px;background:var(--k-sunk);flex:none;display:grid;place-items:center;color:var(--k-muted)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></span>
+              <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <span style="font-size:14px;font-weight:600">{{ c.title }}</span>
+                <span style="font-size:12.5px;line-height:1.35;color:var(--k-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ c.desc }}</span>
+                <span style="font-size:12px;color:var(--k-muted)">{{ c.meta }}</span>
+              </span>
+            </button>
+          </sc-for>
+          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--k-muted);padding:14px 2px 4px;display:flex;align-items:center;gap:7px">SHARED BUILDS<span style="width:7px;height:7px;border-radius:999px;background:var(--k-green);box-shadow:0 0 0 3px color-mix(in srgb,var(--k-green) 22%,transparent)"></span></span>
+          <sc-for list="{{ shared }}" as="c" hint-placeholder-count="2">
+            <button onClick="{{ c.pick }}" style="text-align:left;display:flex;gap:12px;padding:9px;border-radius:12px;border:1px solid {{ c.border }};background:{{ c.bg }};color:var(--k-text);cursor:pointer" style-hover="border-color:var(--k-line2);background:var(--k-panel)">
+              <span style="width:48px;height:48px;border-radius:9px;background:var(--k-sunk);flex:none;display:grid;place-items:center;color:var(--k-muted)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></span>
+              <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                <span style="font-size:14px;font-weight:600">{{ c.title }}</span>
+                <span style="font-size:12px;color:var(--k-muted)">{{ c.by }}</span>
+                <span style="font-size:12px;color:var(--k-muted)">{{ c.meta }}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isChat }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="flex:1;min-height:0;overflow:auto;padding:16px 14px;display:flex;flex-direction:column;gap:14px">
+            <div style="align-self:flex-end;max-width:88%;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+              <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--k-line);border-radius:10px;padding:5px 8px 5px 5px;background:var(--k-win)">
+                <span style="width:30px;height:30px;border-radius:6px;background:var(--k-sunk)"></span>
+                <span style="font-size:12px;color:var(--k-muted)">canal-square.jpg</span>
+              </div>
+              <div style="background:var(--k-panel);border:1px solid var(--k-line);border-radius:14px 14px 4px 14px;padding:10px 12px;line-height:1.45">A canal-side town square with a tall clock tower, four step-gabled canal houses, a footbridge and a café terrace. Large, 48×48 base.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:94%">
+              <span style="line-height:1.5">Working on it. I'll split this into sub-builds — tower, four houses, bridge and square — so the manual stays readable.</span>
+              <div style="border:1px solid var(--k-line);border-radius:14px;background:var(--k-win);padding:12px;display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ tracker }}" as="t" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <sc-if value="{{ t.done }}" hint-placeholder-val="{{ true }}"><span style="width:18px;height:18px;border-radius:999px;background:var(--k-green);color:#fff;display:grid;place-items:center;flex:none"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span></sc-if>
+                    <sc-if value="{{ t.active }}" hint-placeholder-val="{{ false }}">{{ spinner }}</sc-if>
+                    <sc-if value="{{ t.todo }}" hint-placeholder-val="{{ false }}"><span style="width:18px;height:18px;border-radius:999px;border:1.5px solid var(--k-line2);box-sizing:border-box;flex:none"></span></sc-if>
+                    <span style="flex:1;font-weight:{{ t.weight }};color:{{ t.color }}">{{ t.label }}</span>
+                    <span style="font-size:12px;color:var(--k-muted)">{{ t.note }}</span>
+                  </div>
+                </sc-for>
+                <div style="display:flex;justify-content:space-between;border-top:1px solid var(--k-line);padding-top:9px;font-size:13px"><span style="color:var(--k-muted)">Running cost</span><span style="font-weight:600">$1.84 so far</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 14px 14px;border-top:1px solid var(--k-line)">
+            <div style="border:1px solid var(--k-line2);border-radius:14px;background:var(--k-win);padding:10px;display:flex;flex-direction:column;gap:8px">
+              <textarea placeholder="Describe what you want to build, or attach a photo…" style="border:0;resize:none;min-height:52px;font:inherit;font-size:14px;background:transparent;color:var(--k-text);outline:none"></textarea>
+              <div style="display:flex;align-items:center;gap:6px">
+                <button aria-label="Attach photo" style="width:32px;height:32px;border:0;border-radius:9px;background:transparent;color:var(--k-muted);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></button>
+                <div style="display:inline-flex;gap:2px;background:var(--k-sunk);border-radius:9px;padding:2px">
+                  <sc-for list="{{ sizes }}" as="s" hint-placeholder-count="3">
+                    <button onClick="{{ s.pick }}" style="border:0;border-radius:7px;padding:4px 9px;font-size:12px;font-weight:500;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};box-shadow:{{ s.shadow }}">{{ s.label }}</button>
+                  </sc-for>
+                </div>
+                <button aria-label="Build it" style="margin-left:auto;height:32px;border:0;border-radius:9px;background:var(--k-accent);color:#fff;display:flex;align-items:center;gap:6px;padding:0 12px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:var(--k-accent-h)">Build it<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </aside>
+
+    <!-- MAIN -->
+    <main style="order:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:12px;padding:12px 14px 14px">
+      <div role="tablist" style="display:flex;gap:4px;flex-wrap:wrap">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <button role="tab" onClick="{{ t.pick }}" style="border:1px solid {{ t.border }};border-radius:10px;padding:7px 13px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px;cursor:pointer;background:{{ t.bg }};color:{{ t.color }};box-shadow:{{ t.shadow }}" style-hover="color:var(--k-text)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg>{{ t.label }}<sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;box-sizing:border-box;border-radius:999px;background:var(--k-warn);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 5px">{{ t.badge }}</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+
+      <!-- MODEL -->
+      <sc-if value="{{ isModel }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;min-height:360px;position:relative;border-radius:16px;background:var(--k-panel);border:1px solid var(--k-line);display:grid;place-items:center;overflow:hidden">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--k-muted)">
+            <span style="font-size:17px;font-weight:600;color:var(--k-text)">3D viewer</span>
+            <span style="font-size:13px">three.js canvas · {{ viewLabel }} view</span>
+          </div>
+          <div style="position:absolute;top:12px;left:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <div style="display:flex;gap:2px;background:var(--k-win);border:1px solid var(--k-line);border-radius:12px;padding:3px;box-shadow:var(--k-shadow)">
+              <sc-for list="{{ views }}" as="v" hint-placeholder-count="3">
+                <button onClick="{{ v.pick }}" style="border:0;border-radius:9px;padding:6px 10px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;cursor:pointer;background:{{ v.bg }};color:var(--k-text)" style-hover="background:var(--k-sunk)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ v.icon }}"></path></svg>{{ v.label }}</button>
+              </sc-for>
+              <button aria-label="Full screen" style="width:32px;border:0;border-radius:9px;background:transparent;color:var(--k-text);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"></path><path d="M21 8V5a2 2 0 0 0-2-2h-3"></path><path d="M3 16v3a2 2 0 0 0 2 2h3"></path><path d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg></button>
+            </div>
+            <button onClick="{{ toggleSpin }}" aria-pressed="{{ spin }}" style="border:1px solid var(--k-line);border-radius:12px;padding:0 12px;height:40px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;cursor:pointer;background:{{ spinBg }};color:{{ spinColor }};box-shadow:var(--k-shadow)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"></path><circle cx="12" cy="12" r="3"></circle></svg>Spin</button>
+          </div>
+          <button style="position:absolute;top:12px;right:12px;height:40px;border:1px solid var(--k-line);border-radius:12px;padding:0 13px;background:var(--k-win);color:var(--k-accent-ink);font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;cursor:pointer;box-shadow:var(--k-shadow)" style-hover="background:var(--k-accent-soft)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.13-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.13a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.13 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.13a.5.5 0 0 1-.96 0z"></path></svg>Showcase</button>
+          <sc-if value="{{ problems }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;left:12px;bottom:12px;max-width:320px;background:var(--k-win);border:1px solid var(--k-line);border-radius:14px;box-shadow:var(--k-shadow);padding:12px 12px 12px 14px;display:flex;gap:10px;align-items:flex-start">
+              <span style="width:26px;height:26px;border-radius:8px;background:var(--k-warn-soft);color:var(--k-warn);display:grid;place-items:center;flex:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></span>
+              <div style="display:flex;flex-direction:column;gap:4px;flex:1">
+                <span style="font-weight:600">2 issues found</span>
+                <span style="font-size:13px;color:var(--k-muted);line-height:1.4">2 parts are floating on the clock tower. 1 weak connection on the footbridge. Shown in red.</span>
+              </div>
+              <button onClick="{{ dismiss }}" aria-label="Dismiss" style="width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:var(--k-muted);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid var(--k-line);border-radius:16px;background:var(--k-win);padding:10px 14px;box-shadow:var(--k-shadow)">
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onClick="{{ toStart }}" aria-label="Back to start" style="width:32px;height:32px;border:0;border-radius:999px;background:transparent;color:var(--k-muted);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><rect x="4" y="5" width="2.5" height="14"></rect></svg></button>
+            <button onClick="{{ togglePlay }}" aria-label="Play or pause" style="width:40px;height:40px;border:0;border-radius:999px;background:var(--k-accent);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 6px color-mix(in srgb,var(--k-accent) 40%,transparent)" style-hover="background:var(--k-accent-h)">
+              <sc-if value="{{ playing }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg></sc-if>
+              <sc-if value="{{ paused }}" hint-placeholder-val="{{ true }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="margin-left:2px"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></sc-if>
+            </button>
+            <button onClick="{{ toEnd }}" aria-label="Skip to end" style="width:32px;height:32px;border:0;border-radius:999px;background:transparent;color:var(--k-muted);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><rect x="17.5" y="5" width="2.5" height="14"></rect></svg></button>
+          </div>
+          <div style="display:flex;gap:2px;background:var(--k-panel);border:1px solid var(--k-line);border-radius:10px;padding:2px">
+            <sc-for list="{{ speeds }}" as="s" hint-placeholder-count="4">
+              <button onClick="{{ s.pick }}" style="border:0;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:500;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};box-shadow:{{ s.shadow }}">{{ s.label }}</button>
+            </sc-for>
+          </div>
+          <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><span style="font-weight:600">{{ playTitle }}</span><span style="font-size:13px;color:var(--k-muted)">{{ playMeta }}</span></div>
+            <input type="range" min="0" max="487" value="{{ progress }}" onChange="{{ scrub }}" aria-label="Build progress" style="width:100%;margin:0;height:18px">
+          </div>
+          <span style="border:1px solid var(--k-line2);border-radius:10px;padding:6px 11px;font-size:13px;font-weight:500;min-width:62px;text-align:center">{{ playLabel }}</span>
+        </div>
+      </sc-if>
+
+      <!-- MANUAL -->
+      <sc-if value="{{ isManual }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:2px;border:1px solid var(--k-line);border-radius:12px;padding:3px;background:var(--k-win);box-shadow:var(--k-shadow)">
+              <button onClick="{{ prevPage }}" aria-label="Previous page" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--k-text);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+              <span style="font-size:14px;font-weight:600;padding:0 8px;white-space:nowrap">Page {{ page }} of 326</span>
+              <button onClick="{{ nextPage }}" aria-label="Next page" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--k-text);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--k-muted)">Go to
+              <select value="{{ page }}" onChange="{{ goTo }}" style="height:40px;border:1px solid var(--k-line);border-radius:12px;padding:0 10px;font:inherit;font-size:14px;background:var(--k-win);color:var(--k-text);box-shadow:var(--k-shadow);max-width:260px;cursor:pointer">
+                <sc-for list="{{ gotoGroups }}" as="g" hint-placeholder-count="1">
+                  <optgroup label="{{ g.name }}">
+                    <sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="1"><option value="{{ o.v }}">{{ o.label }}</option></sc-for>
+                  </optgroup>
+                </sc-for>
+              </select>
+            </label>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+              <div style="display:flex;align-items:center;gap:2px;border:1px solid var(--k-line);border-radius:12px;padding:3px;background:var(--k-win);box-shadow:var(--k-shadow)">
+                <button onClick="{{ zoomOut }}" aria-label="Zoom out" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--k-text);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line><line x1="8" x2="14" y1="11" y2="11"></line></svg></button>
+                <button onClick="{{ zoomFit }}" style="height:34px;border:0;border-radius:9px;background:{{ fitBg }};color:var(--k-text);font-size:13px;font-weight:600;padding:0 12px;cursor:pointer" style-hover="background:var(--k-sunk)">{{ zoomLabel }}</button>
+                <button onClick="{{ zoomIn }}" aria-label="Zoom in" style="width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--k-text);display:grid;place-items:center;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line><line x1="11" x2="11" y1="8" y2="14"></line><line x1="8" x2="14" y1="11" y2="11"></line></svg></button>
+              </div>
+              <button style="height:40px;border:0;border-radius:12px;background:transparent;color:var(--k-text);font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px;padding:0 12px;cursor:pointer" style-hover="background:var(--k-sunk)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 13h4"></path><path d="M10 17h4"></path></svg>Manual PDF</button>
+            </div>
+          </div>
+
+          <div style="flex:1;min-height:320px;overflow:auto;background:var(--k-sunk);border:1px solid var(--k-line);border-radius:16px;padding:22px;display:flex;justify-content:center;align-items:flex-start">
+            <div data-screen-label="Manual page" style="width:{{ pageW }};max-width:{{ pageMaxW }};flex:none;aspect-ratio:1.42;background:#fdf7ea;box-shadow:0 1px 2px rgba(60,40,10,.08),0 12px 36px rgba(60,40,10,.14);position:relative;box-sizing:border-box;padding:3.4% 3.4% 0;display:flex;flex-direction:column;color:#2a2622;overflow:hidden">
+              <span style="align-self:flex-start;display:flex;align-items:center;gap:7px;background:#f3dfb2;color:#5e430f;border-radius:10px 10px 0 0;padding:6px 12px;font-size:13px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="10" width="18" height="9" rx="2"></rect><rect x="6" y="6" width="4" height="5" rx="1"></rect><rect x="14" y="6" width="4" height="5" rx="1"></rect></svg><b style="font-weight:700">Sub-build</b><span style="opacity:.6">·</span><span style="font-weight:600">{{ pageSub }}</span></span>
+              <div style="flex:1;min-height:0;position:relative;background:#f8ecd2;border:1px solid #eedcb4;border-radius:0 14px 14px 14px">
+                <span style="position:absolute;left:18px;top:10px;font-size:56px;font-weight:800;letter-spacing:-0.04em;line-height:1">{{ pageStep }}</span>
+                <div style="position:absolute;left:18px;top:82px;background:#e2e7ec;border-radius:10px;box-shadow:0 1px 3px rgba(40,50,60,.12);padding:14px;display:grid;grid-template-columns:repeat(2,auto);gap:14px 20px">
+                  <sc-for list="{{ pageParts }}" as="p" hint-placeholder-count="3">
+                    <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">
+                      <div style="height:48px;display:flex;align-items:flex-end">{{ p.art }}</div>
+                      <span style="display:flex;align-items:baseline;gap:5px"><b style="font-size:14px;font-weight:800">{{ p.qty }}×</b><span style="font-size:10px;color:#4b4f55">{{ p.size }}</span></span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="position:absolute;left:30%;right:14%;top:18%;bottom:12%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
+                  <div style="width:min(240px,70%);aspect-ratio:1;border-radius:18px;background:rgba(255,255,255,.35);border:1px solid rgba(94,67,15,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#7a6a52"><span style="font-size:15px;font-weight:600;color:#2a2622">Step render</span><span style="font-size:12px">isometric · three.js</span></div>
+                  <div style="width:min(260px,76%);height:26px;margin-top:-6px;border-radius:50%;background:radial-gradient(closest-side,rgba(90,60,20,.22),transparent)"></div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 2px 16px;font-size:12px;color:#6d6252"><span>Stone Castle<span style="opacity:.5;padding:0 6px">·</span>{{ pageSub }}</span><span><b style="font-size:14px;color:#2a2622">{{ page }}</b> / 326</span></div>
+              <div style="position:absolute;left:0;bottom:0;height:3px;width:{{ pagePct }};background:var(--k-accent)"></div>
+            </div>
+          </div>
+
+          <div ref="{{ thumbRef }}" style="display:flex;gap:10px;overflow-x:auto;padding:4px 2px 6px">
+            <sc-for list="{{ thumbs }}" as="t" hint-placeholder-count="10">
+              <button onClick="{{ t.pick }}" aria-label="{{ t.aria }}" style="flex:none;border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer">
+                <span style="width:84px;height:56px;box-sizing:border-box;border-radius:6px;border:{{ t.border }};background:#fdf7ea;position:relative;display:block;overflow:hidden">
+                  <span style="position:absolute;left:5px;top:4px;width:10px;height:4px;border-radius:1px;background:#e4cf9f"></span>
+                  <span style="position:absolute;left:5px;top:11px;width:14px;height:10px;border-radius:2px;background:#dde3e8"></span>
+                  <span style="position:absolute;left:36px;top:17px;width:{{ t.blob }};height:{{ t.blob }};border-radius:6px;background:#aeb2b5"></span>
+                </span>
+                <span style="font-size:12px;font-weight:{{ t.weight }};color:{{ t.color }}">{{ t.n }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PARTS -->
+      <sc-if value="{{ isParts }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;overflow:auto;border:1px solid var(--k-line);border-radius:16px;background:var(--k-win)">
+          <table style="width:100%;border-collapse:collapse;font-size:14px">
+            <thead><tr style="text-align:left;font-size:12px;color:var(--k-muted);background:var(--k-panel)"><th style="padding:10px 16px;font-weight:600">Part</th><th style="padding:10px 16px;font-weight:600">Colour</th><th style="padding:10px 16px;font-weight:600;text-align:right">Qty</th></tr></thead>
+            <sc-for list="{{ groups }}" as="g" hint-placeholder-count="5">
+              <tbody>
+                <tr><td colspan="2" style="padding:14px 16px 6px;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--k-muted);border-top:1px solid var(--k-line)">{{ g.name }}</td><td style="padding:14px 16px 6px;text-align:right;font-size:12px;color:var(--k-muted);border-top:1px solid var(--k-line)">{{ g.sum }}</td></tr>
+                <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+                  <tr><td style="padding:7px 16px">{{ r.name }}</td><td style="padding:7px 16px"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:16px;height:12px;border-radius:4px;background:{{ r.hex }};box-shadow:0 0 0 1px rgba(0,0,0,.12)"></span>{{ r.colour }}</span></td><td style="padding:7px 16px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums">{{ r.qty }}</td></tr>
+                </sc-for>
+              </tbody>
+            </sc-for>
+            <tfoot><tr><td colspan="2" style="padding:12px 16px;border-top:1px solid var(--k-line2);font-weight:700;background:var(--k-panel)">Total pieces</td><td style="padding:12px 16px;border-top:1px solid var(--k-line2);text-align:right;font-weight:700;font-size:16px;background:var(--k-panel)">{{ totalPieces }}</td></tr></tfoot>
+          </table>
+        </div>
+      </sc-if>
+
+      <!-- DESIGN -->
+      <sc-if value="{{ isDesign }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:grid;grid-template-columns:{{ manualCols }};gap:12px">
+          <div style="border:1px solid var(--k-line);border-radius:16px;background:var(--k-panel);padding:14px;overflow:auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;line-height:1.65;white-space:pre;color:var(--k-text)">{{ json }}</div>
+          <div style="border:1px solid var(--k-line);border-radius:16px;background:var(--k-win);padding:14px;display:flex;flex-direction:column;gap:6px;overflow:auto">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--k-muted);padding-bottom:4px">SUB-BUILDS · 53</span>
+            <sc-for list="{{ subBuilds }}" as="b" hint-placeholder-count="6">
+              <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--k-line)"><span>{{ b.name }}</span><span style="color:var(--k-muted)">{{ b.n }}</span></div>
+            </sc-for>
+            <a href="#" style="padding-top:8px;font-size:13px;font-weight:500">Open model JSON</a>
+          </div>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;}}">
+class Component extends DCLogic {
+  state = { page: 161, zoom: 1, side: 'library', tab: 'manual', playing: false, speed: 4, progress: 487, step: 212, spin: true, view: '3/4', problems: true, size: 'Large', theme: null, dl: false, sel: 'Stone Castle', w: 1400 };
+  C = {
+    tan: ['Tan', '#d8c08c'], dbg: ['Dark bluish grey', '#62676c'], lg: ['Light grey', '#a8adb0'], sb: ['Sand blue', '#6f86a3'],
+    white: ['White', '#f4f3ef'], dg: ['Dark green', '#2f6b3d'], tlb: ['Trans light blue', '#9fd6e6'], dr: ['Dark red', '#8c2a25'],
+    sg: ['Sand green', '#8fb09a'], rb: ['Reddish brown', '#6e4029']
+  };
+  G = [
+    ['BRICKS', [['Brick 1×2', 'tan', 312], ['Brick 1×2', 'dbg', 268], ['Brick 1×1', 'lg', 214], ['Brick 1×4', 'sb', 148], ['Brick 2×4', 'dbg', 96]]],
+    ['PLATES', [['Plate 1×2', 'tan', 286], ['Plate 1×4', 'white', 196], ['Plate 2×2', 'lg', 174], ['Plate 1×1', 'dg', 132], ['Baseplate 48×48', 'lg', 1]]],
+    ['TILES', [['Tile 1×2', 'tan', 240], ['Tile 2×2', 'tlb', 118], ['Tile 1×1 round', 'dr', 96]]],
+    ['SLOPES', [['Slope 45° 2×1', 'dr', 164], ['Slope 45° 2×2', 'sg', 122], ['Slope 30° 1×1', 'sg', 88]]],
+    ['SPECIALS', [['Window 1×2×2', 'white', 142], ['Round plate 2×2', 'dg', 64], ['Door 1×4×5', 'rb', 12], ['Clock face 2×2', 'white', 1]]]
+  ];
+  showcase = [
+    ['Alpine Chalet', 'A two-storey chalet with a stone ground floor, log walls and a wide dark red roof over the balcony.', 611, 118],
+    ['Canal Clock Square', 'A canal-side town square with a tall clock tower, four step-gabled houses, a footbridge and a café terrace.', 2874, 487],
+    ['Friendly Robot', 'A cheerful robot with a screen face, pixel eyes and claw hands, standing on a small base.', 298, 69],
+    ['Harbour Lighthouse', 'A striped lighthouse on a rocky point, with a keeper’s cottage and a small jetty.', 557, 137],
+    ['Retro Rocket', 'A 1950s-style rocket on four swept fins, waiting on a striped launch pad.', 418, 90],
+    ['Sunset Mosaic', 'A standing brick mosaic of a harbour at sunset with a sailboat drifting past.', 369, 73],
+    ['Vintage Camper Van', 'A chunky camper van parked on the beach, with a surfboard on the roof.', 334, 86]
+  ];
+  componentDidMount() {
+    this.onR = () => this.setState({ w: window.innerWidth });
+    this.onR(); window.addEventListener('resize', this.onR);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); clearInterval(this.t); }
+  play() {
+    clearInterval(this.t);
+    if (this.state.progress >= 487) this.setState({ progress: 0 });
+    this.setState({ playing: true });
+    this.t = setInterval(() => this.setState(s => {
+      const p = Math.min(487, s.progress + s.speed);
+      if (p >= 487) { clearInterval(this.t); return { progress: 487, playing: false }; }
+      return { progress: p };
+    }), 120);
+  }
+  SB = [['Base & moat', 1, 48], ['Curtain wall', 49, 102], ['Gatehouse', 103, 135], ['Watchtower', 136, 175], ['Keep', 176, 240], ['Great hall', 241, 290], ['Banners & finishing', 291, 326]];
+  sbOf(p) { const b = this.SB.find(x => p >= x[1] && p <= x[2]); return { name: b[0], step: p - b[1] + 1 }; }
+  shade(hex, f) { const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.max(0, Math.min(255, Math.round(v * f)))); return 'rgb(' + c.join(',') + ')'; }
+  brick(w, d, hex) {
+    const h = React.createElement, U = 8, H = 10, c = 0.866, s = 0.5;
+    const P = (x, y, z) => [(x - y) * c * U, (x + y) * s * U - z];
+    const pts = a => a.map(p => p.join(',')).join(' ');
+    const all = [P(0,0,H+3),P(w,0,H+3),P(0,d,H+3),P(w,d,0),P(w,0,0),P(0,d,0)];
+    const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
+    const minX = Math.min(...xs) - 3, minY = Math.min(...ys) - 3, W = Math.max(...xs) - minX + 3, Hh = Math.max(...ys) - minY + 3;
+    const kids = [
+      h('polygon', { key: 'r', points: pts([P(w,0,H),P(w,d,H),P(w,d,0),P(w,0,0)]), fill: this.shade(hex, .72) }),
+      h('polygon', { key: 'l', points: pts([P(0,d,H),P(w,d,H),P(w,d,0),P(0,d,0)]), fill: this.shade(hex, .86) }),
+      h('polygon', { key: 't', points: pts([P(0,0,H),P(w,0,H),P(w,d,H),P(0,d,H)]), fill: hex })
+    ];
+    for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) {
+      const [x, y] = P(i + .5, j + .5, H), rx = U * .3 * 1.2, ry = U * .3 * .7;
+      kids.push(h('rect', { key: 's' + i + j, x: x - rx, y: y - 3, width: rx * 2, height: 3, fill: this.shade(hex, .8) }), h('ellipse', { key: 'b' + i + j, cx: x, cy: y, rx, ry, fill: this.shade(hex, .8) }), h('ellipse', { key: 'e' + i + j, cx: x, cy: y - 3, rx, ry, fill: this.shade(hex, 1.08) }));
+    }
+    return h('svg', { width: W, height: Hh, viewBox: [minX, minY, W, Hh].join(' '), style: { display: 'block', maxHeight: 48, width: 'auto' } }, kids);
+  }
+  manualVals(s) {
+    const p = s.page, sb = this.sbOf(p), T = 326, grey = '#a3a7ab';
+    const parts = p === 161 ? [[2, 4, 2], [2, 3, 2], [1, 4, 1]] : [[2, 2 + (p % 3), 1 + (p % 3)], [1, 1 + (p % 4), 1 + (p % 2)]];
+    const zooms = [0.6, 0.8, 1, 1.25, 1.5], zi = zooms.indexOf(s.zoom);
+    if (!this.art) this.art = {};
+    return {
+      page: p, pageSub: sb.name, pageStep: sb.step, pagePct: (p / T * 100).toFixed(1) + '%',
+      prevPage: () => this.setState({ page: Math.max(1, p - 1) }), nextPage: () => this.setState({ page: Math.min(T, p + 1) }),
+      goTo: e => this.setState({ page: +e.target.value }),
+      gotoGroups: this.gg || (this.gg = this.SB.map(([name, a, b]) => ({ name, opts: Array.from({ length: b - a + 1 }, (_, k) => ({ v: a + k, label: (a + k) + '. ' + name + ' · step ' + (k + 1) })) }))),
+      zoomIn: () => this.setState({ zoom: zooms[Math.min(zooms.length - 1, zi + 1)] }), zoomOut: () => this.setState({ zoom: zooms[Math.max(0, zi - 1)] }), zoomFit: () => this.setState({ zoom: 1 }),
+      zoomLabel: s.zoom === 1 ? 'Fit' : Math.round(s.zoom * 100) + '%', fitBg: s.zoom === 1 ? 'var(--k-sunk)' : 'transparent',
+      pageW: s.zoom <= 1 ? '100%' : (s.zoom * 100) + '%', pageMaxW: s.zoom <= 1 ? Math.round(980 * s.zoom) + 'px' : 'none',
+      pageParts: parts.map(([w, d, q]) => { const k = w + 'x' + d; return { qty: q, size: w + '×' + d, art: this.art[k] || (this.art[k] = this.brick(d, w, grey)) }; }),
+      thumbs: this.thumbList || (this.thumbList = Array.from({ length: T }, (_, i) => i + 1)).map(n => ({ n, aria: 'Page ' + n, blob: (14 + (n % 5) * 2) + 'px',
+        border: n === p ? '2px solid var(--k-accent)' : '1px solid var(--k-line2)', weight: n === p ? 700 : 400, color: n === p ? 'var(--k-accent-ink)' : 'var(--k-muted)', pick: () => this.setState({ page: n }) })),
+      thumbRef: this.tr || (this.tr = el => { this.thumbEl = el; this.scrollThumbs(true); })
+    };
+  }
+  scrollThumbs(force) {
+    const el = this.thumbEl; if (!el || (!force && this.lastP === this.state.page)) return;
+    this.lastP = this.state.page; el.scrollLeft = (this.state.page - 1) * 94 - el.clientWidth / 2 + 42;
+  }
+  componentDidUpdate() { this.scrollThumbs(false); }
+  stepList(n) {
+    if (n === 212) return [['Brick 1×1', 'lg', 6], ['Slope 45° 2×2', 'sg', 4], ['Window 1×2×2', 'white', 2], ['Clock face 2×2', 'white', 1]].map(this.row);
+    const pool = this.G.flatMap(g => g[1]).filter(p => p[2] > 20);
+    return [0, 1, 2].map(k => { const p = pool[(n * (k + 2)) % pool.length]; return this.row([p[0], p[1], 1 + ((n + k) % 5)]); });
+  }
+  row = ([name, c, qty]) => ({ name, colour: this.C[c][0], hex: this.C[c][1], qty });
+  renderVals() {
+    const s = this.state, theme = s.theme ?? this.props.theme ?? 'light';
+    const narrow = s.w < 960;
+    const on = { bg: 'var(--k-win)', color: 'var(--k-text)', shadow: 'var(--k-shadow)', border: 'var(--k-line)' };
+    const off = { bg: 'transparent', color: 'var(--k-muted)', shadow: 'none', border: 'transparent' };
+    const fmt = n => n.toLocaleString('en-US');
+    const I = {
+      model: 'M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16ZM3.3 7l8.7 5 8.7-5M12 22V12',
+      manual: 'M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20',
+      parts: 'M4 10h16v10H4zM7 10V7h4v3M13 10V7h4v3',
+      design: 'm16 18 6-6-6-6M8 6l-6 6 6 6',
+      front: 'M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 9h18',
+      top: 'M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 9h18M3 15h18M9 3v18M15 3v18'
+    };
+    const stepParts = this.stepList(s.step);
+    const trk = [['Designing', 'done', '14 sub-builds'], ['Checking connections', 'done', '2,874 parts'], ['Repair round 2 of 4', 'active', 'fixing 3 parts'], ['Done', 'todo', '']];
+    const finished = s.progress >= 487;
+    return {
+      theme, pagePad: narrow ? '0' : '28px', appH: narrow ? 'auto' : 'calc(100vh - 56px)',
+      cols: narrow ? 'minmax(0,1fr)' : '340px minmax(0,1fr)', rows: narrow ? 'auto auto' : 'minmax(0,1fr)',
+      sideOrder: narrow ? 2 : 0, sideTop: narrow ? '1px solid var(--k-line)' : '0', sideMaxH: narrow ? '640px' : 'none',
+      manualCols: narrow ? 'minmax(0,1fr)' : 'minmax(0,1.6fr) minmax(300px,1fr)',
+      toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+      badges: [['2,057', 'pieces'], ['319', 'steps'], ['11', 'sub-builds'], ['96×96', 'studs']].map(([n, l]) => ({ n, l })),
+      dlOpen: s.dl, toggleDl: () => this.setState({ dl: !s.dl }),
+      isLib: s.side === 'library', isChat: s.side === 'chat',
+      chatTab: s.side === 'chat' ? on : off, libTab: s.side === 'library' ? on : off,
+      showChat: () => this.setState({ side: 'chat' }), showLib: () => this.setState({ side: 'library' }),
+      showcase: this.showcase.map(([title, desc, p, st]) => ({ title, desc, meta: `${fmt(p)} pieces · ${st} steps`,
+        border: s.sel === title ? 'var(--k-accent)' : 'var(--k-line)', bg: s.sel === title ? 'var(--k-accent-soft)' : 'var(--k-win)',
+        pick: () => this.setState({ sel: title }) })),
+      shared: [{ title: 'Stone Castle', by: 'From Claude · 1 min ago', meta: '2,057 pieces' }, { title: 'Hummingbird', by: 'From Claude · 6 min ago', meta: '412 pieces' }].map(c => ({ ...c, border: s.sel === c.title ? 'var(--k-accent)' : 'var(--k-line)', bg: s.sel === c.title ? 'var(--k-accent-soft)' : 'var(--k-win)', pick: () => this.setState({ sel: c.title }) })),
+      ...this.manualVals(s),
+      tracker: trk.map(([label, st, note]) => ({ label, note, done: st === 'done', active: st === 'active', todo: st === 'todo', weight: st === 'active' ? 600 : 400, color: st === 'todo' ? 'var(--k-muted)' : 'var(--k-text)' })),
+      spinner: this.sp || (this.sp = React.createElement('span', { style: { width: 18, height: 18, borderRadius: 999, border: '2px solid var(--k-accent-soft)', borderTopColor: 'var(--k-accent)', boxSizing: 'border-box', flex: 'none', animation: 'kSpin .8s linear infinite' } })),
+      sizes: ['Small', 'Medium', 'Large'].map(label => ({ label, ...(s.size === label ? on : off), pick: () => this.setState({ size: label }) })),
+      tabs: [['model', 'Model'], ['manual', 'Manual'], ['parts', 'Parts'], ['design', 'Design']].map(([k, label]) => ({ label, icon: I[k], hasBadge: k === 'design', badge: 4, ...(s.tab === k ? on : off), pick: () => this.setState({ tab: k }) })),
+      isModel: s.tab === 'model', isManual: s.tab === 'manual', isParts: s.tab === 'parts', isDesign: s.tab === 'design',
+      views: [['3/4', I.model], ['Front', I.front], ['Top', I.top]].map(([label, icon]) => ({ label, icon, bg: s.view === label ? 'var(--k-sunk)' : 'transparent', pick: () => this.setState({ view: label }) })),
+      viewLabel: s.view, spin: s.spin, toggleSpin: () => this.setState({ spin: !s.spin }),
+      spinBg: s.spin ? 'var(--k-accent-soft)' : 'var(--k-win)', spinColor: s.spin ? 'var(--k-accent-ink)' : 'var(--k-text)',
+      problems: s.problems, dismiss: () => this.setState({ problems: false }),
+      playing: s.playing, paused: !s.playing,
+      togglePlay: () => s.playing ? (clearInterval(this.t), this.setState({ playing: false })) : this.play(),
+      toStart: () => { clearInterval(this.t); this.setState({ progress: 0, playing: false }); },
+      toEnd: () => { clearInterval(this.t); this.setState({ progress: 487, playing: false }); },
+      speeds: [0.5, 1, 2, 4].map(v => ({ label: v + '×', ...(s.speed === v ? on : off), pick: () => this.setState({ speed: v }) })),
+      progress: s.progress, scrub: e => { clearInterval(this.t); this.setState({ progress: +e.target.value, playing: false }); },
+      playTitle: finished ? 'Finished model' : `Building · step ${Math.max(1, Math.round(s.progress))}`,
+      playMeta: finished ? '2,874 pieces · 487 steps' : `${fmt(Math.round(2874 * s.progress / 487))} of 2,874 pieces`,
+      playLabel: finished ? 'Finished' : `${Math.round(s.progress / 487 * 100)}%`,
+      step: s.step, stepPct: (s.step / 487 * 100).toFixed(1) + '%', subBuild: s.step >= 190 && s.step <= 240 ? 'Clock tower' : 'Canal house 2',
+      prevStep: () => this.setState({ step: Math.max(1, s.step - 1) }), nextStep: () => this.setState({ step: Math.min(487, s.step + 1) }),
+      stepParts, stepCount: stepParts.reduce((a, p) => a + p.qty, 0),
+      groups: this.G.map(([name, rows]) => ({ name, sum: fmt(rows.reduce((a, r) => a + r[2], 0)), rows: rows.map(this.row).map(r => ({ ...r, qty: fmt(r.qty) })) })),
+      totalPieces: fmt(this.G.flatMap(g => g[1]).reduce((a, r) => a + r[2], 0)),
+      subBuilds: [['Base & canal', 412], ['Clock tower', 538], ['Canal house 1', 301], ['Canal house 2', 296], ['Canal house 3', 318], ['Canal house 4', 284], ['Footbridge', 96], ['Café terrace', 188]].map(([name, n]) => ({ name, n: fmt(n) })),
+      json: '{\n  "name": "Canal Clock Square",\n  "studs": [48, 48],\n  "pieces": 2874,\n  "steps": 487,\n  "subBuilds": [\n    { "id": "tower", "pieces": 538,\n      "steps": [190, 240] },\n    { "id": "house-1", "pieces": 301 },\n    …\n  ],\n  "issues": [\n    { "type": "floating", "parts": 2 },\n    { "type": "weak", "parts": 1 }\n  ]\n}'
+    };
+  }
+}
+</script>
+</body>
+</html>

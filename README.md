@@ -1,4 +1,4 @@
-# Brick Builder
+# BrickForge (Brick Builder)
 
 Local web app that turns a text description or a photo into a buildable model made of generic interlocking bricks. Claude (`claude-opus-5-5`) designs the model on a stud grid. A validator checks it is physically buildable, and errors go back to Claude until the model is valid. The app shows the model in 3D, with step-by-step instructions, a parts list and LDraw export.
 
@@ -18,12 +18,26 @@ npm run dev                                         # http://localhost:3000
 | `npm test` | Unit tests (validator, steps, LDraw export, repair loop with a fake Claude) |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
+| `npm run gen -- --size small "a rubber duck"` | Target size: `small`, `medium` or `large` (the same choice as the size buttons in the chat) |
 | `npm run verify-ldraw` | Check every part in the library against the official LDraw library (needs `ldraw-lib/`, see below) |
 | `npm run export-sample` | Export the hand-built sample models to `exports/` |
 | `scripts/leocad-render.sh exports/X.ldr [out.png] [step]` | Render an export with LeoCAD (flatpak `org.leocad.LeoCAD`) to confirm it opens |
 
 LDraw library for `verify-ldraw` and LeoCAD rendering:
 `mkdir ldraw-lib && curl -L https://library.ldraw.org/library/updates/complete.zip -o ldraw-lib/complete.zip && (cd ldraw-lib && unzip -q complete.zip)`
+
+## The app
+
+The UI follows `design/brickforge-v2.html`.
+- **Chat:** describe a model or attach a photo, pick a size, and build. Progress and repair rounds show inline with a running cost.
+- **Library:** your saved runs from `debug/` and any `.ldr` files in `exports/`. `.ldr` files are read back with `src/lib/ldraw/import.ts`.
+- **Tabs:**
+  - **Model:** 3D view with 3/4, front and top cameras, full screen and spin. It includes the Issues card (errors outlined in red, warnings in amber) and a playback bar that animates the build step by step.
+  - **Manual:** step-by-step instructions.
+  - **Parts:** parts list grouped by category.
+  - **Design:** the model JSON plus stats.
+- **Other:** dark mode, and the Download menu (.ldr, .mpd, Open model JSON).
+- **Not built yet:** undo/redo, versions, Save, Showcase, editing a model from the chat, sub-builds and shared builds are disabled placeholders.
 
 ## Where to tune things
 

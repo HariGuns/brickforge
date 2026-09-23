@@ -1,8 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generateModel, type GenerateEvent, type ImageMediaType } from "@/lib/claude/generate";
+import type { BuildSize } from "@/lib/prompts/design";
 
 const IMAGE_TYPES: ImageMediaType[] = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const SIZES: BuildSize[] = ["small", "medium", "large"];
 
 function friendly(err: unknown): string {
   if (err instanceof Anthropic.AuthenticationError) return "The Anthropic API key was rejected. Check ANTHROPIC_API_KEY in .env.local.";
@@ -12,9 +14,9 @@ function friendly(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
-/** POST { text?, image?: { mediaType, data(base64) } } → text/event-stream of GenerateEvent. */
+/** POST { text?, image?: { mediaType, data(base64) }, size? } → text/event-stream of GenerateEvent. */
 export async function POST(req: Request) {
-  let body: { text?: string; image?: { mediaType: string; data: string } };
+  let body: { text?: string; image?: { mediaType: string; data: string }; size?: string };
   try {
     body = await req.json();
   } catch {
@@ -28,6 +30,7 @@ export async function POST(req: Request) {
     image = { mediaType: body.image.mediaType as ImageMediaType, data: body.image.data };
   }
   if (!text?.trim() && !image) return Response.json({ error: "Provide a description or a photo" }, { status: 400 });
+  const size = SIZES.includes(body.size as BuildSize) ? (body.size as BuildSize) : undefined;
 
   const encoder = new TextEncoder();
   const abort = new AbortController();
@@ -43,7 +46,7 @@ export async function POST(req: Request) {
         }
       };
       try {
-        await generateModel({ text, image }, send, { signal: abort.signal });
+        await generateModel({ text, image, size }, send, { signal: abort.signal });
       } catch (err) {
         if (!abort.signal.aborted) {
           console.error("[generate] failed:", err);

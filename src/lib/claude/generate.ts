@@ -3,7 +3,7 @@ import { CONFIG } from "../config";
 import { BrickModelSchema, type BrickModel } from "../model/schema";
 import { brickModelJsonSchema } from "../model/jsonSchema";
 import { systemPrompt } from "../prompts/system";
-import { photoDesignPrompt, textDesignPrompt } from "../prompts/design";
+import { photoDesignPrompt, textDesignPrompt, type BuildSize } from "../prompts/design";
 import { repairPrompt } from "../prompts/repair";
 import { validate, type Issue, type ValidationResult } from "../validate/validator";
 import { buildSteps, type BuildStep } from "../steps/steps";
@@ -15,6 +15,7 @@ export type ImageMediaType = "image/jpeg" | "image/png" | "image/webp" | "image/
 export interface GenerateInput {
   text?: string;
   image?: { mediaType: ImageMediaType; data: string /* base64 */ };
+  size?: BuildSize;
 }
 
 export interface RoundSummary {
@@ -91,8 +92,8 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
   onEvent({ type: "start", debugDir: debug.dir });
 
   const system = systemPrompt();
-  const firstText = input.image ? photoDesignPrompt(input.text) : textDesignPrompt(input.text!);
-  debug.write("input.json", { text: input.text ?? null, hasImage: !!input.image, config: CONFIG });
+  const firstText = input.image ? photoDesignPrompt(input.text, input.size) : textDesignPrompt(input.text!, input.size);
+  debug.write("input.json", { text: input.text ?? null, size: input.size ?? null, hasImage: !!input.image, config: CONFIG });
   debug.write("system-prompt.md", system);
   if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
 

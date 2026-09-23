@@ -19,9 +19,16 @@ export interface ViewerProps {
   highlight?: Set<number>;
   /** Indices with validation errors (outlined in red). */
   errorParts?: Set<number>;
+  /** Indices with warnings (outlined in amber). */
+  warnParts?: Set<number>;
   /** Changes to this value re-fit the camera. */
   fitKey?: string;
+  view?: CameraView;
+  spin?: boolean;
+  theme?: "light" | "dark";
 }
+
+export type CameraView = "3/4" | "front" | "top";
 
 const materialCache = new Map<string, THREE.MeshStandardMaterial>();
 function material(colorId: string, variant: "normal" | "highlight"): THREE.MeshStandardMaterial {
@@ -46,8 +53,9 @@ function material(colorId: string, variant: "normal" | "highlight"): THREE.MeshS
 const edgeMat = new THREE.LineBasicMaterial({ color: "#000000", transparent: true, opacity: 0.25 });
 const highlightEdgeMat = new THREE.LineBasicMaterial({ color: "#ffb000" });
 const errorEdgeMat = new THREE.LineBasicMaterial({ color: "#ff2d2d" });
+const warnEdgeMat = new THREE.LineBasicMaterial({ color: "#f2a900" });
 
-function Parts({ model, visible, highlight, errorParts }: ViewerProps) {
+function Parts({ model, visible, highlight, errorParts, warnParts }: ViewerProps) {
   if (!model) return null;
   return (
     <group>
@@ -60,10 +68,11 @@ function Parts({ model, visible, highlight, errorParts }: ViewerProps) {
         const fp = footprint(pl, def);
         const hi = highlight?.has(i) ?? false;
         const err = errorParts?.has(i) ?? false;
+        const warn = !err && (warnParts?.has(i) ?? false);
         return (
           <group key={i} position={[fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2]} rotation={[0, (-pl.rot * Math.PI) / 180, 0]}>
             <mesh geometry={geo} material={material(pl.color, hi ? "highlight" : "normal")} castShadow receiveShadow />
-            <lineSegments geometry={edges} material={err ? errorEdgeMat : hi ? highlightEdgeMat : edgeMat} />
+            <lineSegments geometry={edges} material={err ? errorEdgeMat : hi ? highlightEdgeMat : warn ? warnEdgeMat : edgeMat} />
           </group>
         );
       })}
@@ -84,26 +93,34 @@ function bounds(model: BrickModel | null): THREE.Box3 {
   return box;
 }
 
-function CameraFit({ model, fitKey, controls }: { model: BrickModel | null; fitKey?: string; controls: React.RefObject<OrbitControlsImpl | null> }) {
+function CameraFit({ model, fitKey, view, controls }: { model: BrickModel | null; fitKey?: string; view: CameraView; controls: React.RefObject<OrbitControlsImpl | null> }) {
   const { camera } = useThree();
   useEffect(() => {
     const box = bounds(model);
     const center = box.getCenter(new THREE.Vector3());
     const radius = box.getSize(new THREE.Vector3()).length() / 2;
     const dist = Math.max(radius * 2.6, 6);
-    camera.position.set(center.x + dist * 0.65, center.y + dist * 0.55, center.z + dist * 0.75);
+    const offset =
+      view === "front" ? new THREE.Vector3(0, dist * 0.12, dist) : view === "top" ? new THREE.Vector3(0, dist, 0.001) : new THREE.Vector3(dist * 0.65, dist * 0.55, dist * 0.75);
+    camera.position.copy(center).add(offset);
     camera.near = 0.05;
     camera.far = dist * 20;
     camera.updateProjectionMatrix();
     controls.current?.target.copy(center);
     controls.current?.update();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fitKey]);
+  }, [fitKey, view]);
   return null;
 }
 
+const SCENE = {
+  light: { bg: "#f4f5f3", grid1: "#c9cec7", grid2: "#dfe2dd", shadow: 0.18 },
+  dark: { bg: "#202321", grid1: "#3f4541", grid2: "#2d312e", shadow: 0.45 },
+};
+
 export default function Viewer(props: ViewerProps) {
   const controls = useRef<OrbitControlsImpl | null>(null);
+  const scene = SCENE[props.theme ?? "light"];
   const box = useMemo(() => bounds(props.model), [props.model]);
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
@@ -111,7 +128,7 @@ export default function Viewer(props: ViewerProps) {
 
   return (
     <Canvas shadows="percentage" camera={{ fov: 40, position: [20, 16, 24] }} gl={{ antialias: true, preserveDrawingBuffer: true }}>
-      <color attach="background" args={["#eef1f5"]} />
+      <color attach="background" args={[scene.bg]} />
       <hemisphereLight args={["#ffffff", "#8a8f99", 0.9]} />
       <directionalLight
         position={[center.x + 30, 60, center.z + 40]}
@@ -124,14 +141,14 @@ export default function Viewer(props: ViewerProps) {
         shadow-camera-bottom={-gridSize}
       />
       <directionalLight position={[center.x - 30, 20, center.z - 20]} intensity={0.4} />
-      <gridHelper args={[gridSize, gridSize, "#b8c0cc", "#d5dae2"]} position={[Math.round(center.x), -0.001, Math.round(center.z)]} />
+      <gridHelper key={props.theme} args={[gridSize, gridSize, scene.grid1, scene.grid2]} position={[Math.round(center.x), -0.001, Math.round(center.z)]} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[center.x, -0.002, center.z]} receiveShadow>
         <planeGeometry args={[gridSize, gridSize]} />
-        <shadowMaterial opacity={0.18} />
+        <shadowMaterial opacity={scene.shadow} />
       </mesh>
       <Parts {...props} />
-      <OrbitControls ref={controls} makeDefault enableDamping />
-      <CameraFit model={props.model} fitKey={props.fitKey} controls={controls} />
+      <OrbitControls ref={controls} makeDefault enableDamping autoRotate={!!props.spin} autoRotateSpeed={1.2} />
+      <CameraFit model={props.model} fitKey={props.fitKey} view={props.view ?? "3/4"} controls={controls} />
     </Canvas>
   );
 }
