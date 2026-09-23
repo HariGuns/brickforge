@@ -59,6 +59,8 @@ Colors: ${colorList()}
 - Use slopes for roofs, noses and tapers; plates for thin details and fine height steps; tiles for smooth tops.
 - Aim for a recognizable, well-proportioned shape. Typical size: 8–32 studs in the largest horizontal dimension, 40–${Math.min(250, maxParts)} parts. Prefer larger parts where they don't hurt the shape.
 - Pick colors that match the subject; use color to show features (windows, wheels, eyes, stripes).
+- The model is viewed from every side, so close off openings you didn't intend. A slope only fills its own footprint: under a pitched roof, the triangular gable ends stay open unless you fill them with stepped bricks (or sideways-facing slopes). Hollow interiors are fine where they can't be seen.
+- Make defining features stand out in the silhouette, e.g. wheels should stick out below and past the sides of a vehicle body rather than hide underneath it.
 
 Before answering, check your own placement layer by layer against the rules above: overlaps, the stud under every part, and bonding across seams.
 
