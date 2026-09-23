@@ -3,9 +3,35 @@
 import { useEffect, useRef, useState } from "react";
 import type { BrickModel } from "@/lib/model/schema";
 import type { ModelStats } from "@/lib/model/stats";
+import type { Version } from "@/lib/builds/doc";
 import * as I from "./icons";
 
-const SOON = "Coming soon";
+export type SaveState = "none" | "dirty" | "saving" | "saved";
+
+const mod = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl+";
+
+function ago(iso: string): string {
+  const s = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.round(s / 60)} min ago`;
+  if (s < 86400) return `${Math.round(s / 3600)} h ago`;
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+/** Closes a popover on outside click or Escape. */
+function useDismiss(open: boolean, ref: React.RefObject<HTMLElement | null>, close: () => void) {
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && close();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open, ref, close]);
+}
 
 export function TopBar(props: {
   model: BrickModel | null;
@@ -16,24 +42,24 @@ export function TopBar(props: {
   onToggleTheme: () => void;
   onDownload: (kind: "ldr" | "mpd") => void;
   onOpenJson: (file: File) => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  versions: Version[];
+  currentVersionId: string | null;
+  onRestore: (id: string) => void;
+  saveState: SaveState;
+  onSave: () => void;
 }) {
   const { model, stats } = props;
   const [open, setOpen] = useState(false);
+  const [versionsOpen, setVersionsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const versionsRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (e: MouseEvent | KeyboardEvent) => {
-      if (e instanceof KeyboardEvent ? e.key === "Escape" : !menuRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", close);
-    document.addEventListener("keydown", close);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("keydown", close);
-    };
-  }, [open]);
+  useDismiss(open, menuRef, () => setOpen(false));
+  useDismiss(versionsOpen, versionsRef, () => setVersionsOpen(false));
 
   const fmt = (n: number) => n.toLocaleString("en-US");
   const badges = stats
@@ -66,19 +92,53 @@ export function TopBar(props: {
         </div>
       )}
       <div className="top-actions">
-        <button className="icon-btn" aria-label="Undo" title={`Undo · ${SOON}`} disabled>
+        <button className="icon-btn" aria-label="Undo" title={`Undo (${mod}Z)`} onClick={props.onUndo} disabled={!props.canUndo}>
           <I.Undo />
         </button>
-        <button className="icon-btn" aria-label="Redo" title={`Redo · ${SOON}`} disabled>
+        <button className="icon-btn" aria-label="Redo" title={`Redo (${mod}Shift+Z)`} onClick={props.onRedo} disabled={!props.canRedo}>
           <I.Redo />
         </button>
-        <button className="text-btn" title={`Versions · ${SOON}`} disabled>
-          <I.History />
-          <span className="lbl">Versions</span>
-        </button>
-        <button className="text-btn" title={`Save · ${SOON}`} disabled>
-          <I.Upload />
-          <span className="lbl">Save</span>
+        <div className="menu-anchor" ref={versionsRef} style={{ marginLeft: 0 }}>
+          <button className="text-btn" onClick={() => setVersionsOpen((o) => !o)} disabled={!props.versions.length} aria-haspopup="menu" aria-expanded={versionsOpen}>
+            <I.History />
+            <span className="lbl">Versions</span>
+            {props.versions.length > 0 && <span className="count-pill">{props.versions.length}</span>}
+          </button>
+          {versionsOpen && (
+            <div className="menu versions-menu" role="menu">
+              <span className="section-label" style={{ padding: "6px 10px 4px" }}>Versions of this build</span>
+              {[...props.versions].reverse().map((v, i) => {
+                const cur = v.id === props.currentVersionId;
+                return (
+                  <button
+                    key={v.id}
+                    role="menuitemradio"
+                    aria-checked={cur}
+                    className={`menu-item version ${cur ? "current" : ""}`}
+                    onClick={() => (props.onRestore(v.id), setVersionsOpen(false))}
+                  >
+                    <b>
+                      v{props.versions.length - i} · {v.label}
+                    </b>
+                    <span>
+                      {v.model.parts.length} pieces · {ago(v.createdAt)}
+                      {v.source.cost !== undefined && ` · $${v.source.cost.toFixed(2)}`}
+                      {cur && " · current"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <button
+          className={`text-btn save-btn ${props.saveState}`}
+          onClick={props.onSave}
+          disabled={props.saveState === "none" || props.saveState === "saving" || props.saveState === "saved"}
+          title={props.saveState === "saved" ? "All changes saved" : `Save this build with all its versions (${mod}S)`}
+        >
+          {props.saveState === "saved" ? <I.Check size={14} strokeWidth={2.6} /> : <I.Upload />}
+          <span className="lbl">{props.saveState === "saving" ? "Saving…" : props.saveState === "saved" ? "Saved" : "Save"}</span>
         </button>
         <button className="icon-btn" onClick={props.onToggleTheme} aria-label={props.theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} title="Toggle dark mode">
           {props.theme === "dark" ? <I.Sun /> : <I.Moon />}

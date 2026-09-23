@@ -11,4 +11,6 @@ export const CONFIG = {
   /** USD per million tokens for cost estimates (claude-opus-5-5). */
   pricing: { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 },
   debugDir: "debug",
+  /** Saved builds (one JSON file per build, all versions). */
+  buildsDir: "builds",
 };

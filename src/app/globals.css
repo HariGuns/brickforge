@@ -59,6 +59,12 @@ input[type="range"] { accent-color: var(--k-accent); }
 .menu-item:hover:not(:disabled) { background: var(--k-panel); }
 .menu-item b { font-weight: 600; }
 .menu-item span { font-size: 12px; color: var(--k-muted); }
+.count-pill { font-size: 12px; background: var(--k-sunk); border-radius: 999px; padding: 1px 7px; color: var(--k-muted); }
+.versions-menu { left: 0; right: auto; width: 300px; max-height: 60vh; overflow: auto; }
+.menu-item.version.current { background: var(--k-accent-soft); }
+.menu-item.version.current b { color: var(--k-accent-ink); }
+.save-btn.dirty { color: var(--k-accent-ink); }
+.save-btn.saved { opacity: 1 !important; color: var(--k-green); cursor: default !important; }
 .menu-sep { height: 1px; background: var(--k-line); margin: 4px 6px; }
 .menu-link { border: 0; background: transparent; text-align: left; padding: 8px 10px; font-size: 13px; font-weight: 500; color: var(--k-accent-ink); cursor: pointer; border-radius: 9px; }
 .menu-link:hover { color: var(--k-accent); background: var(--k-panel); }

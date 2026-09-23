@@ -1,6 +1,7 @@
 "use client";
 
 import type { LibraryEntry } from "@/lib/library/scan";
+import type { BuildSummary } from "@/lib/builds/store";
 import * as I from "./icons";
 
 function when(iso: string): string {
@@ -35,11 +36,30 @@ function Card({ e, selected, onPick }: { e: LibraryEntry; selected: boolean; onP
   );
 }
 
+function BuildCard({ b, selected, onPick }: { b: BuildSummary; selected: boolean; onPick: () => void }) {
+  return (
+    <button className={`lib-card ${selected ? "selected" : ""}`} onClick={onPick} aria-pressed={selected}>
+      <span className="thumb">
+        <I.Cube size={22} strokeWidth={1.6} />
+      </span>
+      <span className="lib-text">
+        <span className="lib-title">{b.name}</span>
+        {b.description && <span className="lib-desc">{b.description}</span>}
+        <span className="lib-meta">
+          {b.parts} pieces · {b.versions} version{b.versions === 1 ? "" : "s"} · saved {when(b.updatedAt)}
+        </span>
+      </span>
+    </button>
+  );
+}
+
 export function LibraryPanel(props: {
   entries: LibraryEntry[] | null;
+  builds: BuildSummary[] | null;
   error: string | null;
   selected: string | null;
   onPick: (e: LibraryEntry) => void;
+  onPickBuild: (b: BuildSummary) => void;
   onRefresh: () => void;
 }) {
   const generated = props.entries?.filter((e) => e.kind === "debug") ?? [];
@@ -49,12 +69,18 @@ export function LibraryPanel(props: {
   return (
     <div className="side-scroll">
       <span className="section-label" style={{ justifyContent: "space-between" }}>
-        Generated
+        Saved builds
         <button className="icon-btn" style={{ width: 24, height: 24 }} onClick={props.onRefresh} aria-label="Refresh library" title="Refresh">
           <I.Refresh size={13} />
         </button>
       </span>
       {props.error && <p className="empty-note">{props.error}</p>}
+      {props.builds && props.builds.length === 0 && <p className="empty-note">Nothing saved yet. Use Save in the top bar to keep a build and its versions.</p>}
+      {props.builds?.map((b) => (
+        <BuildCard key={b.id} b={b} selected={props.selected === `build:${b.id}`} onPick={() => props.onPickBuild(b)} />
+      ))}
+
+      <span className="section-label">Generated</span>
       {props.entries === null && !props.error && <p className="empty-note">Loading…</p>}
       {props.entries && generated.length === 0 && <p className="empty-note">No generated models yet. Runs are saved to debug/.</p>}
       {generated.map((e) => (

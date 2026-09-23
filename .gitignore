@@ -7,3 +7,4 @@ next-env.d.ts
 debug/
 ldraw-lib/
 exports/
+/builds/

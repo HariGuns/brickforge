@@ -38,7 +38,12 @@ The UI follows `design/brickforge-v2.html`.
   - **Parts:** parts list grouped by category.
   - **Design:** the model JSON plus stats.
 - **Other:** dark mode, and the Download menu (.ldr, .mpd, Open model JSON).
-- **Not built yet:** undo/redo, versions, Save, Showcase, sub-builds and shared builds are disabled placeholders.
+- **Versions, undo/redo and Save:**
+  - **Versions:** every chat edit adds a version to the open build, and the Versions menu lists them all (click one to restore it).
+  - **Undo/redo:** the top-bar buttons, or ⌘/Ctrl+Z and ⌘/Ctrl+Shift+Z, step through your changes. A new edit clears the redo steps but never deletes a version.
+  - **Save** (⌘/Ctrl+S): writes the build with all its versions to `builds/<id>.json` (gitignored). Saved builds appear at the top of the Library.
+  - **Unsaved work:** switching builds or leaving the page asks first. Logic: `src/lib/builds/doc.ts`; storage: `src/lib/builds/store.ts`.
+- **Not built yet:** Showcase, sub-builds and shared builds are disabled placeholders.
 
 ## Where to tune things
 
