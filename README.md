@@ -33,7 +33,7 @@ The UI follows `design/brickforge-v2.html`.
 - **Library:** your saved runs from `debug/` and any `.ldr` files in `exports/`. `.ldr` files are read back with `src/lib/ldraw/import.ts`.
 - **Tabs:**
   - **Model:** 3D view with 3/4, front and top cameras, full screen and spin. It includes the Issues card (errors outlined in red, warnings in amber) and a playback bar that animates the build step by step.
-  - **Manual:** step-by-step instructions.
+  - **Manual:** an instruction book with one cream page per step. Each page has an isometric three.js render (new parts outlined in orange), a parts callout with 3D icons, zoom, a Go to menu and a thumbnail strip. **Manual PDF** exports it as one A4 page per step.
   - **Parts:** parts list grouped by category.
   - **Design:** the model JSON plus stats.
 - **Other:** dark mode, and the Download menu (.ldr, .mpd, Open model JSON).

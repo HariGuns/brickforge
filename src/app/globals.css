@@ -203,6 +203,8 @@ input[type="range"] { accent-color: var(--k-accent); }
 .man-fit { height: 34px; min-width: 52px; border: 0; border-radius: 9px; background: transparent; color: var(--k-text); font-size: 13px; font-weight: 600; padding: 0 12px; cursor: pointer; }
 .man-fit.on, .man-fit:hover { background: var(--k-sunk); }
 .man-pdf { height: 40px; border-radius: 12px; padding: 0 12px; }
+.man-mini-spin { width: 14px; height: 14px; border-radius: 999px; border: 2px solid var(--k-accent-soft); border-top-color: var(--k-accent); animation: kSpin .8s linear infinite; }
+.man-error { margin: 0; color: var(--k-red); font-size: 13px; }
 .man-viewport { flex: 1; min-height: 320px; overflow: auto; background: var(--k-sunk); border: 1px solid var(--k-line); border-radius: 16px; padding: 22px; display: flex; align-items: flex-start; }
 .man-page-wrap { flex: none; margin: 0 auto; }
 .man-page { container-type: inline-size; width: 100%; aspect-ratio: 1.42; background: #fdf7ea; box-shadow: 0 1px 2px rgba(60,40,10,.08), 0 12px 36px rgba(60,40,10,.14); position: relative; padding: 3.4% 3.4% 0; display: flex; flex-direction: column; color: #2a2622; overflow: hidden; }

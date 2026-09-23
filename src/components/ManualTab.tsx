@@ -5,6 +5,7 @@ import type { BrickModel } from "@/lib/model/schema";
 import type { BuildStep } from "@/lib/steps/steps";
 import { manualPages, type CalloutItem, type ManualPage } from "@/lib/manual/pages";
 import { peekStep, renderPartIcon, renderStep, STEP_SIZE, THUMB_SIZE, type PartIcon } from "./manual/stepRenderer";
+import { exportFileNames } from "@/lib/ldraw/export";
 import * as I from "./icons";
 
 const ZOOMS = [0.6, 0.8, 1, 1.25, 1.5] as const;
@@ -90,7 +91,7 @@ function Thumb({ model, steps, n, current, ready, onPick }: { model: BrickModel;
   );
 }
 
-export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: number; onStep: (n: number) => void; onPdf?: () => void; pdfBusy?: string | null }) {
+export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: number; onStep: (n: number) => void }) {
   const { model, steps, onStep } = props;
   const pages = useMemo(() => manualPages(model, steps), [model, steps]);
   const total = pages.length;
@@ -99,6 +100,7 @@ export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: 
   const [zoom, setZoom] = useState<(typeof ZOOMS)[number]>(1);
   const [fitW, setFitW] = useState(DESIGN_W);
   const [ready, setReady] = useState(false);
+  const [pdf, setPdf] = useState<{ busy: string | null; error: string | null }>({ busy: null, error: null });
   const viewportRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
 
@@ -150,6 +152,23 @@ export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: 
     return () => window.removeEventListener("keydown", onKey);
   }, [n, total, onStep]);
 
+  async function downloadPdf() {
+    setPdf({ busy: "Preparing…", error: null });
+    try {
+      const { buildManualPdf } = await import("./manual/manualPdf");
+      const blob = await buildManualPdf(model, steps, (done, all) => setPdf({ busy: done < all ? `Page ${done + 1} of ${all}…` : "Saving…", error: null }));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = exportFileNames(model).ldr.replace(/\.ldr$/, "_manual.pdf");
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      setPdf({ busy: null, error: null });
+    } catch (e) {
+      setPdf({ busy: null, error: `Couldn't create the PDF: ${(e as Error).message}` });
+    }
+  }
+
   if (!page) return null;
   const zi = ZOOMS.indexOf(zoom);
 
@@ -189,13 +208,18 @@ export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: 
               <I.ZoomIn size={15} />
             </button>
           </div>
-          <button className="text-btn man-pdf" onClick={props.onPdf} disabled={!props.onPdf || !!props.pdfBusy} title={props.onPdf ? "Download the manual as a PDF, one page per step" : "Coming soon"}>
-            <I.FileText size={15} />
-            {props.pdfBusy ?? "Manual PDF"}
+          <button className="text-btn man-pdf" onClick={downloadPdf} disabled={!!pdf.busy} title="Download the manual as a PDF, one page per step" aria-live="polite">
+            {pdf.busy ? <span className="man-mini-spin" aria-hidden="true" /> : <I.FileText size={15} />}
+            {pdf.busy ?? "Manual PDF"}
           </button>
         </div>
       </div>
 
+      {pdf.error && (
+        <p className="man-error" role="alert">
+          {pdf.error}
+        </p>
+      )}
       <div className="man-viewport" ref={viewportRef}>
         <div className="man-page-wrap" style={{ width: Math.round(fitW * zoom) }}>
           <Page model={model} steps={steps} page={page} total={total} />
