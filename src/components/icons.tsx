@@ -44,6 +44,9 @@ export const ArrowUp = (p: P) => <Stroke strokeWidth={2.4} {...p}><path d="m5 12
 export const ChevronLeft = (p: P) => <Stroke {...p}><path d="m15 18-6-6 6-6" /></Stroke>;
 export const ChevronRight = (p: P) => <Stroke {...p}><path d="m9 18 6-6-6-6" /></Stroke>;
 export const Pencil = (p: P) => <Stroke {...p}><path d="M21.17 6.81a1 1 0 0 0-3.98-3.98L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z" /></Stroke>;
+export const ZoomIn = (p: P) => <Stroke {...p}><circle cx="11" cy="11" r="8" /><line x1="21" x2="16.65" y1="21" y2="16.65" /><line x1="11" x2="11" y1="8" y2="14" /><line x1="8" x2="14" y1="11" y2="11" /></Stroke>;
+export const ZoomOut = (p: P) => <Stroke {...p}><circle cx="11" cy="11" r="8" /><line x1="21" x2="16.65" y1="21" y2="16.65" /><line x1="8" x2="14" y1="11" y2="11" /></Stroke>;
+export const FileText = (p: P) => <Stroke {...p}><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 13h4" /><path d="M10 17h4" /></Stroke>;
 export const Refresh = (p: P) => <Stroke {...p}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 16h5v5" /></Stroke>;
 
 export const Play = ({ size = 15 }: { size?: number }) => (

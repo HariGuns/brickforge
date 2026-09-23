@@ -254,7 +254,7 @@ export default function Page() {
             {(tab === "model" || !model) && (
               <ModelTab model={model} modelKey={modelKey} steps={steps} errors={validation?.errors ?? []} warnings={validation?.warnings ?? []} theme={theme} />
             )}
-            {tab === "manual" && model && <ManualTab model={model} modelKey={modelKey} steps={steps} step={manualStep} onStep={setManualStep} theme={theme} />}
+            {tab === "manual" && model && <ManualTab model={model} steps={steps} step={manualStep} onStep={setManualStep} />}
             {tab === "parts" && model && <PartsTab model={model} />}
             {tab === "design" && model && stats && <DesignTab model={model} stats={stats} steps={steps.length} onDownloadJson={() => downloadModel("json")} />}
           </main>
