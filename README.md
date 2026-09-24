@@ -152,7 +152,7 @@ Each run writes `debug/<timestamp>-<slug>/`, containing:
 - for each round: the prompt, raw JSON output, thinking summary, parsed model and validation result
 - `summary.json` and `final-model.json`
 
-Token usage and estimated cost are logged per round and in total. They appear in the server console, the UI and `summary.json`. To view a debug model in the app, use **Open model JSON**.
+Token usage and estimated cost are logged per round and in total. They appear in the server console, the UI and `summary.json`. To view a debug model in the app, use **Open model JSON**: it opens `final-model.json` and also designs with sub-builds (`final-design.json`, or a design downloaded from the Design tab).
 
 ## Test results (phase 6)
 

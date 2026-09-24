@@ -26,9 +26,10 @@ import type { BuildSummary } from "@/lib/builds/store";
 import { designFromModel, type BrickDesign } from "@/lib/design/schema";
 import { exportDesignMpd, exportFileNames, exportLdr, exportMpd } from "@/lib/ldraw/export";
 import { exportWantedList } from "@/lib/bricklink/wantedList";
+import { parseModelFile } from "@/lib/design/openFile";
 import { compileDesign } from "@/lib/design/compile";
 import { designSteps } from "@/lib/design/steps";
-import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
+import type { BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
 import { streamGenerate } from "@/lib/client/sse";
 import { download, prepareImage } from "@/lib/client/image";
@@ -331,10 +332,10 @@ export default function Page() {
 
   async function openJson(file: File) {
     try {
-      const parsed = BrickModelSchema.safeParse(JSON.parse(await file.text()));
-      if (!parsed.success) throw new Error(parsed.error.issues.slice(0, 3).map((i) => `${i.path.join(".")}: ${i.message}`).join("; "));
+      // A flat model or a design with sub-builds (as the Design tab downloads it).
+      const { model: m, design } = parseModelFile(await file.text());
       setNotice(null);
-      if (openModel(parsed.data, `Opened ${file.name}`, { kind: "open" })) setSelected(null);
+      if (openModel(m, `Opened ${file.name}`, { kind: "open" }, design)) setSelected(null);
     } catch (e) {
       setNotice(`Couldn't open ${file.name}: ${(e as Error).message}`);
     }
