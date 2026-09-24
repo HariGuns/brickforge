@@ -10,10 +10,25 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local   # server-side only, gitignore
 npm run dev                                         # http://localhost:3000
 ```
 
+## Desktop app (AppImage)
+
+```bash
+npm run appimage        # → dist/BrickForge-0.1.0-x86_64.AppImage (~145 MB)
+```
+
+The AppImage is the whole app in one file: Electron plus the Next.js standalone server. Run it, and:
+1. **The server** starts on a free local port and opens in its own window. Closing the window stops it.
+2. **First run:** a welcome screen asks for your Anthropic API key. It's checked with a free API call, then stored in `~/.config/BrickForge/settings.json` (readable by you only). Change it later with the gear button. The key is never bundled: the build refuses to package if the key from `.env.local` appears anywhere in the output.
+3. **Your existing builds:** the first run also offers to copy the generation runs, saved builds and exports from the folder the AppImage was built from (you can edit the path). Nothing is overwritten.
+4. **Data:** builds, generation runs, exports and logs live in `~/.config/BrickForge` (`builds/`, `debug/`, `exports/`, `logs/server.log`).
+5. **App menu:** on launch the AppImage adds a **BrickForge** entry with its icon (`~/.local/share/applications/brickforge-app.desktop`), updated if you move the file.
+
+Development is unchanged: `npm run dev` and the launcher read the key from `.env.local` and keep data in the repo folder. The desktop build goes to `.next-app/`, separate from `.next/`.
+
 ## One-click launcher (Linux)
 
 ```bash
-npm run install-launcher              # adds "BrickForge" to your app menu
+npm run install-launcher              # adds "BrickForge (dev)" to your app menu
 scripts/install-launcher.sh --desktop # …and a desktop icon
 scripts/install-launcher.sh --uninstall
 ```

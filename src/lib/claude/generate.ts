@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { apiKey, settingsEnabled } from "../settings/store";
 import { CONFIG } from "../config";
 import { BrickModelSchema, type BrickModel } from "../model/schema";
 import { brickModelJsonSchema } from "../model/jsonSchema";
@@ -53,10 +54,13 @@ export interface StageEvent {
 
 export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };
 
-let client: Anthropic | null = null;
+let client: { key: string; api: Anthropic } | null = null;
+/** A client for the current key (Settings, or ANTHROPIC_API_KEY in .env.local); rebuilt when the key changes. */
 export function getClient(): Anthropic {
-  if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not set. Add it to .env.local.");
-  return (client ??= new Anthropic());
+  const key = apiKey().key;
+  if (!key) throw new Error(settingsEnabled() ? "No Anthropic API key yet. Add one in Settings." : "ANTHROPIC_API_KEY is not set. Add it to .env.local.");
+  if (client?.key !== key) client = { key, api: new Anthropic({ apiKey: key }) };
+  return client.api;
 }
 
 export function invalidOutput(message: string): Issue {

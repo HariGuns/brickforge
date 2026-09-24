@@ -1,3 +1,10 @@
+/**
+ * Where runs, builds and exports are stored: the working directory by default
+ * (development and the launcher), or BRICKFORGE_DATA_DIR (the desktop app sets
+ * it to its user data folder, ~/.config/BrickForge).
+ */
+const DATA = process.env.BRICKFORGE_DATA_DIR ? `${process.env.BRICKFORGE_DATA_DIR.replace(/\/+$/, "")}/` : "";
+
 /** Tunable limits and generation settings. */
 export const CONFIG = {
   /** Build area in studs (x, z) and max height in plates (y). */
@@ -26,7 +33,9 @@ export const CONFIG = {
   maxTokens: 64000,
   /** USD per million tokens for cost estimates (claude-opus-5-5). */
   pricing: { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 },
-  debugDir: "debug",
+  debugDir: `${DATA}debug`,
   /** Saved builds (one JSON file per build, all versions). */
-  buildsDir: "builds",
+  buildsDir: `${DATA}builds`,
+  /** .ldr/.mpd files shown in the Library. */
+  exportsDir: `${DATA}exports`,
 };

@@ -5,6 +5,7 @@ import { BrickDesignSchema as DesignSchema, type BrickDesign } from "@/lib/desig
 import type { BuildSize } from "@/lib/prompts/design";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
+import { settingsEnabled } from "@/lib/settings/store";
 import { AVAILABLE_PIPELINES, PIPELINES, resolvePipeline, type Pipeline } from "@/lib/claude/pipeline";
 
 const IMAGE_TYPES: ImageMediaType[] = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -12,7 +13,7 @@ const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const SIZES: BuildSize[] = ["small", "medium", "large"];
 
 function friendly(err: unknown): string {
-  if (err instanceof Anthropic.AuthenticationError) return "The Anthropic API key was rejected. Check ANTHROPIC_API_KEY in .env.local.";
+  if (err instanceof Anthropic.AuthenticationError) return settingsEnabled() ? "The Anthropic API key was rejected. Check it in Settings." : "The Anthropic API key was rejected. Check ANTHROPIC_API_KEY in .env.local.";
   if (err instanceof Anthropic.RateLimitError) return "Rate limited by the Anthropic API. Wait a moment and try again.";
   if (err instanceof Anthropic.BadRequestError) return `The API rejected the request: ${err.message}`;
   if (err instanceof Anthropic.APIError) return `Anthropic API error ${err.status ?? ""}: ${err.message}`;

@@ -40,6 +40,7 @@ import { ModelTab } from "@/components/ModelTab";
 import { ManualTab } from "@/components/ManualTab";
 import { PartsTab } from "@/components/PartsTab";
 import { Showcase } from "@/components/Showcase";
+import { SettingsDialog, type SettingsStatus } from "@/components/SettingsDialog";
 import { DesignTab, compactJson } from "@/components/DesignTab";
 import * as I from "@/components/icons";
 
@@ -107,6 +108,19 @@ export default function Page() {
   const stats = useMemo(() => (model ? modelStats(model) : null), [model]);
   const [focusParts, setFocusParts] = useState<Set<number> | undefined>();
   const [showcase, setShowcase] = useState(false);
+  const [settings, setSettings] = useState<SettingsStatus | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Desktop app: open Settings on first run, or when there's no API key yet.
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((s: SettingsStatus) => {
+        setSettings(s);
+        if (s.managed && (!s.setupDone || !s.hasKey)) setSettingsOpen(true);
+      })
+      .catch(() => {});
+  }, []);
 
   /** Replace the open build. Asks first if that would drop unsaved edits. */
   function open(next: Workspace): boolean {
@@ -353,6 +367,7 @@ export default function Page() {
 
   return (
     <div className="page">
+      {settingsOpen && settings && <SettingsDialog status={settings} onChange={setSettings} onImported={loadLibrary} onClose={() => setSettingsOpen(false)} />}
       {showcase && model && sections.length > 0 && <Showcase sections={sections} modelName={model.name} theme={theme} onClose={() => setShowcase(false)} />}
       <div className="app">
         <TopBar
@@ -363,6 +378,7 @@ export default function Page() {
           problems={validation?.errors.length ?? 0}
           theme={theme}
           onToggleTheme={toggleTheme}
+          onSettings={() => setSettingsOpen(true)}
           onDownload={downloadModel}
           onOpenJson={openJson}
           canUndo={!!ws && canUndo(ws)}

@@ -1,0 +1,31 @@
+# Desktop app (AppImage). Build with: npm run appimage
+appId: app.brickforge
+productName: BrickForge
+copyright: BrickForge
+directories:
+  app: electron
+  output: dist
+  buildResources: electron
+files:
+  - main.cjs
+  - package.json
+  - icon.png
+  - build-info.json
+  - "!**/node_modules/**"
+# The app itself has no dependencies; the server brings its own node_modules.
+npmRebuild: false
+nodeGypRebuild: false
+# The standalone server (.next-app/standalone) is copied to resources/server here.
+afterPack: scripts/electron-after-pack.cjs
+linux:
+  target: AppImage
+  executableName: brickforge
+  icon: electron/icon.png
+  category: Graphics
+  synopsis: Turn a description or photo into a buildable brick model
+  artifactName: BrickForge-${version}-${arch}.AppImage
+  desktop:
+    entry:
+      Name: BrickForge
+      StartupWMClass: BrickForge
+publish: null

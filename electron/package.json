@@ -1,0 +1,9 @@
+{
+  "name": "brickforge",
+  "productName": "BrickForge",
+  "version": "0.1.0",
+  "description": "Turn a description or photo into a buildable brick model",
+  "author": "HariGuns",
+  "main": "main.cjs",
+  "desktopName": "brickforge-app.desktop"
+}

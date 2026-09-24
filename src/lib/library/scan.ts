@@ -5,7 +5,7 @@ import { BrickModelSchema, type BrickModel } from "../model/schema";
 import { BrickDesignSchema, type BrickDesign } from "../design/schema";
 import { importLdr } from "../ldraw/import";
 
-export const EXPORTS_DIR = "exports";
+export const EXPORTS_DIR = CONFIG.exportsDir;
 
 export interface LibraryEntry {
   kind: "debug" | "export";

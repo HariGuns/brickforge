@@ -20,7 +20,7 @@ cat >"$FILE" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=BrickForge
+Name=BrickForge (dev)
 Comment=Turn a description or photo into a buildable brick model
 Exec="$ROOT/scripts/launch.sh"
 Icon=$ROOT/src/app/icon.svg

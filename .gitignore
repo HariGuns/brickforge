@@ -9,3 +9,8 @@ ldraw-lib/
 exports/
 /builds/
 /logs/
+
+# Desktop app build output
+/.next-app/
+/dist/
+/electron/build-info.json

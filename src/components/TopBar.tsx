@@ -42,6 +42,7 @@ export function TopBar(props: {
   problems: number;
   theme: "light" | "dark";
   onToggleTheme: () => void;
+  onSettings: () => void;
   onDownload: (kind: "ldr" | "mpd" | "bricklink") => void;
   onOpenJson: (file: File) => void;
   canUndo: boolean;
@@ -142,6 +143,9 @@ export function TopBar(props: {
         >
           {props.saveState === "saved" ? <I.Check size={14} strokeWidth={2.6} /> : <I.Upload />}
           <span className="lbl">{props.saveState === "saving" ? "Saving…" : props.saveState === "saved" ? "Saved" : "Save"}</span>
+        </button>
+        <button className="icon-btn" onClick={props.onSettings} aria-label="Settings" title="Settings (API key)">
+          <I.Gear />
         </button>
         <button className="icon-btn" onClick={props.onToggleTheme} aria-label={props.theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} title="Toggle dark mode">
           {props.theme === "dark" ? <I.Sun /> : <I.Moon />}
