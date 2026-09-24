@@ -37,10 +37,13 @@ export interface RefineSpec<T> {
   /** The flat model to render. */
   toModel: (v: T) => BrickModel;
   prompt: (v: T, round: number, rounds: number) => string;
-  /** refineJsonSchema(key, inner). */
+  /** refineJsonSchema(diff schema). */
   schema: Record<string, unknown>;
-  key: "model" | "design";
-  parseInner: (json: unknown) => { value: T | null; issues: Issue[] };
+  /** Apply Claude's changes to `base`. */
+  applyChanges: (base: T, changes: unknown) => { value: T | null; issues: Issue[] };
+  /** The model/design listing with indices (shown with repair requests). */
+  listing: (v: T) => string;
+  instructions: string;
   check: (v: T, last: boolean) => CheckResult;
   system: string;
   tools?: LoopTool[];
@@ -70,6 +73,18 @@ export async function refineWithPhoto<T>(spec: RefineSpec<T>, ctx: LoopContext, 
   const rounds: RoundSummary[] = [];
   const log: RefineLog[] = [];
   const { view, side } = views(spec.analysis.view);
+  const readAnswer = (raw: string, base: T, keepDiffs?: string[]): { value: Answer<T> | null; issues: Issue[] } => {
+    let json: { matches?: unknown; differences?: unknown; changes?: unknown };
+    try {
+      json = JSON.parse(raw);
+    } catch (e) {
+      return { value: null, issues: [invalid(`Output was not valid JSON (${(e as Error).message}).`)] };
+    }
+    const differences = Array.isArray(json.differences) && json.differences.length ? json.differences.map(String) : (keepDiffs ?? []);
+    if (json.matches === true) return { value: { matches: true, differences, value: null }, issues: [] };
+    const r = spec.applyChanges(base, json.changes);
+    return r.value ? { value: { matches: false, differences, value: r.value }, issues: [] } : { value: null, issues: r.issues };
+  };
   for (let r = 1; r <= total; r++) {
     emit({ type: "refine", round: r, rounds: total, status: "start" });
     const size = { width: CONFIG.refine.width, height: CONFIG.refine.height };
@@ -89,17 +104,13 @@ export async function refineWithPhoto<T>(spec: RefineSpec<T>, ctx: LoopContext, 
         schema: spec.schema,
         tools: spec.tools,
         maxRepairRounds: CONFIG.refine.repairRounds,
-        parse: (raw) => {
-          let json: { matches?: unknown; differences?: unknown; [k: string]: unknown };
-          try {
-            json = JSON.parse(raw);
-          } catch (e) {
-            return { value: null, issues: [invalid(`Output was not valid JSON (${(e as Error).message}).`)] };
-          }
-          const differences = Array.isArray(json.differences) ? json.differences.map(String) : [];
-          if (json.matches === true) return { value: { matches: true, differences, value: null }, issues: [] };
-          const inner = spec.parseInner(json[spec.key]);
-          return inner.value ? { value: { matches: false, differences, value: inner.value }, issues: [] } : { value: null, issues: inner.issues };
+        parse: (raw) => readAnswer(raw, current),
+        // Repairs of a correction: changes to the corrected version.
+        diff: {
+          schema: spec.schema,
+          apply: (prev, json) => readAnswer(JSON.stringify(json), prev.value ?? current, prev.differences),
+          listing: (a) => spec.listing(a.value ?? current),
+          instructions: `Return matches: false, the same differences, and changes to your corrected version listed here. ${spec.instructions}`,
         },
         check: (a, last) => (a.matches || !a.value ? { errors: [], warnings: [], valid: true, partCount: 0 } : spec.check(a.value, last)),
       },

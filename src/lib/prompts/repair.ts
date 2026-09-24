@@ -19,7 +19,7 @@ const HINTS: Partial<Record<IssueCode, string>> = {
   INTERLOCKED: "Two copies each sit on the other. Merge them into one sub-build or change heights so one is fully below the other.",
 };
 
-export function repairPrompt(errors: Issue[], warnings: Issue[], opts: { round: number; maxErrors?: number } = { round: 1 }): string {
+export function repairPrompt(errors: Issue[], warnings: Issue[], opts: { round: number; maxErrors?: number; diff?: { listing: string; instructions: string } } = { round: 1 }): string {
   const max = opts.maxErrors ?? 60;
   const counts = new Map<string, number>();
   for (const e of errors) counts.set(e.code, (counts.get(e.code) ?? 0) + 1);
@@ -38,5 +38,9 @@ ${listed.join("\n")}
 How to fix:
 ${hints.join("\n")}${warn}
 
-Return the complete corrected model (all parts, not just the changed ones). Keep the design and everything that was already fine; change only what is needed to fix these problems, and make sure your fixes don't create new overlaps or gaps.`;
+${
+    opts.diff
+      ? `Your last answer, with indices:\n${opts.diff.listing}\n\nFix these problems and nothing else; make sure your fixes don't create new overlaps or gaps. ${opts.diff.instructions}`
+      : "Return the complete corrected model (all parts, not just the changed ones). Keep the design and everything that was already fine; change only what is needed to fix these problems, and make sure your fixes don't create new overlaps or gaps."
+  }`;
 }

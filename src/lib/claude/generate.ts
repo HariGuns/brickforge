@@ -13,7 +13,9 @@ import { analyzePhoto, type AnalysisEvent } from "./analyze";
 import { refineWithPhoto, type RefineEvent, type RefineLog } from "./refine";
 import { refineJsonSchema, refinePrompt } from "../prompts/refine";
 import { sumUsage } from "./usage";
-import { editPrompt } from "../prompts/edit";
+import { editPrompt, modelListing } from "../prompts/edit";
+import { applyModelDiff, DIFF_INSTRUCTIONS, modelDiffJsonSchema } from "../diff/diff";
+import { codec } from "../diff/format";
 import { validate, type Issue, type ValidationResult } from "../validate/validator";
 import { buildSteps, type BuildStep } from "../steps/steps";
 import { DebugRun } from "./debug";
@@ -120,6 +122,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
   onEvent({ type: "start", debugDir: debug.dir });
 
   const system = systemPrompt();
+  const fmt = codec();
   debug.write("input.json", { mode: input.base ? "edit" : "build", text: input.text ?? null, detail: input.detail ?? null, hasImage: !!input.image, config: CONFIG });
   if (input.base) debug.write("base-model.json", input.base);
   debug.write("system-prompt.md", system);
@@ -149,12 +152,22 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
       system,
       firstContent,
       firstText,
-      schema: brickModelJsonSchema(),
+      // An edit returns only the changes (applied to the base); a new build returns the whole model.
+      schema: input.base ? modelDiffJsonSchema(fmt) : brickModelJsonSchema(),
       tools: [searchPartsTool],
       parse: (text) => {
+        if (input.base) {
+          try {
+            return applyModelDiff(input.base, JSON.parse(text), fmt);
+          } catch (e) {
+            return { value: null, issues: [invalidOutput(`Output was not valid JSON (${(e as Error).message}).`)] };
+          }
+        }
         const r = parseModel(text);
         return { value: r.model, issues: r.issues };
       },
+      // Repairs return only the changes.
+      diff: { schema: modelDiffJsonSchema(fmt), apply: (prev, json) => applyModelDiff(prev, json, fmt), listing: (m) => modelListing(m, fmt), instructions: DIFF_INSTRUCTIONS },
       // Structural issues (weak joints, overhangs) block acceptance during repair
       // rounds; after the last round they're reported as warnings instead.
       check: (model, last) => {
@@ -180,12 +193,10 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
         initial: bestModel,
         toModel: (m) => m,
         prompt: (m, round, n) => refinePrompt(photo.analysis, photo.target, m, round, n),
-        schema: refineJsonSchema("model", brickModelJsonSchema() as unknown as Record<string, unknown>),
-        key: "model",
-        parseInner: (json) => {
-          const p = parseModelJson(json);
-          return { value: p.model, issues: p.issues };
-        },
+        schema: refineJsonSchema(modelDiffJsonSchema(fmt)),
+        applyChanges: (base, changes) => applyModelDiff(base, changes, fmt),
+        listing: (m) => modelListing(m, fmt),
+        instructions: DIFF_INSTRUCTIONS,
         check: (m, last) => {
           const v = validate(m, { structure: last ? "warn" : "error" });
           return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: m.parts.length };

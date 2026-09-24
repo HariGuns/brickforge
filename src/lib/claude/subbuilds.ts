@@ -1,4 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { applyAssemblyDiff, applyDesignDiff, applyModelDiff, assemblyDiffJsonSchema, DESIGN_DIFF_INSTRUCTIONS, designDiffJsonSchema, DIFF_INSTRUCTIONS, modelDiffJsonSchema } from "../diff/diff";
+import { codec } from "../diff/format";
+import { designListing, modelListing } from "../prompts/edit";
 import { refineWithPhoto, type RefineLog } from "./refine";
 import { refineDesignPrompt, refineJsonSchema } from "../prompts/refine";
 import { analysisBlock, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
@@ -12,8 +15,7 @@ import { PART_IDS } from "../parts/library";
 import { COLOR_IDS } from "../parts/colors";
 import { BrickModelSchema, PlacementSchema, type BrickModel } from "../model/schema";
 import { brickModelJsonSchema } from "../model/jsonSchema";
-import { BrickDesignSchema, InstanceSchema, SUB_ID, type BrickDesign } from "../design/schema";
-import { designJsonSchema } from "../design/jsonSchema";
+import { InstanceSchema, SUB_ID, type BrickDesign } from "../design/schema";
 import { designEditPrompt } from "../prompts/edit";
 import { compileDesign } from "../design/compile";
 import { surfaceMaps } from "../design/surface";
@@ -129,6 +131,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   const debug = cp ? DebugRun.open(cp.dir) : new DebugRun(`subbuilds-${input.text?.trim() || "photo"}`);
   onEvent({ type: "start", debugDir: debug.dir });
   const system = systemPrompt();
+  const fmt = codec();
   if (!cp) {
     debug.write("input.json", { mode: "build", pipeline: "subbuilds", text: input.text ?? null, detail: input.detail ?? null, hasImage: !!input.image, config: CONFIG });
     debug.write("system-prompt.md", system);
@@ -205,6 +208,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
         schema: brickModelJsonSchema(),
         tools: [searchPartsTool],
         parse: (t) => parseJson(t, BrickModelSchema),
+        diff: { schema: modelDiffJsonSchema(fmt), apply: (prev, json) => applyModelDiff(prev, json, fmt), listing: (m) => modelListing(m, fmt), instructions: DIFF_INSTRUCTIONS },
         check: (model, last) => {
           const v = validate(model, { grid: { x: sub.w, z: sub.d, y: sub.h }, maxParts: Math.min(CONFIG.maxParts, Math.ceil(sub.parts * 1.6) + 10), structure: last ? "warn" : "error" });
           return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: model.parts.length };
@@ -241,6 +245,12 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
       schema: assemblyJsonSchema(PART_IDS, COLOR_IDS, subBuilds.map((s) => s.id)),
       tools: [searchPartsTool],
       parse: (t) => parseJson(t, AssemblySchema),
+      diff: {
+        schema: assemblyDiffJsonSchema(fmt),
+        apply: (prev, json) => applyAssemblyDiff(prev, json, fmt),
+        listing: (a) => designListing({ name: a.name, description: a.description, subBuilds: [], main: { parts: a.parts, uses: a.uses } }),
+        instructions: `Return only the changes to the main build: remove / set / add for its parts and removeCopies / setCopies / addCopies for its copies, by index into the listing above (before your changes). Leave the name and description empty to keep them. Everything you don't mention stays as it is.`,
+      },
       check: (a, last) => {
         const c = compileDesign(designOf(a), { structure: last ? "warn" : "error" });
         return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
@@ -266,12 +276,10 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
         initial: design,
         toModel: (d) => compileDesign(d, { structure: "off" }).model,
         prompt: (d, round, n) => refineDesignPrompt(photo!.analysis, photo!.target, d, compileDesign(d, { structure: "off" }).stats.pieces, round, n),
-        schema: refineJsonSchema("design", designJsonSchema()),
-        key: "design",
-        parseInner: (json) => {
-          const p = BrickDesignSchema.safeParse(json);
-          return p.success ? { value: p.data, issues: [] } : { value: null, issues: p.error.issues.slice(0, 10).map((i) => ({ code: "INVALID_OUTPUT" as const, severity: "error" as const, parts: [], message: `${i.path.join(".")}: ${i.message}` })) };
-        },
+        schema: refineJsonSchema(designDiffJsonSchema(fmt)),
+        applyChanges: (base, changes) => applyDesignDiff(base, changes, fmt),
+        listing: (d) => designListing(d),
+        instructions: DESIGN_DIFF_INSTRUCTIONS,
         check: (d, last) => {
           const c = compileDesign(d, { structure: last ? "warn" : "error" });
           return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
@@ -345,6 +353,7 @@ export async function editDesign(input: GenerateInput & { baseDesign: BrickDesig
   const debug = new DebugRun(`edit-${input.text?.trim() || "photo"}`);
   onEvent({ type: "start", debugDir: debug.dir });
   const system = systemPrompt();
+  const fmt = codec();
   debug.write("input.json", { mode: "edit", pipeline: "design-edit", text: input.text ?? null, hasImage: !!input.image, config: CONFIG });
   debug.write("base-design.json", input.baseDesign);
   debug.write("system-prompt.md", system);
@@ -364,9 +373,17 @@ export async function editDesign(input: GenerateInput & { baseDesign: BrickDesig
       system,
       firstContent: content,
       firstText: text,
-      schema: designJsonSchema(),
+      // The edit returns only the changes, applied to the base design (repairs too).
+      schema: designDiffJsonSchema(fmt),
       tools: [searchPartsTool],
-      parse: (t) => parseJson(t, BrickDesignSchema),
+      parse: (t) => {
+        try {
+          return applyDesignDiff(input.baseDesign, JSON.parse(t), fmt);
+        } catch (e) {
+          return { value: null, issues: [{ code: "INVALID_OUTPUT" as const, severity: "error" as const, parts: [], message: `Output was not valid JSON (${(e as Error).message}).` }] };
+        }
+      },
+      diff: { schema: designDiffJsonSchema(fmt), apply: (prev, json) => applyDesignDiff(prev, json, fmt), listing: (d) => designListing(d), instructions: DESIGN_DIFF_INSTRUCTIONS },
       check: (d, last) => {
         const c = compileDesign(d, { structure: last ? "warn" : "error" });
         return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };

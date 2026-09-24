@@ -5,10 +5,9 @@
  */
 import type { BrickDesign } from "../design/schema";
 import type { BrickModel } from "../model/schema";
-import { designListing } from "./edit";
+import { designListing, modelListing } from "./edit";
 import type { PhotoAnalysis, SizeTarget } from "./analysis";
-
-const listing = (m: BrickModel) => m.parts.map((p, i) => `  #${i} ${JSON.stringify(p)}`).join("\n");
+import { DESIGN_DIFF_INSTRUCTIONS, DIFF_INSTRUCTIONS } from "../diff/diff";
 
 function intro(a: PhotoAnalysis, target: SizeTarget, round: number, rounds: number): string {
   return `You are checking a brick model against the photo it was built from (comparison round ${round} of ${rounds}).
@@ -24,11 +23,11 @@ export function refinePrompt(a: PhotoAnalysis, target: SizeTarget, model: BrickM
   return `${intro(a, target, round, rounds)}
 
 Current model (${model.parts.length} parts, bottom layer first):
-${listing(model)}
+${modelListing(model)}
 
-If it already matches the photo well, return matches: true, the differences you'd still note (may be empty), and an empty parts list (name and description can stay as they are).
+If it already matches the photo well, return matches: true, the differences you'd still note (may be empty), and no changes.
 
-Otherwise return matches: false, the most important differences (at most 6, most important first, each a concrete change such as "roof is 3 plates too high", "nose should taper over the front 4 studs"), and the complete corrected model with every part. Fix the listed differences; keep parts that are already right exactly as they are; keep it within the target size and part budget. The corrected model must still meet every physical rule.`;
+Otherwise return matches: false, the most important differences (at most 6, most important first, each a concrete change such as "roof is 3 plates too high", "nose should taper over the front 4 studs"), and the changes that fix them. Keep parts that are already right; stay within the target size and part budget. The corrected model must still meet every physical rule. Changes: ${DIFF_INSTRUCTIONS}`;
 }
 
 export function refineDesignPrompt(a: PhotoAnalysis, target: SizeTarget, design: BrickDesign, pieces: number, round: number, rounds: number): string {
@@ -37,17 +36,17 @@ export function refineDesignPrompt(a: PhotoAnalysis, target: SizeTarget, design:
 Current model as sub-builds (${pieces} pieces in total; each sub-build is defined once and placed as copies, mirror: true copies are mirror images):
 ${designListing(design)}
 
-If it already matches the photo well, return matches: true, the differences you'd still note (may be empty), and an empty design (no sub-builds, an empty main build).
+If it already matches the photo well, return matches: true, the differences you'd still note (may be empty), and no changes.
 
-Otherwise return matches: false, the most important differences (at most 6, most important first, each a concrete change), and the complete corrected design. Change a sub-build to change all its copies; keep ids, parts and copies that are already right exactly as they are. Everything must still be one connected, buildable structure.`;
+Otherwise return matches: false, the most important differences (at most 6, most important first, each a concrete change), and the changes that fix them. Change a sub-build to change all its copies (mirrored ones too). Everything must still be one connected, buildable structure. Changes: ${DESIGN_DIFF_INSTRUCTIONS}`;
 }
 
-/** Output schema: matches + differences + the corrected model (or design); `inner` is the model/design schema. */
-export function refineJsonSchema(key: "model" | "design", inner: Record<string, unknown>): Record<string, unknown> {
+/** Output schema: matches + differences + the changes (`changes`: a model or design diff schema). */
+export function refineJsonSchema(changes: Record<string, unknown>): Record<string, unknown> {
   return {
     type: "object",
-    properties: { matches: { type: "boolean" }, differences: { type: "array", items: { type: "string" } }, [key]: inner },
-    required: ["matches", "differences", key],
+    properties: { matches: { type: "boolean" }, differences: { type: "array", items: { type: "string" } }, changes },
+    required: ["matches", "differences", "changes"],
     additionalProperties: false,
   };
 }

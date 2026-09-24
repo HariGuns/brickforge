@@ -40,13 +40,17 @@ function fakeClient(answers: string[]) {
   return { client: client as unknown as Pick<Anthropic, "messages">, requests };
 }
 
+/** A repair / edit answer: only the changes. */
+const diff = (d: { remove?: number[]; set?: object[]; add?: object[] } = {}) => JSON.stringify({ name: "", description: "", remove: d.remove ?? [], set: d.set ?? [], add: d.add ?? [] });
+
 const dirs: string[] = [];
 afterAll(() => dirs.forEach((d) => fs.rmSync(d, { recursive: true, force: true })));
 
 describe("generate/repair loop (fake Claude)", () => {
   it("feeds validator errors back and stops when the model is valid", async () => {
     const broken = { ...SAMPLE_HOUSE, parts: [...SAMPLE_HOUSE.parts, P("brick_2x2", "red", 20, 9, 20)] }; // floating part
-    const { client, requests } = fakeClient([JSON.stringify(broken), JSON.stringify(SAMPLE_HOUSE)]);
+    // The repair removes the floating part by its index.
+    const { client, requests } = fakeClient([JSON.stringify(broken), diff({ remove: [broken.parts.length - 1] })]);
     const events: GenerateEvent[] = [];
     const r = await generateModel({ text: "tiny house" }, (e) => events.push(e), { client });
     dirs.push(r.debugDir);
@@ -61,7 +65,13 @@ describe("generate/repair loop (fake Claude)", () => {
     expect(second[1].role).toBe("assistant");
     expect((second[1].content as { type: string }[]).map((b) => b.type)).toEqual(["thinking", "text"]);
     expect(second[2].content).toMatch(/FLOATING/);
+    expect(second[2].content).toContain(`Your last answer, with indices:\n#0 ${JSON.stringify(broken.parts[0])}`);
     expect(requests[0].model).toBe(CONFIG.model);
+    // The repair asks for changes, not the whole model; the result is the house without the stray brick.
+    const schemaProps = (q: Anthropic.MessageCreateParams) => Object.keys(((q.output_config?.format?.schema ?? {}) as { properties?: object }).properties ?? {});
+    expect(schemaProps(requests[0])).toContain("parts");
+    expect(schemaProps(requests[1])).toEqual(["name", "description", "remove", "set", "add"]);
+    expect(r.model!.parts).toEqual(SAMPLE_HOUSE.parts);
 
     // Usage and cost: 2 rounds × (1000×4 + 2000×20 + 500×0.2 + 100×5) / 1e6
     expect(r.usage.cost).toBeCloseTo(2 * (4000 + 40000 + 100 + 500) / 1e6, 6);
@@ -79,8 +89,8 @@ describe("generate/repair loop (fake Claude)", () => {
 
   it("returns the best attempt when repairs run out", async () => {
     const bad = JSON.stringify({ name: "x", description: "x", parts: [P("brick_2x2", "red", 0, 0, 0), P("brick_2x2", "red", 0, 9, 0)] });
-    const answers = Array.from({ length: CONFIG.maxRepairRounds + 1 }, () => bad);
-    answers[0] = "not json";
+    // Round 0 doesn't parse, so round 1 asks for the whole model again; later rounds change nothing.
+    const answers = ["not json", bad, ...Array.from({ length: CONFIG.maxRepairRounds - 1 }, () => diff())];
     const { client, requests } = fakeClient(answers);
     const r = await generateModel({ text: "x" }, () => {}, { client });
     dirs.push(r.debugDir);
@@ -94,7 +104,7 @@ describe("generate/repair loop (fake Claude)", () => {
 describe("edit mode (fake Claude)", () => {
   it("sends the current model and the change request, and records the base in debug", async () => {
     const edited = { ...SAMPLE_HOUSE, parts: [...SAMPLE_HOUSE.parts, P("brick_1x1", "white", 0, 17, 2)] };
-    const { client, requests } = fakeClient([JSON.stringify(edited)]);
+    const { client, requests } = fakeClient([diff({ add: [P("brick_1x1", "white", 0, 17, 2)] })]);
     const r = await generateModel({ text: "add a chimney", base: SAMPLE_HOUSE }, () => {}, { client });
     dirs.push(r.debugDir);
     const first = requests[0].messages[0].content as string;
@@ -102,7 +112,7 @@ describe("edit mode (fake Claude)", () => {
     expect(first).toContain(`#0 ${JSON.stringify(SAMPLE_HOUSE.parts[0])}`);
     expect(first).toContain(`Parts (${SAMPLE_HOUSE.parts.length})`);
     expect(r.valid).toBe(true);
-    expect(r.model?.parts).toHaveLength(SAMPLE_HOUSE.parts.length + 1);
+    expect(r.model?.parts).toEqual(edited.parts);
     expect(fs.readdirSync(r.debugDir)).toContain("base-model.json");
     expect(JSON.parse(fs.readFileSync(path.join(r.debugDir, "input.json"), "utf8")).mode).toBe("edit");
   });
@@ -113,7 +123,8 @@ describe("structural issues in the repair loop (fake Claude)", () => {
   const balanced = JSON.stringify({ name: "Beam", description: "d", parts: [P("brick_1x1", "red", 4, 0, 0), P("brick_1x8", "blue", 0, 3, 0)] });
 
   it("sends an overhang back for repair", async () => {
-    const { client, requests } = fakeClient([overhang, balanced]);
+    void balanced;
+    const { client, requests } = fakeClient([overhang, diff({ set: [{ index: 0, ...P("brick_1x1", "red", 4, 0, 0) }] })]);
     const r = await generateModel({ text: "a beam" }, () => {}, { client });
     dirs.push(r.debugDir);
     expect(r.rounds.map((x) => x.errorCodes)).toEqual([{ OVERSTRESSED: 1 }, {}]);
@@ -122,7 +133,7 @@ describe("structural issues in the repair loop (fake Claude)", () => {
   });
 
   it("accepts it as a warning if it's still there after the last round", async () => {
-    const { client } = fakeClient(Array.from({ length: CONFIG.maxRepairRounds + 1 }, () => overhang));
+    const { client } = fakeClient([overhang, ...Array.from({ length: CONFIG.maxRepairRounds }, () => diff())]);
     const r = await generateModel({ text: "a beam" }, () => {}, { client });
     dirs.push(r.debugDir);
     expect(r.valid).toBe(true);

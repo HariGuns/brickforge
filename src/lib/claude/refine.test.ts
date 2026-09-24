@@ -20,10 +20,12 @@ const h1 = P("4600", "black", 2, 2, 1), h2 = P("4600", "black", 2, 2, 7);
 const wheels = [h1, h2].flatMap((h) => mountsFor(h, "4624c01").map((m) => ({ ...P("4624c01", "white", 0, 0, 0), ...m.at })));
 const base = [h1, h2, P("plate_2x8", "dark_gray", 2, 3, 1, 90), P("plate_2x8", "red", 2, 4, 1, 90)];
 const car = { name: "Car", description: "", parts: [...base, P("plate_4x8", "red", 1, 5, 1, 90), ...wheels] };
-// The comparison's correction: a lower, sleeker top (no 4×8 plate, a 2×8 instead).
+// The comparison's correction: a lower, sleeker top (the 4×8 plate becomes a 2×8), as a change by index.
 const refined = { name: "Car", description: "", parts: [...base, P("plate_2x8", "red", 2, 5, 1, 90), ...wheels] };
-// A broken correction: a part floating in the air.
-const broken = { name: "Car", description: "", parts: [...car.parts, P("brick_2x2", "red", 10, 12, 10)] };
+const changes = (d: { set?: object[]; add?: object[] }) => ({ name: "", description: "", remove: [], set: d.set ?? [], add: d.add ?? [] });
+const sleeker = changes({ set: [{ index: 4, ...P("plate_2x8", "red", 2, 5, 1, 90) }] });
+// A broken correction: adds a part floating in the air.
+const broken = changes({ add: [P("brick_2x2", "red", 10, 12, 10)] });
 
 const usage = { input_tokens: 1000, output_tokens: 500, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
 function fake(answers: unknown[]) {
@@ -56,8 +58,8 @@ const photo = { image: { mediaType: "image/jpeg" as const, data: "AAAA" }, detai
 describe("visual comparison with the photo", () => {
   it("renders from the photo's angle and the side, takes a valid correction, stops when it matches", async () => {
     const { client, requests } = fake([
-      { matches: false, differences: ["roof too wide"], model: refined },
-      { matches: true, differences: [], model: { name: "", description: "", parts: [] } },
+      { matches: false, differences: ["roof too wide"], changes: sleeker },
+      { matches: true, differences: [], changes: changes({}) },
     ]);
     const events: GenerateEvent[] = [];
     const r = await generateModel(photo, (e) => events.push(e), { client });
@@ -83,9 +85,9 @@ describe("visual comparison with the photo", () => {
 
   it("keeps the previous model when a correction can't be made valid", async () => {
     const { client } = fake([
-      { matches: false, differences: ["add a spoiler"], model: broken },
-      { matches: false, differences: [], model: broken },
-      { matches: false, differences: [], model: broken },
+      { matches: false, differences: ["add a spoiler"], changes: broken },
+      { matches: false, differences: [], changes: changes({}) }, // repairs that don't fix it
+      { matches: false, differences: [], changes: changes({}) },
     ]);
     const r = await generateModel(photo, () => {}, { client });
     dirs.push(r.debugDir);

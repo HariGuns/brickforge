@@ -69,6 +69,17 @@ export interface LoopSpec<T> {
   tools?: LoopTool[];
   /** Effort for this loop (default CONFIG.effort). */
   effort?: "low" | "medium" | "high";
+  /**
+   * Repairs as diffs: from the first repair round on, Claude returns only the
+   * changes (this schema), applied to its previous answer; the repair prompt
+   * shows that answer with indices.
+   */
+  diff?: {
+    schema: Record<string, unknown>;
+    apply: (prev: T, json: unknown) => { value: T | null; issues: Issue[] };
+    listing: (v: T) => string;
+    instructions: string;
+  };
 }
 
 export interface LoopContext {
@@ -93,6 +104,8 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
   const rounds: RoundSummary[] = [];
   const f = (name: string) => `${spec.debugPrefix}${name}`;
   let best: LoopResult<T>["best"] = null;
+  /** The last answer that parsed (valid or not): what a repair diff applies to. */
+  let lastValue: T | null = null;
 
   for (let round = 0; round <= maxRounds; round++) {
     const kind = round === 0 ? "design" : "repair";
@@ -111,6 +124,8 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
       ctx.onEvent({ type: "progress", scope: spec.scope, round, thinkingChars, outputChars, thinking: thinkingTail.slice(-400) });
     };
 
+    const useDiff = round > 0 && !!spec.diff && lastValue !== null;
+    const diffBase = lastValue;
     // One round = one answer; with tools, Claude may search first (several API calls, same round).
     const tools = spec.tools ?? [];
     const toolLog: { name: string; input: unknown; summary: string }[] = [];
@@ -123,7 +138,7 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
           model: CONFIG.model,
           max_tokens: CONFIG.maxTokens,
           thinking: { type: "adaptive", display: "summarized" },
-          output_config: { effort: spec.effort ?? CONFIG.effort, format: { type: "json_schema", schema: spec.schema } },
+          output_config: { effort: spec.effort ?? CONFIG.effort, format: { type: "json_schema", schema: useDiff ? spec.diff!.schema : spec.schema } },
           // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next call.
           system: [{ type: "text", text: spec.system, cache_control: { type: "ephemeral" } }],
           cache_control: { type: "ephemeral" },
@@ -182,8 +197,16 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     if (msg.stop_reason === "max_tokens") {
       issues = [invalidOutput(`Your output was cut off at the ${CONFIG.maxTokens}-token limit. Return something smaller (fewer, larger parts).`)];
     } else {
-      const parsed = spec.parse(text);
+      let parsed: { value: T | null; issues: Issue[] };
+      if (useDiff) {
+        try {
+          parsed = spec.diff!.apply(diffBase!, JSON.parse(text));
+        } catch (e) {
+          parsed = { value: null, issues: [invalidOutput(`Output was not valid JSON (${(e as Error).message}).`)] };
+        }
+      } else parsed = spec.parse(text);
       value = parsed.value;
+      if (value !== null) lastValue = value;
       if (value !== null) {
         check = spec.check(value, round === maxRounds);
         issues = check.errors;
@@ -218,7 +241,8 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     if (round === maxRounds) break;
 
     messages.push({ role: "assistant", content: msg.content });
-    messages.push({ role: "user", content: (spec.repairText ?? ((e, w, r) => repairPrompt(e, w, { round: r })))(issues, warnings, round + 1) });
+    const diff = spec.diff && lastValue !== null ? { listing: spec.diff.listing(lastValue), instructions: spec.diff.instructions } : undefined;
+    messages.push({ role: "user", content: (spec.repairText ?? ((e, w, r) => repairPrompt(e, w, { round: r, diff })))(issues, warnings, round + 1) });
   }
 
   return { best, rounds, usage: sumUsage(rounds.map((r) => r.usage)) };

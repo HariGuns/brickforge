@@ -56,8 +56,9 @@ function fakeClient(opts: { failAssembly?: boolean; assemblyOk?: boolean } = {})
         const first = typeof c0 === "string" ? c0 : c0.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n");
         let text: string;
         if ("keyFeatures" in props) text = JSON.stringify(photoAnalysis);
-        else if ("matches" in props) text = JSON.stringify({ matches: true, differences: [], design: { name: "", description: "", subBuilds: [], main: { parts: [], uses: [] } } });
+        else if ("matches" in props) text = JSON.stringify({ matches: true, differences: [], changes: { name: "", description: "", changes: [], newSubBuilds: [], removeSubBuilds: [] } });
         else if ("layout" in props) text = JSON.stringify(plan);
+        else if ("setCopies" in props) text = JSON.stringify({ name: "", description: "", remove: [], set: [], add: [], removeCopies: [], setCopies: [{ index: 1, ...goodMain.uses[1], mirror: false }], addCopies: [] });
         else if ("uses" in props) {
           if (opts.failAssembly) throw new Error("Your credit balance is too low to access the Anthropic API.");
           text = JSON.stringify(assemblies++ === 0 ? badMain : goodMain);
@@ -190,7 +191,9 @@ describe("design edits (fake Claude)", () => {
               return this;
             },
             async finalMessage() {
-              return { content: [{ type: "text", text: JSON.stringify(edited) }], stop_reason: "end_turn", stop_details: null, usage: { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } };
+              // The edit returns only the change: one part added to the pine tree sub-build.
+              const change = { name: "", description: "", changes: [{ id: "pine_tree", remove: [], set: [], add: [P("plate_1x1", "yellow", 0, 11, 0)], removeCopies: [], setCopies: [], addCopies: [] }], newSubBuilds: [], removeSubBuilds: [] };
+              return { content: [{ type: "text", text: JSON.stringify(change) }], stop_reason: "end_turn", stop_details: null, usage: { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } };
             },
           };
         },
@@ -202,6 +205,7 @@ describe("design edits (fake Claude)", () => {
     expect(prompt).toMatch(/Sub-build pine_tree "Pine tree"/);
     expect(prompt).toMatch(/Change request: put a star on every tree/);
     expect(r.valid).toBe(true);
+    expect(r.design!.subBuilds).toEqual(edited.subBuilds);
     const before = compileDesign(SAMPLE_VILLAGE).stats.pieces;
     expect(r.model!.parts.length).toBe(before + 4); // 4 pine tree copies
     expect(describeDesignDiff(diffDesigns(SAMPLE_VILLAGE, r.design!))).toBe("changed Pine tree; main build unchanged");

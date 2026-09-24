@@ -61,7 +61,7 @@ describe("photo builds start with the analysis", () => {
         stream(params: Anthropic.MessageCreateParams) {
           requests.push(structuredClone(params));
           const props = ((params.output_config?.format?.schema ?? {}) as { properties?: object }).properties ?? {};
-          const text = JSON.stringify("keyFeatures" in props ? huracan : "matches" in props ? { matches: true, differences: [], model: { name: "", description: "", parts: [] } } : car);
+          const text = JSON.stringify("keyFeatures" in props ? huracan : "matches" in props ? { matches: true, differences: [], changes: { name: "", description: "", remove: [], set: [], add: [] } } : car);
           return {
             on() {
               return this;
