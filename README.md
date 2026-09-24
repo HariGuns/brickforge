@@ -191,6 +191,13 @@ Where it shows up:
 
 **Manual:** wheel holders hanging under a chassis go in the same step as the part they hang from, and wheels go on last.
 
+## Cost
+
+`npm run token-report` shows where the tokens go, per stage, per model and effort, and per token kind (answer vs thinking, cache reads and writes), from every run in `debug/`. The baseline before the cost work is in `docs/token-report-before.md`: thinking was 74% of the cost, the JSON answers 18%, and input 8%.
+
+- **Model and effort per stage** (`CONFIG.stages`): analysis, plan, design, sub-build, assembly, edit, comparison, and `repair` for every repair round. Any stage can switch model or effort; each round logs which it used, and its cost uses that model's prices (`CONFIG.pricing`). Defaults: Opus 5.5 at effort high, except analysis and repairs at medium.
+- **Diffs:** repairs, chat edits and photo comparisons return only the changes (remove / set / add by index, copies and new sub-builds for designs), applied by code (`src/lib/diff`).
+
 ## Part catalog
 
 Claude can use **937 parts**:

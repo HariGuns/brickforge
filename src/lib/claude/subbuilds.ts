@@ -167,6 +167,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   const planLoop = cp?.plan.valid ? reusedLoop(cp.plan, cp.plan.valid, 0) : await runLoop<Plan>(
     {
       scope: "plan",
+      stage: "plan",
       debugPrefix: "plan.",
       system,
       firstContent: withImage(planText),
@@ -201,6 +202,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     const loop = await runLoop<BrickModel>(
       {
         scope,
+        stage: "subBuild",
         debugPrefix: `sub-${sub.id}.`,
         system,
         firstContent: text,
@@ -238,6 +240,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   const assembly = savedAssembly?.success ? reusedLoop<Assembly>({ rounds: cp!.assembly.rounds, valid: savedAssembly.data }, savedAssembly.data, 0) : await runLoop<Assembly>(
     {
       scope: "assembly",
+      stage: "assembly",
       debugPrefix: "assembly.",
       system,
       firstContent: withImage(aText),
@@ -369,6 +372,7 @@ export async function editDesign(input: GenerateInput & { baseDesign: BrickDesig
   const loop = await runLoop<BrickDesign>(
     {
       scope: "edit",
+      stage: "edit",
       debugPrefix: "edit.",
       system,
       firstContent: content,

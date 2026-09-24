@@ -108,4 +108,3 @@ Target size (keep these proportions; they matter more than detail): ${target.len
 Orientation: the model's front faces +z (toward the viewer), its length runs along z, and its right side is at max x.`;
 }
 
-export const ANALYSIS_EFFORT = CONFIG.analysisEffort;

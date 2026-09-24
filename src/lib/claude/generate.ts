@@ -148,6 +148,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
   const loop = await runLoop<BrickModel>(
     {
       scope: "main",
+      stage: input.base ? "edit" : "design",
       debugPrefix: "",
       system,
       firstContent,

@@ -1,4 +1,4 @@
-import { CONFIG } from "../config";
+import { CONFIG, pricingFor } from "../config";
 
 export interface RoundUsage {
   input: number;
@@ -16,8 +16,8 @@ interface ApiUsage {
   cache_creation_input_tokens?: number | null;
 }
 
-export function toRoundUsage(u: ApiUsage): RoundUsage {
-  const p = CONFIG.pricing;
+export function toRoundUsage(u: ApiUsage, model: string = CONFIG.model): RoundUsage {
+  const p = pricingFor(model);
   const r = {
     input: u.input_tokens,
     output: u.output_tokens,

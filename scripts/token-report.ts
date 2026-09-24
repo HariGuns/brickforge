@@ -9,7 +9,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { CONFIG } from "../src/lib/config";
+import { CONFIG, pricingFor } from "../src/lib/config";
 
 const args = process.argv.slice(2);
 const since = args.includes("--since") ? args[args.indexOf("--since") + 1] : "";
@@ -27,6 +27,7 @@ interface Row {
   cost: number;
 }
 const stages = new Map<string, Row>();
+const settings = new Map<string, { rounds: number; output: number; cost: number }>();
 const add = (k: string, r: Partial<Row>) => {
   const s = stages.get(k) ?? { rounds: 0, input: 0, cacheRead: 0, cacheWrite: 0, output: 0, answer: 0, parts: 0, cost: 0 };
   for (const key of Object.keys(r) as (keyof Row)[]) s[key] += r[key] ?? 0;
@@ -44,7 +45,7 @@ for (const dir of fs.readdirSync(root).sort()) {
   if (!files.length) continue;
   runs++;
   for (const f of files) {
-    let v: { summary?: { scope?: string; round?: number; partCount?: number; usage?: { input: number; output: number; cacheRead: number; cacheWrite: number; cost: number } } };
+    let v: { summary?: { scope?: string; round?: number; partCount?: number; model?: string; effort?: string; usage?: { input: number; output: number; cacheRead: number; cacheWrite: number; cost: number } } };
     try {
       v = JSON.parse(fs.readFileSync(path.join(full, f), "utf8"));
     } catch {
@@ -59,6 +60,9 @@ for (const dir of fs.readdirSync(root).sort()) {
     const raw = path.join(full, f.replace(".validation.json", ".raw.json.txt"));
     const answer = fs.existsSync(raw) ? Math.round(fs.statSync(raw).size / CHARS_PER_TOKEN) : 0;
     add(stage, { rounds: 1, ...s.usage, answer: Math.min(answer, s.usage.output), parts: s.partCount ?? 0 });
+    const key = `${s.model ?? "(not logged: default model)"} · ${s.effort ?? "high"}`;
+    const e = settings.get(key) ?? { rounds: 0, output: 0, cost: 0 };
+    settings.set(key, { rounds: e.rounds + 1, output: e.output + s.usage.output, cost: e.cost + s.usage.cost });
   }
 }
 
@@ -76,7 +80,7 @@ const lines = [
   }),
 ];
 // Where the money goes, by token kind.
-const p = CONFIG.pricing;
+const p = pricingFor(CONFIG.model);
 const sum = (f: (r: Row) => number) => rows.reduce((t, [, r]) => t + f(r), 0);
 const byKind = {
   "output: answer (JSON)": (sum((r) => r.answer) * p.output) / 1e6,
@@ -86,5 +90,6 @@ const byKind = {
   "input: uncached": (sum((r) => r.input) * p.input) / 1e6,
 };
 lines.push("", "| cost by token kind | $ | share |", "|---|---|---|", ...Object.entries(byKind).map(([n, c]) => `| ${n} | $${c.toFixed(2)} | ${((c / total) * 100).toFixed(0)}% |`));
+lines.push("", "| model · effort | rounds | output tokens | output / round | cost |", "|---|---|---|---|---|", ...[...settings].map(([n, e]) => `| ${n} | ${e.rounds} | ${k(e.output)} | ${k(Math.round(e.output / e.rounds))} | $${e.cost.toFixed(2)} |`));
 console.log(lines.join("\n"));
 if (mdOut) fs.writeFileSync(mdOut, lines.join("\n") + "\n");

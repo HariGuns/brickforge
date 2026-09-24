@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { analysisJsonSchema, analysisPrompt, ANALYSIS_EFFORT, PhotoAnalysisSchema, sizeTarget, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
+import { analysisJsonSchema, analysisPrompt, PhotoAnalysisSchema, sizeTarget, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
 import type { Detail } from "../detail";
 import type { Issue } from "../validate/validator";
 import { runLoop, type LoopContext, type RoundSummary } from "./loop";
@@ -42,7 +42,7 @@ export async function analyzePhoto(
       firstContent: [{ type: "image", source: { type: "base64", media_type: input.image.mediaType, data: input.image.data } }, { type: "text", text }],
       firstText: text,
       schema: analysisJsonSchema(),
-      effort: ANALYSIS_EFFORT,
+      stage: "analysis",
       maxRepairRounds: 1,
       parse: (raw) => {
         try {

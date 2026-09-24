@@ -97,6 +97,7 @@ export async function refineWithPhoto<T>(spec: RefineSpec<T>, ctx: LoopContext, 
     const loop = await runLoop<Answer<T>>(
       {
         scope: `refine:${r}`,
+        stage: "refine",
         debugPrefix: `refine-${r}.`,
         system: spec.system,
         firstContent: [image(spec.photo.data, spec.photo.mediaType), ...pngs.map((b) => image(b.toString("base64"), "image/png")), { type: "text", text }],

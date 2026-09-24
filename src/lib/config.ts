@@ -5,6 +5,20 @@
  */
 const DATA = process.env.BRICKFORGE_DATA_DIR ? `${process.env.BRICKFORGE_DATA_DIR.replace(/\/+$/, "")}/` : "";
 
+export type Effort = "low" | "medium" | "high";
+/** Generation stages that call Claude (see CONFIG.stages). */
+export type Stage = "analysis" | "plan" | "design" | "subBuild" | "assembly" | "edit" | "refine" | "repair";
+export interface StageSetting {
+  model?: string;
+  effort?: Effort;
+}
+export interface Pricing {
+  input: number;
+  output: number;
+  cacheRead: number;
+  cacheWrite: number;
+}
+
 /** Tunable limits and generation settings. */
 export const CONFIG = {
   /** Build area in studs (x, z) and max height in plates (y). */
@@ -34,8 +48,6 @@ export const CONFIG = {
    * Renders are width × height px.
    */
   refine: { rounds: 2, repairRounds: 2, width: 768, height: 512 },
-  /** Effort for the photo analysis call (a short structured description). */
-  analysisEffort: "medium" as const,
   /** Sub-build generator limits: unique sub-builds, total copies, envelope size (studs), parts per copy, parallel calls. */
   subbuilds: { maxUnique: 8, maxCopies: 64, maxEnvelope: 32, maxSubParts: 250, planRepairRounds: 2, concurrency: 4 },
   /**
@@ -47,14 +59,51 @@ export const CONFIG = {
   structure: { gramsPerUnit: 0.0967, slopeFactor: 0.75, maxStackPlatesOnOneStud: 12, maxLoadOnOneStudG: 5, maxMomentPerStud: 6 },
   /** Repair rounds after the initial generation. */
   maxRepairRounds: 4,
+  /** Default model and effort; each stage can override them (see `stages`). */
   model: "claude-opus-5-5",
-  effort: "high" as const,
+  effort: "high" as Effort,
+  /**
+   * Model and effort per stage. `repair` applies to every repair round (after
+   * the first answer) of the design stages; each stage's first answer uses its
+   * own entry. Leave a field out to use the default above. The model must
+   * support adaptive thinking and the effort setting.
+   */
+  stages: {
+    analysis: { effort: "medium" },
+    plan: {},
+    design: {},
+    subBuild: {},
+    assembly: {},
+    edit: {},
+    refine: {},
+    repair: { effort: "medium" },
+  } as Record<Stage, StageSetting>,
   maxTokens: 64000,
-  /** USD per million tokens for cost estimates (claude-opus-5-5). */
-  pricing: { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 },
+  /**
+   * USD per million tokens, per model, for cost estimates (cacheWrite = 5-minute
+   * cache writes). Opus 5.5 is the rate this project has used throughout; the
+   * others are included so stages can switch model; check anthropic.com/pricing
+   * before relying on them.
+   */
+  pricing: {
+    "claude-opus-5-5": { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 },
+    "claude-sonnet-5": { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3.75 },
+    "claude-haiku-4-5-20251001": { input: 1, output: 5, cacheRead: 0.1, cacheWrite: 1.25 },
+  } as Record<string, Pricing>,
   debugDir: `${DATA}debug`,
   /** Saved builds (one JSON file per build, all versions). */
   buildsDir: `${DATA}builds`,
   /** .ldr/.mpd files shown in the Library. */
   exportsDir: `${DATA}exports`,
 };
+
+/** Model and effort for a stage's round (round 0 = its first answer; later rounds are repairs). */
+export function stageSetting(stage: Stage, round = 0): { model: string; effort: Effort } {
+  const s = CONFIG.stages[round > 0 && stage !== "analysis" ? "repair" : stage] ?? {};
+  return { model: s.model ?? CONFIG.model, effort: s.effort ?? CONFIG.effort };
+}
+
+/** Prices for a model (the default model's if it isn't listed). */
+export function pricingFor(model: string): Pricing {
+  return CONFIG.pricing[model] ?? CONFIG.pricing[CONFIG.model];
+}

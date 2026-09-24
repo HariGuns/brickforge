@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { CONFIG } from "../config";
+import { CONFIG, stageSetting, type Effort, type Stage } from "../config";
 import type { Issue } from "../validate/validator";
 import { repairPrompt } from "../prompts/repair";
 import type { DebugRun } from "./debug";
@@ -26,6 +26,9 @@ export interface RoundSummary {
   reused?: boolean;
   /** Tool calls (part searches) made during this round. */
   toolCalls?: number;
+  /** Model and effort used for this round. */
+  model?: string;
+  effort?: Effort;
 }
 
 /** A client-side tool Claude can call during a round (e.g. search_parts). */
@@ -67,8 +70,8 @@ export interface LoopSpec<T> {
   repairText?: (errors: Issue[], warnings: Issue[], round: number) => string;
   /** Client-side tools Claude may call before answering. */
   tools?: LoopTool[];
-  /** Effort for this loop (default CONFIG.effort). */
-  effort?: "low" | "medium" | "high";
+  /** Which CONFIG.stages entry sets the model and effort (repair rounds use `repair`). Default "design". */
+  stage?: Stage;
   /**
    * Repairs as diffs: from the first repair round on, Claude returns only the
    * changes (this schema), applied to its previous answer; the repair prompt
@@ -125,6 +128,7 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     };
 
     const useDiff = round > 0 && !!spec.diff && lastValue !== null;
+    const setting = stageSetting(spec.stage ?? "design", round);
     const diffBase = lastValue;
     // One round = one answer; with tools, Claude may search first (several API calls, same round).
     const tools = spec.tools ?? [];
@@ -135,10 +139,10 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     for (let turn = 0; ; turn++) {
       const stream = ctx.anthropic.messages.stream(
         {
-          model: CONFIG.model,
+          model: setting.model,
           max_tokens: CONFIG.maxTokens,
           thinking: { type: "adaptive", display: "summarized" },
-          output_config: { effort: spec.effort ?? CONFIG.effort, format: { type: "json_schema", schema: useDiff ? spec.diff!.schema : spec.schema } },
+          output_config: { effort: setting.effort, format: { type: "json_schema", schema: useDiff ? spec.diff!.schema : spec.schema } },
           // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next call.
           system: [{ type: "text", text: spec.system, cache_control: { type: "ephemeral" } }],
           cache_control: { type: "ephemeral" },
@@ -157,7 +161,7 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
         emitProgress();
       });
       msg = await stream.finalMessage();
-      callUsage.push(toRoundUsage(msg.usage));
+      callUsage.push(toRoundUsage(msg.usage, setting.model));
       thinkingParts.push(...msg.content.flatMap((b) => (b.type === "thinking" ? [b.thinking] : [])));
       if (msg.stop_reason !== "tool_use") break;
 
@@ -229,11 +233,13 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
       stopReason: msg.stop_reason,
       seconds,
       ...(toolLog.length ? { toolCalls: toolLog.length } : {}),
+      model: setting.model,
+      effort: setting.effort,
     };
     rounds.push(summary);
     ctx.debug.write(f(`round-${round}.validation.json`), { summary, errors: issues, warnings });
     if (value !== null) ctx.debug.write(f(`round-${round}.model.json`), value);
-    console.log(`[generate] ${spec.scope} round ${round} (${kind}): ${summary.partCount} parts, ${issues.length} errors, ${warnings.length} warnings, ${toolLog.length ? `${toolLog.length} part searches, ` : ""}${seconds.toFixed(1)}s · ${formatUsage(usage)}`);
+    console.log(`[generate] ${spec.scope} round ${round} (${kind}, ${setting.model} ${setting.effort}): ${summary.partCount} parts, ${issues.length} errors, ${warnings.length} warnings, ${toolLog.length ? `${toolLog.length} part searches, ` : ""}${seconds.toFixed(1)}s · ${formatUsage(usage)}`);
     ctx.onEvent({ type: "round_end", scope: spec.scope, summary, errors: issues.slice(0, 50) });
 
     if (value !== null && check && (!best || issues.length < best.check.errors.length)) best = { value, check };

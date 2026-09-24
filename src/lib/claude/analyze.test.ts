@@ -3,7 +3,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { generateModel, type GenerateEvent } from "./generate";
 import { analysisBlock, sizeTarget, type PhotoAnalysis } from "../prompts/analysis";
-import { CONFIG } from "../config";
+import { CONFIG, stageSetting } from "../config";
 import { P } from "../fixtures/samples";
 import { mountsFor } from "../parts/wheels";
 
@@ -78,7 +78,7 @@ describe("photo builds start with the analysis", () => {
     dirs.push(r.debugDir);
 
     expect(requests).toHaveLength(3); // analysis, design, one comparison (matches)
-    expect(requests[0].output_config?.effort).toBe(CONFIG.analysisEffort);
+    expect(requests[0].output_config?.effort).toBe(stageSetting("analysis").effort);
     expect(requests[0].tools).toBeUndefined();
     const designText = (requests[1].messages[0].content as Anthropic.ContentBlockParam[]).find((b) => b.type === "text") as Anthropic.TextBlockParam;
     expect(designText.text).toContain("33 studs long (z, front to back) × 14 studs wide");
