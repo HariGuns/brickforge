@@ -46,7 +46,11 @@ The UI follows `design/brickforge-v2.html`.
   - **Undo/redo:** the top-bar buttons, or ⌘/Ctrl+Z and ⌘/Ctrl+Shift+Z, step through your changes. A new edit clears the redo steps but never deletes a version.
   - **Save** (⌘/Ctrl+S): writes the build with all its versions to `builds/<id>.json` (gitignored). Saved builds appear at the top of the Library.
   - **Unsaved work:** switching builds or leaving the page asks first. Logic: `src/lib/builds/doc.ts`; storage: `src/lib/builds/store.ts`.
-- **Not built yet:** Showcase and shared builds are disabled placeholders.
+- **Showcase** (Model tab): a full-screen animated build that assembles each sub-build in turn ("Assembling Pine tree ×4"), then the main build ("Adding 3× Track Section"). New parts are highlighted as they go on, and it has a step counter, a progress bar, speed 0.5×–4×, pause/replay, and Stop (or Esc).
+- **Chat:**
+  - **Empty state:** "Try one" suggestion chips that fill in the composer (text, size and path) without sending anything.
+  - **Toggle:** when a model is open, a "Change this build / Start a new build" choice sets what the next message does.
+- **Not built yet:** shared builds is a disabled placeholder.
 
 ## Sub-builds
 

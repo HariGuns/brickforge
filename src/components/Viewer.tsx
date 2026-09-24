@@ -146,12 +146,16 @@ function bounds(model: BrickModel | null): THREE.Box3 {
 }
 
 function CameraFit({ model, fitKey, view, controls }: { model: BrickModel | null; fitKey?: string; view: CameraView; controls: React.RefObject<OrbitControlsImpl | null> }) {
-  const { camera } = useThree();
+  const { camera, size } = useThree();
   useEffect(() => {
     const box = bounds(model);
     const center = box.getCenter(new THREE.Vector3());
     const radius = box.getSize(new THREE.Vector3()).length() / 2;
-    const dist = Math.max(radius * 2.6, 6);
+    // Fit to the narrower field of view, so tall, narrow viewports (phones) don't crop the sides.
+    const persp = camera as THREE.PerspectiveCamera;
+    const vfov = ((persp.fov ?? 40) * Math.PI) / 180;
+    const hfov = 2 * Math.atan(Math.tan(vfov / 2) * (persp.aspect || 1));
+    const dist = Math.max((radius * 0.9) / Math.sin(Math.min(vfov, hfov) / 2), 6);
     const offset =
       view === "front" ? new THREE.Vector3(0, dist * 0.12, dist) : view === "top" ? new THREE.Vector3(0, dist, 0.001) : new THREE.Vector3(dist * 0.65, dist * 0.55, dist * 0.75);
     camera.position.copy(center).add(offset);
@@ -161,7 +165,7 @@ function CameraFit({ model, fitKey, view, controls }: { model: BrickModel | null
     controls.current?.target.copy(center);
     controls.current?.update();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fitKey, view]);
+  }, [fitKey, view, size.width, size.height]);
   return null;
 }
 

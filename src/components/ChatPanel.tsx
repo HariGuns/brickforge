@@ -59,6 +59,14 @@ const SIZES: { id: BuildSize; label: string }[] = [
   { id: "large", label: "Large" },
 ];
 
+/** "Try one" suggestions for the empty chat; picking one fills the composer (it doesn't send). */
+const SUGGESTIONS: { label: string; text: string; size: BuildSize; pipeline: Pipeline }[] = [
+  { label: "Cottage with a garden", text: "a cozy cottage with a flower garden and a picket fence", size: "medium", pipeline: "single" },
+  { label: "Red fire truck", text: "a red fire truck with a ladder", size: "medium", pipeline: "single" },
+  { label: "Lighthouse", text: "a striped lighthouse on a rocky island", size: "medium", pipeline: "single" },
+  { label: "Castle (large)", text: "a medieval castle with four corner towers, walls and a gatehouse", size: "large", pipeline: "subbuilds" },
+];
+
 const usd = (n: number) => `$${n.toFixed(2)}`;
 const k = (n: number) => (n < 1000 ? `${n}` : `${(n / 1000).toFixed(1)}k`);
 
@@ -201,6 +209,25 @@ export function ChatPanel(props: {
           <div className="chat-empty">
             <b>What should we build?</b>
             Describe a model or attach a photo. Claude designs it, checks every connection and repairs problems until it&apos;s buildable.
+            <div className="try-one">
+              <span className="section-label">Try one</span>
+              <div className="try-chips">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s.label}
+                    className="try-chip"
+                    onClick={() => {
+                      if (props.modelName && editing) props.onToggleEdit();
+                      props.onDraft({ text: s.text, size: s.size, pipeline: s.pipeline });
+                      requestAnimationFrame(() => document.getElementById("composer")?.focus());
+                    }}
+                    title={s.text}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
         {props.turns.map((t) => (
@@ -242,6 +269,18 @@ export function ChatPanel(props: {
       </div>
 
       <div className="composer-wrap">
+        {props.modelName && (
+          <div className="seg small mode-toggle" role="radiogroup" aria-label="What the next message does">
+            <button role="radio" aria-checked={editing} className={editing ? "on" : ""} onClick={() => !editing && props.onToggleEdit()} title={`Messages change ${props.modelName}`}>
+              <I.Pencil size={12} />
+              Change this build
+            </button>
+            <button role="radio" aria-checked={!editing} className={!editing ? "on" : ""} onClick={() => editing && props.onToggleEdit()} title="Messages start a new model">
+              <I.Sparkle size={12} />
+              Start a new build
+            </button>
+          </div>
+        )}
         <div className="composer">
           {draft.image && (
             <div className="attach-chip">
@@ -309,17 +348,7 @@ export function ChatPanel(props: {
                 </select>
               </label>
             )}
-            {props.modelName && (
-              <button
-                className={`edit-toggle ${editing ? "on" : ""}`}
-                aria-pressed={editing}
-                onClick={props.onToggleEdit}
-                title={editing ? "Messages change the current model. Click to start a new build instead." : "Click to make messages change the current model."}
-              >
-                <I.Pencil size={12} />
-                <span className="edit-name">{editing ? `Editing ${props.modelName}` : "Edit model"}</span>
-              </button>
-            )}
+
             {props.running ? (
               <button className="send-btn stop" onClick={props.onStop}>
                 Stop

@@ -50,6 +50,7 @@ export function ModelTab(props: {
   /** Parts to highlight from outside (e.g. a sub-build's copies picked in the Design tab). */
   focusParts?: Set<number>;
   onClearFocus?: () => void;
+  onShowcase?: () => void;
 }) {
   const { model, steps } = props;
   const [view, setView] = useState<CameraView>("3/4");
@@ -170,7 +171,7 @@ export function ModelTab(props: {
           </div>
         )}
         <div className="overlay-tr">
-          <button className="float-btn accent-ink" disabled title="Coming soon: presentation mode">
+          <button className="float-btn accent-ink" aria-label="Showcase" onClick={props.onShowcase} disabled={!model || !props.onShowcase} title="Watch the model assemble, sub-build by sub-build">
             <I.Sparkle size={14} />
             <span className="lbl">Showcase</span>
           </button>

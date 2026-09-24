@@ -37,6 +37,7 @@ import { LibraryPanel } from "@/components/LibraryPanel";
 import { ModelTab } from "@/components/ModelTab";
 import { ManualTab } from "@/components/ManualTab";
 import { PartsTab } from "@/components/PartsTab";
+import { Showcase } from "@/components/Showcase";
 import { DesignTab, compactJson } from "@/components/DesignTab";
 import * as I from "@/components/icons";
 
@@ -103,6 +104,7 @@ export default function Page() {
   const totalSteps = sections.reduce((n, s) => n + s.steps.length, 0);
   const stats = useMemo(() => (model ? modelStats(model) : null), [model]);
   const [focusParts, setFocusParts] = useState<Set<number> | undefined>();
+  const [showcase, setShowcase] = useState(false);
 
   /** Replace the open build. Asks first if that would drop unsaved edits. */
   function open(next: Workspace): boolean {
@@ -348,6 +350,7 @@ export default function Page() {
 
   return (
     <div className="page">
+      {showcase && model && sections.length > 0 && <Showcase sections={sections} modelName={model.name} theme={theme} onClose={() => setShowcase(false)} />}
       <div className="app">
         <TopBar
           model={model}
@@ -424,7 +427,7 @@ export default function Page() {
               </div>
             )}
             {(tab === "model" || !model) && (
-              <ModelTab model={model} modelKey={modelKey} steps={steps} errors={validation?.errors ?? []} warnings={validation?.warnings ?? []} theme={theme} focusParts={focusParts} onClearFocus={() => setFocusParts(undefined)} />
+              <ModelTab model={model} modelKey={modelKey} steps={steps} errors={validation?.errors ?? []} warnings={validation?.warnings ?? []} theme={theme} focusParts={focusParts} onClearFocus={() => setFocusParts(undefined)} onShowcase={() => setShowcase(true)} />
             )}
             {tab === "manual" && model && <ManualTab sections={sections} modelName={model.name} step={manualStep} onStep={setManualStep} />}
             {tab === "parts" && model && <PartsTab model={model} />}
