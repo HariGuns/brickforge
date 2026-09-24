@@ -34,3 +34,26 @@ describe("LDraw import", () => {
     expect(skipped.map((s) => s.reason)).toEqual(["unknown part 99999.dat", "part is tilted or mirrored", "part is off the stud grid"]);
   });
 });
+
+describe("LDraw import: design .mpd with submodels", () => {
+  it("expands nested, rotated sub-build copies back to exactly the compiled parts", async () => {
+    const { SAMPLE_VILLAGE } = await import("../fixtures/designs");
+    const { compileDesign } = await import("../design/compile");
+    const { exportDesignMpd, submodelFile } = await import("./export");
+    const compiled = compileDesign(SAMPLE_VILLAGE);
+    expect(compiled.errors).toEqual([]);
+    const mpd = exportDesignMpd(SAMPLE_VILLAGE, compiled);
+    // One submodel per unique sub-build, copies as references.
+    expect(mpd.match(/^0 FILE /gm)).toHaveLength(1 + SAMPLE_VILLAGE.subBuilds.length);
+    expect(mpd.split(/\r\n/).filter((l) => l.startsWith("1 ") && l.endsWith(submodelFile("pine_tree")))).toHaveLength(4);
+    const { model, skipped } = importLdr(mpd);
+    expect(skipped).toEqual([]);
+    expect(model.name).toBe("Tiny village");
+    expect(model.parts.map(key).sort()).toEqual(compiled.model.parts.map(key).sort());
+  });
+
+  it("guards against a submodel that includes itself", () => {
+    const text = ["0 FILE main.ldr", "1 16 0 0 0 1 0 0 0 1 0 0 0 1 loop.ldr", "0 NOFILE", "0 FILE loop.ldr", "1 16 0 0 0 1 0 0 0 1 0 0 0 1 loop.ldr", "0 NOFILE"].join("\n");
+    expect(importLdr(text).skipped.map((s) => s.reason)).toEqual(["submodel loop.ldr includes itself"]);
+  });
+});

@@ -3,6 +3,7 @@ import { generateModel, type GenerateEvent, type ImageMediaType } from "@/lib/cl
 import type { BuildSize } from "@/lib/prompts/design";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
+import { AVAILABLE_PIPELINES, PIPELINES, resolvePipeline, type Pipeline } from "@/lib/claude/pipeline";
 
 const IMAGE_TYPES: ImageMediaType[] = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -16,9 +17,13 @@ function friendly(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
-/** POST { text?, image?: { mediaType, data(base64) }, size?, base? } → text/event-stream of GenerateEvent. `base` = model to edit. */
+/**
+ * POST { text?, image?: { mediaType, data(base64) }, size?, base?, pipeline? }
+ * → text/event-stream of GenerateEvent. `base` = model to edit; `pipeline` =
+ * "single" | "subbuilds" | "auto" (default CONFIG.generator).
+ */
 export async function POST(req: Request) {
-  let body: { text?: string; image?: { mediaType: string; data: string }; size?: string; base?: unknown };
+  let body: { text?: string; image?: { mediaType: string; data: string }; size?: string; base?: unknown; pipeline?: string };
   try {
     body = await req.json();
   } catch {
@@ -39,6 +44,11 @@ export async function POST(req: Request) {
     if (!parsed.success) return Response.json({ error: "The model to edit isn't valid JSON for this app" }, { status: 400 });
     if (parsed.data.parts.length > CONFIG.maxParts) return Response.json({ error: `The model to edit has more than ${CONFIG.maxParts} parts` }, { status: 400 });
     base = parsed.data;
+  }
+  if (body.pipeline !== undefined && !PIPELINES.includes(body.pipeline as Pipeline)) return Response.json({ error: `Unknown pipeline "${body.pipeline}"` }, { status: 400 });
+  const pipeline = resolvePipeline(body.pipeline as Pipeline | undefined, size, !!base);
+  if (!AVAILABLE_PIPELINES.includes(pipeline)) {
+    return Response.json({ error: "The sub-build generator isn't built yet. Choose Single pass for now." }, { status: 501 });
   }
 
   const encoder = new TextEncoder();

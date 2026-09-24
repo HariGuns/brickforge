@@ -140,6 +140,7 @@ input[type="range"] { accent-color: var(--k-accent); }
 .send-btn { margin-left: auto; height: 32px; border: 0; border-radius: 9px; background: var(--k-accent); color: #fff; display: flex; align-items: center; gap: 6px; padding: 0 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .send-btn:hover:not(:disabled) { background: var(--k-accent-h); }
 .send-btn.stop { background: var(--k-text); color: var(--k-win); }
+.path-select select { height: 28px; border: 1px solid var(--k-line2); border-radius: 8px; background: var(--k-win); color: var(--k-muted); font: inherit; font-size: 12px; padding: 0 6px; cursor: pointer; }
 .edit-toggle { height: 28px; border: 1px dashed var(--k-line2); border-radius: 8px; background: transparent; color: var(--k-muted); display: flex; align-items: center; gap: 5px; padding: 0 8px; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 0; max-width: 190px; }
 .edit-toggle .edit-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .edit-toggle:hover { color: var(--k-text); border-color: var(--k-muted); }

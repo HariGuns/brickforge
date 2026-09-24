@@ -26,6 +26,7 @@ import {
 import type { BuildSummary } from "@/lib/builds/store";
 import { exportFileNames, exportLdr, exportMpd } from "@/lib/ldraw/export";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
+import { CONFIG } from "@/lib/config";
 import { streamGenerate } from "@/lib/client/sse";
 import { download, prepareImage } from "@/lib/client/image";
 import { TopBar, type SaveState } from "@/components/TopBar";
@@ -56,7 +57,7 @@ export default function Page() {
   const wsRef = useRef<Workspace | null>(null);
   const [manualStep, setManualStep] = useState(1);
   const [turns, setTurns] = useState<Turn[]>([]);
-  const [draft, setDraft] = useState<Draft>({ text: "", size: "medium", image: null });
+  const [draft, setDraft] = useState<Draft>({ text: "", size: "medium", pipeline: CONFIG.generator, image: null });
   const [running, setRunning] = useState(false);
   const [editing, setEditing] = useState(true);
   const [library, setLibrary] = useState<LibraryEntry[] | null>(null);
@@ -228,7 +229,7 @@ export default function Page() {
     const ac = new AbortController();
     abortRef.current = ac;
     try {
-      const body = { text: d.text, size: d.size, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined, base };
+      const body = { text: d.text, size: d.size, pipeline: d.pipeline, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined, base };
       for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev, base, docId, d.text.trim());
     } catch (e) {
       if (ac.signal.aborted) updateTurn(id, (t) => ({ ...t, status: "cancelled" }));

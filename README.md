@@ -20,6 +20,8 @@ npm run dev                                         # http://localhost:3000
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
 | `npm run gen -- --size small "a rubber duck"` | Target size: `small`, `medium` or `large` (the same choice as the size buttons in the chat) |
+| `npm run gen -- --pipeline single "a castle"` | Generator path: `single` (default), `subbuilds` or `auto` (sub-builds for Large). Sub-builds arrive in phase 3 |
+| `npm run bench [side]` | Compile benchmark for a large nested design (`side` 5 ≈ 4,600 parts) |
 | `npm run verify-ldraw` | Check every part in the library against the official LDraw library (needs `ldraw-lib/`, see below) |
 | `npm run export-sample` | Export the hand-built sample models to `exports/` |
 | `scripts/leocad-render.sh exports/X.ldr [out.png] [step]` | Render an export with LeoCAD (flatpak `org.leocad.LeoCAD`) to confirm it opens |
@@ -44,6 +46,17 @@ The UI follows `design/brickforge-v2.html`.
   - **Save** (⌘/Ctrl+S): writes the build with all its versions to `builds/<id>.json` (gitignored). Saved builds appear at the top of the Library.
   - **Unsaved work:** switching builds or leaving the page asks first. Logic: `src/lib/builds/doc.ts`; storage: `src/lib/builds/store.ts`.
 - **Not built yet:** Showcase, sub-builds and shared builds are disabled placeholders.
+
+## Sub-builds (in progress)
+
+A **design** (`src/lib/design/schema.ts`) describes a model as a tree of sub-builds: each unique sub-build is defined once in its own frame, and `uses` place copies (x, y, z, rot). The deterministic compiler (`src/lib/design/compile.ts`) turns a design into a flat model:
+- It expands copies (rotating each inside its footprint box, nested up to 4 levels) and tags every part with the copy it came from (e.g. `Grove #1 › Pine tree #2`).
+- It runs the validator, then checks joins at every level: each copy must be attached, must rest on something, and must not interlock with a sibling.
+- It reports stats: pieces, sub-builds, copies, compile time, errors, warnings, and size in cm.
+
+A flat model is a design with no sub-builds, so the single-pass path and older saved builds are unchanged. Versions store the compiled `model` and, optionally, the `design`.
+
+`.mpd` export for designs has one submodel per unique sub-build, with copies as references; the importer expands them back. Compiling ~4,600 parts in 425 nested copies takes about 60 ms (`npm run bench`).
 
 ## Where to tune things
 

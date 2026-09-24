@@ -1,0 +1,466 @@
+{
+  "id": "bmuf30ahk1-9c41d3f3",
+  "name": "Tiny house",
+  "versions": [
+    {
+      "id": "vmuf30ahk0-ec48c97a",
+      "model": {
+        "name": "Tiny house",
+        "description": "An 8×6 house with a door, running-bond walls and a sloped roof.",
+        "parts": [
+          {
+            "part": "plate_4x6",
+            "color": "dark_green",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "rot": 90
+          },
+          {
+            "part": "plate_4x6",
+            "color": "dark_green",
+            "x": 4,
+            "y": 0,
+            "z": 0,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x8",
+            "color": "red",
+            "x": 0,
+            "y": 1,
+            "z": 0,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x3",
+            "color": "red",
+            "x": 0,
+            "y": 1,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x3",
+            "color": "red",
+            "x": 5,
+            "y": 1,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x4",
+            "color": "red",
+            "x": 0,
+            "y": 1,
+            "z": 1,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x4",
+            "color": "red",
+            "x": 7,
+            "y": 1,
+            "z": 1,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x6",
+            "color": "red",
+            "x": 1,
+            "y": 4,
+            "z": 0,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x6",
+            "color": "white",
+            "x": 0,
+            "y": 4,
+            "z": 0,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x6",
+            "color": "white",
+            "x": 7,
+            "y": 4,
+            "z": 0,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x2",
+            "color": "red",
+            "x": 1,
+            "y": 4,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x2",
+            "color": "red",
+            "x": 5,
+            "y": 4,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x8",
+            "color": "red",
+            "x": 0,
+            "y": 7,
+            "z": 0,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x8",
+            "color": "red",
+            "x": 0,
+            "y": 7,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x4",
+            "color": "red",
+            "x": 0,
+            "y": 7,
+            "z": 1,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x4",
+            "color": "red",
+            "x": 7,
+            "y": 7,
+            "z": 1,
+            "rot": 90
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 10,
+            "z": 4,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 4,
+            "y": 10,
+            "z": 4,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 10,
+            "z": 0,
+            "rot": 180
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 4,
+            "y": 10,
+            "z": 0,
+            "rot": 180
+          },
+          {
+            "part": "brick_2x8",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 10,
+            "z": 2,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 13,
+            "z": 3,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 4,
+            "y": 13,
+            "z": 3,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 13,
+            "z": 1,
+            "rot": 180
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 4,
+            "y": 13,
+            "z": 1,
+            "rot": 180
+          },
+          {
+            "part": "plate_2x8",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 16,
+            "z": 2,
+            "rot": 0
+          }
+        ]
+      },
+      "label": "Built from “a tiny house”",
+      "createdAt": "2026-09-24T10:00:00.000Z",
+      "source": {
+        "kind": "build",
+        "prompt": "a tiny house",
+        "debugDir": "2026-09-23_18-03-56-x",
+        "cost": 0.12
+      }
+    },
+    {
+      "id": "vmuf30ahk2-8a8203b0",
+      "model": {
+        "name": "Tiny house",
+        "description": "An 8×6 house with a door, running-bond walls and a sloped roof.",
+        "parts": [
+          {
+            "part": "plate_4x6",
+            "color": "dark_green",
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "rot": 90
+          },
+          {
+            "part": "plate_4x6",
+            "color": "dark_green",
+            "x": 4,
+            "y": 0,
+            "z": 0,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x8",
+            "color": "red",
+            "x": 0,
+            "y": 1,
+            "z": 0,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x3",
+            "color": "red",
+            "x": 0,
+            "y": 1,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x3",
+            "color": "red",
+            "x": 5,
+            "y": 1,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x4",
+            "color": "red",
+            "x": 0,
+            "y": 1,
+            "z": 1,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x4",
+            "color": "red",
+            "x": 7,
+            "y": 1,
+            "z": 1,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x6",
+            "color": "red",
+            "x": 1,
+            "y": 4,
+            "z": 0,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x6",
+            "color": "white",
+            "x": 0,
+            "y": 4,
+            "z": 0,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x6",
+            "color": "white",
+            "x": 7,
+            "y": 4,
+            "z": 0,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x2",
+            "color": "red",
+            "x": 1,
+            "y": 4,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x2",
+            "color": "red",
+            "x": 5,
+            "y": 4,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x8",
+            "color": "red",
+            "x": 0,
+            "y": 7,
+            "z": 0,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x8",
+            "color": "red",
+            "x": 0,
+            "y": 7,
+            "z": 5,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x4",
+            "color": "red",
+            "x": 0,
+            "y": 7,
+            "z": 1,
+            "rot": 90
+          },
+          {
+            "part": "brick_1x4",
+            "color": "red",
+            "x": 7,
+            "y": 7,
+            "z": 1,
+            "rot": 90
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 10,
+            "z": 4,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 4,
+            "y": 10,
+            "z": 4,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 10,
+            "z": 0,
+            "rot": 180
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 4,
+            "y": 10,
+            "z": 0,
+            "rot": 180
+          },
+          {
+            "part": "brick_2x8",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 10,
+            "z": 2,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 13,
+            "z": 3,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 4,
+            "y": 13,
+            "z": 3,
+            "rot": 0
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 13,
+            "z": 1,
+            "rot": 180
+          },
+          {
+            "part": "slope45_2x4",
+            "color": "dark_gray",
+            "x": 4,
+            "y": 13,
+            "z": 1,
+            "rot": 180
+          },
+          {
+            "part": "plate_2x8",
+            "color": "dark_gray",
+            "x": 0,
+            "y": 16,
+            "z": 2,
+            "rot": 0
+          },
+          {
+            "part": "brick_1x1",
+            "color": "white",
+            "x": 0,
+            "y": 17,
+            "z": 2,
+            "rot": 0
+          }
+        ]
+      },
+      "label": "Edit: add a chimney",
+      "createdAt": "2026-09-24T10:05:00.000Z",
+      "source": {
+        "kind": "edit",
+        "prompt": "add a chimney",
+        "cost": 0.08
+      }
+    }
+  ],
+  "currentId": "vmuf30ahk0-ec48c97a",
+  "createdAt": "2026-09-24T10:00:00.000Z",
+  "updatedAt": "2026-09-24T10:06:00.000Z"
+}

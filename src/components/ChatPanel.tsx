@@ -5,6 +5,7 @@ import type { Issue } from "@/lib/validate/validator";
 import type { RoundSummary } from "@/lib/claude/generate";
 import type { BuildSize } from "@/lib/prompts/design";
 import { CONFIG } from "@/lib/config";
+import { AVAILABLE_PIPELINES, type Pipeline } from "@/lib/claude/pipeline";
 import * as I from "./icons";
 
 export interface RoundState {
@@ -33,6 +34,8 @@ export interface Turn {
 export interface Draft {
   text: string;
   size: BuildSize;
+  /** Generator path for new builds (testing setting). */
+  pipeline: Pipeline;
   image: { name: string; mediaType: "image/jpeg"; data: string; previewUrl: string } | null;
 }
 
@@ -240,6 +243,25 @@ export function ChatPanel(props: {
                   </button>
                 ))}
               </div>
+            )}
+            {!editing && (
+              <label className="path-select" title="Generator path (testing): single pass, sub-builds, or auto (sub-builds for Large)">
+                <span className="sr-only">Generator path</span>
+                <select value={draft.pipeline} onChange={(e) => props.onDraft({ pipeline: e.target.value as Pipeline })}>
+                  {(
+                    [
+                      ["single", "Single pass"],
+                      ["subbuilds", "Sub-builds"],
+                      ["auto", "Auto"],
+                    ] as const
+                  ).map(([id, label]) => (
+                    <option key={id} value={id} disabled={!AVAILABLE_PIPELINES.includes(id)}>
+                      {label}
+                      {!AVAILABLE_PIPELINES.includes(id) ? " (soon)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
             )}
             {props.modelName && (
               <button

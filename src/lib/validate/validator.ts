@@ -15,7 +15,17 @@ export type IssueCode =
   | "FLOATING"
   | "UNSUPPORTED"
   | "DISCONNECTED"
-  | "WEAK_CONNECTION";
+  | "WEAK_CONNECTION"
+  // design / sub-build compiler
+  | "UNKNOWN_SUBBUILD"
+  | "DUPLICATE_SUBBUILD"
+  | "SUBBUILD_CYCLE"
+  | "TOO_DEEP"
+  | "EMPTY_SUBBUILD"
+  | "UNUSED_SUBBUILD"
+  | "DETACHED_SUBBUILD"
+  | "SUBBUILD_UNSUPPORTED"
+  | "INTERLOCKED";
 
 export interface Issue {
   code: IssueCode;
@@ -219,9 +229,14 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
   }
 
   // --- weak connections (warning only) ------------------------------------------
+  const studTotal = new Map<number, number>();
+  for (const c of connections) {
+    studTotal.set(c.upper, (studTotal.get(c.upper) ?? 0) + c.studs);
+    studTotal.set(c.lower, (studTotal.get(c.lower) ?? 0) + c.studs);
+  }
   for (const r of ok) {
     if (r.fp.y0 === 0 || floating.has(r.index) || r.fp.sx * r.fp.sz < 2) continue;
-    const total = connections.filter((c) => c.upper === r.index || c.lower === r.index).reduce((s, c) => s + c.studs, 0);
+    const total = studTotal.get(r.index) ?? 0;
     if (total === 1) {
       warnings.push({
         code: "WEAK_CONNECTION",

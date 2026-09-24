@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BrickModelSchema, type BrickModel } from "../model/schema";
+import { BrickDesignSchema } from "../design/schema";
 
 /**
  * A build is a document with an append-only list of versions. Undo/redo is a
@@ -9,7 +10,10 @@ import { BrickModelSchema, type BrickModel } from "../model/schema";
 
 export const VersionSchema = z.object({
   id: z.string(),
+  /** Compiled parts (always present; everything that displays or exports reads this). */
   model: BrickModelSchema,
+  /** The sub-build design this version was compiled from, if any. Absent for flat models and older saves. */
+  design: BrickDesignSchema.optional(),
   /** Human label, e.g. "Built from “a lighthouse”", "Edit: add a chimney". */
   label: z.string(),
   createdAt: z.string(),

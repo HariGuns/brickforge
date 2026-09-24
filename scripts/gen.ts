@@ -4,6 +4,7 @@
  *   npm run gen -- --image photo.jpg "optional extra instructions"
  *   npm run gen -- --size small "a rubber duck"      (small | medium | large)
  *   npm run gen -- --base model.json "add a chimney"  (edit an existing model)
+ *   npm run gen -- --pipeline single "a castle"         (single | subbuilds | auto; default from CONFIG.generator)
  * Writes exports/<name>.ldr/.mpd and a debug folder under ./debug.
  */
 import fs from "node:fs";
@@ -22,6 +23,8 @@ if (i >= 0) [imagePath] = args.splice(i, 2).slice(1);
 let size: "small" | "medium" | "large" | undefined;
 const si = args.indexOf("--size");
 if (si >= 0) size = args.splice(si, 2)[1] as typeof size;
+const pi = args.indexOf("--pipeline");
+const pipelineArg = pi >= 0 ? (args.splice(pi, 2)[1] as "single" | "subbuilds" | "auto") : undefined;
 const bi = args.indexOf("--base");
 const base = bi >= 0 ? JSON.parse(fs.readFileSync(args.splice(bi, 2)[1], "utf8")) : undefined;
 const text = args.join(" ").trim() || undefined;
@@ -29,6 +32,14 @@ const text = args.join(" ").trim() || undefined;
 const ext = imagePath ? path.extname(imagePath).slice(1).toLowerCase() : "";
 const mediaType = ({ jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" } as const)[ext as "jpg"];
 const image = imagePath ? { mediaType, data: fs.readFileSync(imagePath).toString("base64") } : undefined;
+
+const { resolvePipeline, AVAILABLE_PIPELINES } = await import("../src/lib/claude/pipeline");
+const pipeline = resolvePipeline(pipelineArg, size, !!base);
+if (!AVAILABLE_PIPELINES.includes(pipeline)) {
+  console.error(`The ${pipeline} generator isn't built yet. Use --pipeline single.`);
+  process.exit(2);
+}
+console.log(`pipeline: ${pipeline}`);
 
 const result = await generateModel({ text, image, size, base }, (e) => {
   if (e.type === "round_start") console.log(`→ round ${e.round} (${e.kind})…`);

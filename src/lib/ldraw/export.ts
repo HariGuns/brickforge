@@ -3,6 +3,8 @@ import { getPart, type PartDef } from "../parts/library";
 import { footprint } from "../model/geometry";
 import type { BrickModel, Placement } from "../model/schema";
 import type { BuildStep } from "../steps/steps";
+import type { BrickDesign, Instance } from "../design/schema";
+import type { Box, CompileResult } from "../design/compile";
 
 /**
  * LDraw units: 1 stud = 20 LDU, 1 plate = 8 LDU, -Y is up.
@@ -91,4 +93,55 @@ export function exportMpd(model: BrickModel, steps: BuildStep[]): string {
 export function exportFileNames(model: BrickModel): { ldr: string; mpd: string } {
   const base = safeName(model.name);
   return { ldr: `${base}.ldr`, mpd: `${base}.mpd` };
+}
+
+// ---- designs: one submodel per unique sub-build --------------------------------
+
+/** LDraw type-1 line placing a copy of a submodel, matching the compiler's copy transform. */
+export function instanceLine(inst: Instance, box: Box, file: string): string {
+  const u = -box.minX, v = -box.minZ; // local grid origin, relative to the box's min corner
+  const W = box.maxX - box.minX, D = box.maxZ - box.minZ;
+  const [ru, rv] = inst.rot === 0 ? [u, v] : inst.rot === 90 ? [D - v, u] : inst.rot === 180 ? [W - u, D - v] : [v, W - u];
+  const pos = [(inst.x + ru) * LDU_STUD, -inst.y * LDU_PLATE, -(inst.z + rv) * LDU_STUD];
+  return ["1", 16, ...pos.map(fmt), ...yawMatrix(inst.rot).map(fmt), file].join(" ");
+}
+
+/** Submodel file for a sub-build (prefixed so it can't collide with the main model's file). */
+export function submodelFile(id: string): string {
+  return `sub_${id}.ldr`;
+}
+
+/** Group placements (parts or copies) by height into STEP blocks, bottom first. */
+function stepBlocks(items: { y: number; line: string }[]): string[] {
+  const out: string[] = [];
+  const ys = [...new Set(items.map((i) => i.y))].sort((a, b) => a - b);
+  for (const y of ys) {
+    for (const i of items) if (i.y === y) out.push(i.line);
+    out.push("0 STEP");
+  }
+  return out;
+}
+
+/**
+ * .mpd for a design: the main model first, then one submodel per unique
+ * sub-build. Copies are references to their submodel, so nesting is preserved.
+ * Requires a successful compile (for each sub-build's local box).
+ */
+export function exportDesignMpd(design: BrickDesign, compiled: Pick<CompileResult, "boxes">): string {
+  const subFiles = new Set(design.subBuilds.map((s) => submodelFile(s.id).toLowerCase()));
+  let mainName = `${safeName(design.name)}.ldr`;
+  if (subFiles.has(mainName.toLowerCase())) mainName = `main_${mainName}`;
+  const block = (file: string, title: string, description: string, parts: Placement[], uses: Instance[]) => {
+    const items = [
+      ...parts.map((p) => ({ y: p.y, line: partLine(p) })),
+      ...uses.filter((u) => compiled.boxes[u.sub]).map((u) => ({ y: u.y, line: instanceLine(u, compiled.boxes[u.sub], submodelFile(u.sub)) })),
+    ];
+    return [`0 FILE ${file}`, `0 ${title}`, `0 Name: ${file}`, `0 Author: Brick Builder`, `0 !LDRAW_ORG Unofficial_Model`, ...(description ? [`0 // ${description.replace(/\s+/g, " ")}`] : []), "", ...stepBlocks(items), "0 NOFILE"];
+  };
+  const lines = block(mainName, design.name, design.description, design.main.parts, design.main.uses);
+  for (const s of design.subBuilds) {
+    if (!compiled.boxes[s.id]) continue; // unused or broken
+    lines.push(...block(submodelFile(s.id), s.name, "", s.parts, s.uses));
+  }
+  return lines.join("\r\n") + "\r\n";
 }

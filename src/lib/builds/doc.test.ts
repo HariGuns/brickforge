@@ -67,3 +67,17 @@ describe("build documents", () => {
     expect([canUndo(reopened), isDirty(reopened)]).toEqual([false, false]);
   });
 });
+
+describe("builds saved before sub-builds", () => {
+  it("still load, with their versions, undo/redo and no design field", async () => {
+    const saved = (await import("../fixtures/saved-build-v1.json")).default;
+    const doc = BuildDocSchema.parse(saved);
+    const ws = openWorkspace(doc);
+    expect(doc.versions).toHaveLength(2);
+    expect(doc.versions.every((v) => v.design === undefined)).toBe(true);
+    expect(currentVersion(ws).label).toBe("Built from “a tiny house”");
+    const edited = restoreVersion(ws, doc.versions[1].id);
+    expect(currentVersion(edited).model.parts).toHaveLength(27);
+    expect(currentVersion(undo(edited)).label).toBe("Built from “a tiny house”");
+  });
+});

@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "gen": "tsx scripts/gen.ts",
     "export-sample": "tsx scripts/export-sample.ts",
-    "verify-ldraw": "tsx scripts/verify-ldraw.ts"
+    "verify-ldraw": "tsx scripts/verify-ldraw.ts",
+    "bench": "tsx scripts/bench.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
