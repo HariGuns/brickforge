@@ -23,7 +23,13 @@
  * available to Claude automatically (the prompt lists the library).
  */
 
-export type PartCategory = "brick" | "plate" | "tile" | "slope";
+export type PartCategory = "brick" | "plate" | "tile" | "slope" | "round" | "cone" | "fence" | "arch" | "window" | "door" | "flower";
+
+/** How the 3D viewer draws the part (LDraw export always uses the real part). */
+export type PartShape = "box" | "slope" | "ridge" | "round" | "cone" | "fence" | "arch" | "window" | "door" | "flower";
+
+/** A solid region in local cells and plates: x0..x1, z0..z1 (exclusive), y0..y1 (exclusive). */
+export type Solid = [number, number, number, number, number, number];
 
 export interface PartDef {
   id: string;
@@ -34,11 +40,26 @@ export interface PartDef {
   h: number;
   /** Top cells with studs, local [cx, cz]. Undefined = all cells. */
   studs?: [number, number][];
+  /** Underside cells that take a stud from below, local [cx, cz]. Undefined = all cells. */
+  bottom?: [number, number][];
+  /** Space the part fills, for collisions. Undefined = its whole box. */
+  solids?: Solid[];
+  shape?: PartShape;
+  /** Fraction of the box that's material, for the mass estimate (default 1; slopes 0.75). */
+  massFactor?: number;
   ldraw: {
     file: string;
     yaw: 0 | 90 | 180 | 270;
     /** Native LDraw coords (LDU) of our footprint's top-centre point, if the part's origin isn't there. */
     origin?: [number, number, number];
+    /** Extra LDraw parts written with this one (e.g. a door in its frame), at native offsets (LDU). */
+    extra?: { file: string; offset: [number, number, number] }[];
+    /** Verification: tabs may rise up to one stud height above the top face. */
+    topTabs?: boolean;
+    /** Verification: bounding-box tolerance in LDU (default 1). */
+    slack?: number;
+    /** Verification: the real part has a stud between grid cells (unusable on the grid, so not modelled). */
+    offGridStud?: boolean;
   };
   /** One-line hint shown to Claude. */
   hint?: string;
@@ -128,13 +149,159 @@ export const PARTS: PartDef[] = [
   slope(1, "3040b.dat"),
   slope(2, "3039.dat"),
   slope(4, "3037.dat"),
+
+  // Roof: 33° slopes (3 deep) and 45° ridges.
+  slope33(2, "3298.dat"),
+  slope33(4, "3297.dat"),
+  ridge(1, "3044b.dat"),
+  ridge(2, "3043.dat"),
+
+  // Round bricks, plates and tiles.
+  round("round_brick_1x1", "Round brick 1×1", 1, BRICK, "3062b.dat"),
+  round("round_brick_2x2", "Round brick 2×2", 2, BRICK, "3941.dat"),
+  round("round_plate_1x1", "Round plate 1×1", 1, PLATE, "6141.dat"),
+  round("round_plate_2x2", "Round plate 2×2", 2, PLATE, "4032b.dat"),
+  { ...round("round_tile_1x1", "Round tile 1×1", 1, PLATE, "98138.dat"), category: "tile", studs: [], hint: "smooth round top, nothing attaches on top" },
+
+  // Cones.
+  { id: "cone_1x1", name: "Cone 1×1", category: "cone", shape: "cone", w: 1, d: 1, h: BRICK, massFactor: 0.5, ldraw: { file: "4589.dat", yaw: 0 }, hint: "tapers to a single stud on top" },
+  {
+    id: "cone_2x2x2",
+    name: "Cone 2×2×2",
+    category: "cone",
+    shape: "cone",
+    w: 2,
+    d: 2,
+    h: 2 * BRICK,
+    studs: [], // its one stud is centred between cells, so nothing on the grid attaches to it
+    massFactor: 0.45,
+    ldraw: { file: "3942c.dat", yaw: 0, offGridStud: true },
+    hint: "2 bricks tall, tapers to a point; nothing attaches on top",
+  },
+
+  // Fences (1 stud deep, no studs on top).
+  fence("fence_1x4x1", "Fence 1×4×1 (lattice)", BRICK, "3633.dat"),
+  fence("fence_1x4x2", "Fence 1×4×2 (picket)", 2 * BRICK, "33303.dat"),
+
+  // Arches: open underneath between the legs.
+  arch(4, "3659.dat"),
+  arch(6, "3455.dat"),
+
+  // Windows (with glass) and a door in its frame.
+  window("window_1x2x2", "Window 1×2×2", 2 * BRICK, "60592c01.dat"),
+  window("window_1x2x3", "Window 1×2×3", 3 * BRICK, "60593c01.dat"),
+  {
+    id: "door_1x4x6",
+    name: "Door 1×4×6 (frame + door)",
+    category: "door",
+    shape: "door",
+    w: 4,
+    d: 1,
+    h: 6 * BRICK,
+    studs: [
+      [1, 0],
+      [2, 0],
+    ],
+    massFactor: 0.35,
+    // The door goes 32 LDU across and 5 LDU deep in the frame (per the LDraw part's own notes).
+    ldraw: { file: "60596.dat", yaw: 0, topTabs: true, extra: [{ file: "60616a.dat", offset: [-32, 0, 5] }] },
+    hint: "6 bricks tall; studs only on the two middle cells on top",
+  },
+
+  // Flowers (sit on a stud; petals overhang very slightly).
+  { id: "flower_1x1", name: "Flower plate 1×1 (5 petals)", category: "flower", shape: "flower", w: 1, d: 1, h: PLATE, massFactor: 0.6, ldraw: { file: "24866.dat", yaw: 0 }, hint: "a flower head; has a stud on top" },
+  { id: "flower_1x1_tabs", name: "Flower plate 1×1 (4 petals)", category: "flower", shape: "flower", w: 1, d: 1, h: PLATE, massFactor: 0.6, ldraw: { file: "33291.dat", yaw: 0, slack: 2.5 }, hint: "a four-petal flower; has a stud on top" },
 ];
+
+/** 33° slope, 3 deep: flat stud row at local z = 0, slope descends toward +z over 2 studs. */
+function slope33(w: number, file: string): PartDef {
+  const studs: [number, number][] = [];
+  for (let cx = 0; cx < w; cx++) studs.push([cx, 0]);
+  return {
+    id: `slope33_3x${w}`,
+    name: `Slope 33° 3×${w}`,
+    category: "slope",
+    shape: "slope",
+    w,
+    d: 3,
+    h: BRICK,
+    studs,
+    ldraw: { file, yaw: 0, origin: [0, 0, -20] },
+    hint: "gentle roof slope; studs only on the back row (local z=0); slope descends toward local +z over 2 studs",
+  };
+}
+
+/** 45° double slope (roof ridge): 2 deep, peak runs along x; no studs. */
+function ridge(w: number, file: string): PartDef {
+  return {
+    id: `ridge45_2x${w}`,
+    name: `Ridge 45° 2×${w}`,
+    category: "slope",
+    shape: "ridge",
+    w,
+    d: 2,
+    h: BRICK,
+    studs: [],
+    ldraw: { file, yaw: 0 },
+    hint: "roof ridge: slopes down on both sides (±z at rot 0), no studs; caps the top of two opposed slopes",
+  };
+}
+
+function round(id: string, name: string, size: number, h: number, file: string): PartDef {
+  return { id, name, category: "round", shape: "round", w: size, d: size, h, massFactor: 0.8, ldraw: { file, yaw: 0 } };
+}
+
+function fence(id: string, name: string, h: number, file: string): PartDef {
+  return { id, name, category: "fence", shape: "fence", w: 4, d: 1, h, studs: [], massFactor: 0.3, ldraw: { file, yaw: 0 }, hint: "thin see-through fence; nothing attaches on top" };
+}
+
+/** Arch 1×w: legs are the end cells (full height, the only underside connectors); the span in between is only the top plate. */
+function arch(w: number, file: string): PartDef {
+  return {
+    id: `arch_1x${w}`,
+    name: `Arch 1×${w}`,
+    category: "arch",
+    shape: "arch",
+    w,
+    d: 1,
+    h: BRICK,
+    bottom: [
+      [0, 0],
+      [w - 1, 0],
+    ],
+    solids: [
+      [0, 0, 1, 1, 0, BRICK],
+      [w - 1, 0, w, 1, 0, BRICK],
+      [1, 0, w - 1, 1, BRICK - 1, BRICK],
+    ],
+    massFactor: 0.7,
+    ldraw: { file, yaw: 0 },
+    hint: `opening under the middle ${w - 2} studs is 2 plates tall; only the two end cells connect underneath`,
+  };
+}
+
+function window(id: string, name: string, h: number, file: string): PartDef {
+  return { id, name, category: "window", shape: "window", w: 2, d: 1, h, massFactor: 0.4, ldraw: { file, yaw: 0 }, hint: `frame with clear glass, ${h / BRICK} bricks tall; 2 studs on top` };
+}
 
 export const PART_MAP: ReadonlyMap<string, PartDef> = new Map(PARTS.map((p) => [p.id, p]));
 export const PART_IDS = PARTS.map((p) => p.id) as [string, ...string[]];
 
 export function getPart(id: string): PartDef | undefined {
   return PART_MAP.get(id);
+}
+
+/** Local underside cells that accept a stud (resolves the "all cells" default). */
+export function localBottom(p: PartDef): [number, number][] {
+  if (p.bottom) return p.bottom;
+  const out: [number, number][] = [];
+  for (let cz = 0; cz < p.d; cz++) for (let cx = 0; cx < p.w; cx++) out.push([cx, cz]);
+  return out;
+}
+
+/** Solid regions of a part (resolves the "whole box" default). */
+export function localSolids(p: PartDef): Solid[] {
+  return p.solids ?? [[0, 0, p.w, p.d, 0, p.h]];
 }
 
 /** Local top-stud cells of a part (resolves the "all cells" default). */

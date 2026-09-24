@@ -12,6 +12,8 @@ export interface ImportResult {
 
 const byFile = new Map<string, PartDef>(PARTS.map((p) => [p.ldraw.file.toLowerCase(), p]));
 const byColor = new Map<number, string>(COLORS.map((c) => [c.ldraw, c.id]));
+/** Parts written as extras of a library part (e.g. the door in a door frame): skipped on import. */
+const extraFiles = new Set(PARTS.flatMap((p) => (p.ldraw.extra ?? []).map((e) => e.file.toLowerCase())));
 const near = (a: number, b: number) => Math.abs(a - b) < 1e-3;
 const INHERIT = 16;
 const IDENTITY: Mat3 = [1, 0, 0, 0, 1, 0, 0, 0, 1];
@@ -104,6 +106,7 @@ export function importLdr(text: string, fallbackName = "Imported model"): Import
         continue;
       }
 
+      if (extraFiles.has(ref.toLowerCase())) continue;
       const def = byFile.get(ref.toLowerCase());
       if (!def) {
         skipped.push({ line: lineNo, reason: `unknown part ${ref.toLowerCase()}` });

@@ -1,6 +1,6 @@
 import { CONFIG } from "../config";
 import { COLOR_MAP } from "../parts/colors";
-import { describe, footprintCells, resolve, worldStuds, type Resolved } from "../model/geometry";
+import { describe, resolve, worldBottom, worldSolidCells, worldStuds, type Resolved } from "../model/geometry";
 import type { BrickModel } from "../model/schema";
 import { analyzeStructure, type StructureReport } from "./structure";
 
@@ -132,8 +132,8 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
   const occupancy = new Map<string, number>();
   const overlapPairs = new Map<string, { a: number; b: number; cells: number }>();
   for (const r of ok) {
-    for (const [x, z] of footprintCells(r.fp)) {
-      for (let y = r.fp.y0; y < r.fp.y1; y++) {
+    for (const [x, y, z] of worldSolidCells(r.pl, r.def)) {
+      {
         const k = key3(x, y, z);
         const other = occupancy.get(k);
         if (other === undefined) {
@@ -160,7 +160,7 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
   // Index each part's underside by (bottom layer, cell).
   const underside = new Map<string, number>(); // "y|x,z" -> part index
   for (const r of ok) {
-    for (const [x, z] of footprintCells(r.fp)) underside.set(`${r.fp.y0}|${key2(x, z)}`, r.index);
+    for (const [x, z] of worldBottom(r.pl, r.def)) underside.set(`${r.fp.y0}|${key2(x, z)}`, r.index);
   }
   const connCount = new Map<string, Connection>();
   for (const r of ok) {

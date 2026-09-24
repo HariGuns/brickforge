@@ -1,6 +1,6 @@
 import { CONFIG } from "../config";
 import { describe, footprint, worldStuds } from "../model/geometry";
-import { getPart, type PartDef } from "../parts/library";
+import { getPart, localSolids, type PartDef } from "../parts/library";
 import type { BrickModel } from "../model/schema";
 import type { Connection, Issue } from "./validator";
 
@@ -47,7 +47,8 @@ export interface StructureReport {
 
 export function partMass(def: PartDef): number {
   const s = CONFIG.structure;
-  return def.w * def.d * def.h * s.gramsPerUnit * (def.category === "slope" ? s.slopeFactor : 1);
+  const volume = localSolids(def).reduce((v, [x0, z0, x1, z1, y0, y1]) => v + (x1 - x0) * (z1 - z0) * (y1 - y0), 0);
+  return volume * s.gramsPerUnit * (def.massFactor ?? (def.category === "slope" ? s.slopeFactor : 1));
 }
 
 const round = (n: number, d = 1) => Math.round(n * 10 ** d) / 10 ** d;

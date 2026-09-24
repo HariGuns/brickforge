@@ -13,7 +13,8 @@
     "gen": "tsx scripts/gen.ts",
     "export-sample": "tsx scripts/export-sample.ts",
     "verify-ldraw": "tsx scripts/verify-ldraw.ts",
-    "bench": "tsx scripts/bench.ts"
+    "bench": "tsx scripts/bench.ts",
+    "probe-ldraw": "tsx scripts/probe-ldraw.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

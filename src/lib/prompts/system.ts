@@ -6,15 +6,19 @@ import { CONFIG } from "../config";
 import { COLORS } from "../parts/colors";
 import { PARTS, type PartDef } from "../parts/library";
 
-function studText(p: PartDef): string {
-  if (!p.studs) return "all";
-  if (p.studs.length === 0) return "none";
-  return p.studs.map(([x, z]) => `(${x},${z})`).join(" ");
+function cellsText(cells: [number, number][] | undefined): string {
+  if (!cells) return "all";
+  if (cells.length === 0) return "none";
+  return cells.map(([x, z]) => `(${x},${z})`).join(" ");
 }
 
 export function partTable(): string {
-  const rows = PARTS.map((p) => `| ${p.id} | ${p.w}×${p.d} | ${p.h} | ${studText(p)} | ${p.hint ?? ""} |`);
-  return ["| id | footprint at rot 0 (x×z studs) | height (plates) | top studs (local x,z) | notes |", "|---|---|---|---|---|", ...rows].join("\n");
+  const rows = PARTS.map((p) => `| ${p.id} | ${p.w}×${p.d} | ${p.h} | ${cellsText(p.studs)} | ${cellsText(p.bottom)} | ${p.hint ?? ""} |`);
+  return [
+    "| id | footprint at rot 0 (x×z studs) | height (plates) | top studs (local x,z) | underside takes studs at | notes |",
+    "|---|---|---|---|---|---|",
+    ...rows,
+  ].join("\n");
 }
 
 export function colorList(): string {
@@ -35,12 +39,18 @@ export function systemPrompt(): string {
 # Parts
 ${partTable()}
 
-Slopes (slope45_*): the slope face descends away from the stud row, and only the stud row has studs.
+Slopes (slope45_*, slope33_*): the slope face descends away from the stud row, and only the stud row has studs.
 - rot 0: studs on the min-z row, slope faces front (+z)
 - rot 90: studs on the max-x column, slope faces left (−x)
 - rot 180: studs on the max-z row, slope faces back (−z)
 - rot 270: studs on the min-x column, slope faces right (+x)
-A slope occupies its whole bounding box for collision purposes.
+33° slopes are 3 deep (a gentler roof). Ridges (ridge45_*) slope down on both long sides and cap a roof; nothing attaches on top.
+Slopes and ridges occupy their whole bounding box for collision purposes.
+
+Other shaped parts:
+- Arches (arch_1x*) stand on their two end cells (the only underside connectors). The span between is just the top plate, leaving an opening 2 plates tall underneath for other parts. Studs run along the whole top.
+- Windows and the door stand upright, 1 stud deep; build the wall around them and put a lintel (plate or brick) across their top studs. The door's top studs are only on its two middle cells.
+- Round bricks/plates, cones and flowers connect like 1×1 or 2×2 parts. Flowers and the 1×1 cone have a stud on top; the 2×2×2 cone and fences have none.
 
 Colors: ${colorList()}
 

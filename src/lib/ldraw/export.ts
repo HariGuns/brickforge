@@ -42,12 +42,19 @@ export function ldrawTransform(pl: Placement, def: PartDef): { pos: [number, num
 
 const fmt = (n: number) => (Object.is(n, -0) ? "0" : String(Math.round(n * 1000) / 1000));
 
+/** LDraw line(s) for a placement: the part, plus any extra parts it includes (e.g. a door in its frame). */
 export function partLine(pl: Placement): string {
   const def = getPart(pl.part);
   if (!def) throw new Error(`Unknown part ${pl.part}`);
   const color = COLOR_MAP.get(pl.color)?.ldraw ?? 16;
   const { pos, m } = ldrawTransform(pl, def);
-  return ["1", color, ...pos.map(fmt), ...m.map(fmt), def.ldraw.file].join(" ");
+  const line = (file: string, p: number[]) => ["1", color, ...p.map(fmt), ...m.map(fmt), file].join(" ");
+  const out = [line(def.ldraw.file, pos)];
+  for (const e of def.ldraw.extra ?? []) {
+    const [ox, oy, oz] = e.offset;
+    out.push(line(e.file, [pos[0] + m[0] * ox + m[1] * oy + m[2] * oz, pos[1] + m[3] * ox + m[4] * oy + m[5] * oz, pos[2] + m[6] * ox + m[7] * oy + m[8] * oz]));
+  }
+  return out.join("\r\n");
 }
 
 function safeName(name: string): string {

@@ -14,7 +14,19 @@ export interface PartCount {
 }
 
 const ORDER = new Map(PARTS.map((p, i) => [p.id, i]));
-const CATEGORY_LABEL: Record<PartCategory, string> = { brick: "Bricks", plate: "Plates", tile: "Tiles", slope: "Slopes" };
+const CATEGORY_LABEL: Record<PartCategory, string> = {
+  brick: "Bricks",
+  plate: "Plates",
+  tile: "Tiles",
+  slope: "Slopes & roof",
+  round: "Round parts",
+  cone: "Cones",
+  arch: "Arches",
+  window: "Windows",
+  door: "Doors",
+  fence: "Fences",
+  flower: "Flowers",
+};
 
 /** Part × colour counts for the given part indices (default: all), in library order. */
 export function countParts(model: BrickModel, indices?: number[]): PartCount[] {

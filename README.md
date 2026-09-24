@@ -67,7 +67,15 @@ A flat model is a design with no sub-builds, so the single-pass path and older s
 
 ## Where to tune things
 
-- **Part library**: `src/lib/parts/library.ts`. Add an entry, then run `npm run verify-ldraw`. The prompt's part table is generated from this file.
+- **Part library**: `src/lib/parts/library.ts`, with 52 parts:
+  - bricks, plates and tiles;
+  - 45°/33° slopes and ridges;
+  - round bricks, plates and tiles;
+  - cones, fences, arches, windows, a door and flower plates.
+
+  Parts that aren't solid boxes declare `solids` (e.g. an arch's opening), `bottom` (the underside cells that take studs) and a viewer `shape`. Multi-piece parts list LDraw `extra` files (the door is frame + door).
+
+  To add a part: add an entry, then run `npm run verify-ldraw`, which checks the bounding box and top studs against the real LDraw geometry. `npm run probe-ldraw <file>` prints a part's measured box and studs. The prompt's part table is generated from this file.
 - **Colors**: `src/lib/parts/colors.ts`.
 - **Prompts**: `src/lib/prompts/`. `system.ts` holds the rules, coordinate system and design advice. `design.ts` holds the first-turn text and photo prompts. `repair.ts` holds the feedback message and the fix hint for each error type.
 - **Limits and model settings**: `src/lib/config.ts`. It sets grid size, part cap, repair rounds, model, effort, max tokens, and pricing for cost estimates.

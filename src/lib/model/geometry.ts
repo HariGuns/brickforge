@@ -1,4 +1,4 @@
-import { getPart, localStuds, type PartDef } from "../parts/library";
+import { getPart, localBottom, localSolids, localStuds, type PartDef } from "../parts/library";
 import type { Placement, Rot } from "./schema";
 
 /**
@@ -57,6 +57,27 @@ export function worldStuds(pl: Placement, def: PartDef): [number, number][] {
     const [ox, oz] = rotateCell(cx, cz, def, pl.rot);
     return [pl.x + ox, pl.z + oz];
   });
+}
+
+/** World cells [x, z] of the part's underside that accept a stud from below. */
+export function worldBottom(pl: Placement, def: PartDef): [number, number][] {
+  return localBottom(def).map(([cx, cz]) => {
+    const [ox, oz] = rotateCell(cx, cz, def, pl.rot);
+    return [pl.x + ox, pl.z + oz];
+  });
+}
+
+/** World unit cells [x, y, z] the part fills (its solids; the whole box for most parts). */
+export function worldSolidCells(pl: Placement, def: PartDef): [number, number, number][] {
+  const out: [number, number, number][] = [];
+  for (const [x0, z0, x1, z1, y0, y1] of localSolids(def)) {
+    for (let cz = z0; cz < z1; cz++)
+      for (let cx = x0; cx < x1; cx++) {
+        const [ox, oz] = rotateCell(cx, cz, def, pl.rot);
+        for (let y = y0; y < y1; y++) out.push([pl.x + ox, pl.y + y, pl.z + oz]);
+      }
+  }
+  return out;
 }
 
 /** Resolved placement: definition plus geometry, or null if the part id is unknown. */

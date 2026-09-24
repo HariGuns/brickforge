@@ -24,9 +24,21 @@ export function sizeLabel(partId: string): string {
   const def = getPart(partId);
   if (!def) return partId;
   const dims = `${Math.min(def.w, def.d)}×${Math.max(def.w, def.d)}`;
-  if (def.category === "brick") return dims;
-  if (def.category === "slope") return `${def.d}×${def.w} slope`;
-  return `${dims} ${def.category}`;
+  const tall = `${dims}×${def.h / 3}`;
+  switch (def.category) {
+    case "brick":
+      return dims;
+    case "slope":
+      return `${def.d}×${def.w} ${def.shape === "ridge" ? "ridge" : "slope"}`;
+    case "window":
+    case "door":
+      return `${tall} ${def.category}`;
+    case "fence":
+    case "cone":
+      return def.h > 3 ? `${tall} ${def.category}` : `${dims} ${def.category}`;
+    default:
+      return `${dims} ${def.category}`;
+  }
 }
 
 /** One instruction page per build step. */

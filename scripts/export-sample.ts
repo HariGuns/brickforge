@@ -2,13 +2,14 @@
 import fs from "node:fs";
 import { SAMPLE_HOUSE, SAMPLE_STACK } from "../src/lib/fixtures/samples";
 import { SAMPLE_VILLAGE } from "../src/lib/fixtures/designs";
+import { PART_SHOWCASE } from "../src/lib/fixtures/showcase";
 import { validate } from "../src/lib/validate/validator";
 import { buildSteps } from "../src/lib/steps/steps";
 import { compileDesign } from "../src/lib/design/compile";
 import { exportDesignMpd, exportFileNames, exportLdr, exportMpd } from "../src/lib/ldraw/export";
 
 fs.mkdirSync("exports", { recursive: true });
-for (const m of [SAMPLE_HOUSE, SAMPLE_STACK]) {
+for (const m of [SAMPLE_HOUSE, SAMPLE_STACK, PART_SHOWCASE]) {
   const v = validate(m);
   if (!v.valid) throw new Error(`${m.name} invalid: ${v.errors.map((e) => e.message).join("; ")}`);
   const steps = buildSteps(m);
