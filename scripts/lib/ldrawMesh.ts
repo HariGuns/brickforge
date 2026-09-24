@@ -34,7 +34,7 @@ const mulM = (a: Mat3, b: Mat3): Mat3 => {
   return r;
 };
 
-export function partMesh(lib: Lib, file: string, opts: { skipPins?: boolean } = {}): Mesh {
+export function partMesh(lib: Lib, file: string, opts: { skipPins?: boolean; keepSideStuds?: boolean } = {}): Mesh {
   const mesh: Mesh = { tris: [], colors: [], min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity], missing: new Set() };
   const grow = (p: V) => {
     for (let a = 0; a < 3; a++) {
@@ -52,8 +52,10 @@ export function partMesh(lib: Lib, file: string, opts: { skipPins?: boolean } = 
       if (tok[0] === "1" && tok.length >= 15) {
         const sub = tok.slice(14).join(" ");
         const base = sub.toLowerCase().replace(/\\/g, "/");
-        if (TOP_STUD.test(base) || SKIP.test(base.split("/").pop()!) || (opts.skipPins && PIN.test(base.split("/").pop()!))) continue;
         const n = tok.slice(2, 14).map(Number);
+        // Studs pointing up are drawn from the connection data; side studs (sideways parts) stay in the mesh.
+        const upright = () => Math.abs(mulM(m, n.slice(3) as Mat3)[4]) > 0.99;
+        if ((TOP_STUD.test(base) && (!opts.keepSideStuds || upright())) || SKIP.test(base.split("/").pop()!) || (opts.skipPins && PIN.test(base.split("/").pop()!))) continue;
         const pos = mul(m, [n[0], n[1], n[2]]);
         walk(sub, mulM(m, n.slice(3) as Mat3), [pos[0] + t[0], pos[1] + t[1], pos[2] + t[2]], depth + 1, eff(tok[1], color));
       } else if (tok[0] === "3" || tok[0] === "4") {

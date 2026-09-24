@@ -60,6 +60,12 @@ export const CONFIG = {
   /** Repair rounds after the initial generation. */
   maxRepairRounds: 4,
   /**
+   * Sideways building (studs on sides, sideways sub-builds). Off until it's
+   * complete: side-stud parts aren't loaded, so upright models behave exactly
+   * as before.
+   */
+  sideways: { enabled: false },
+  /**
    * How parts and copies are written in Claude's answers and in listings:
    * "compact" strings ("brick_2x4 red 3 0 5 90") or "json" objects.
    */

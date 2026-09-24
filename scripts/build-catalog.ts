@@ -25,6 +25,7 @@ import { openLibrary, type V } from "./lib/ldrawGeo";
 import { partMesh } from "./lib/ldrawMesh";
 import { openShadow, snapAxis } from "./lib/snaps";
 import { classify, hubKind, voxelize, type Classified, type PinKind } from "./lib/classify";
+import { classifySideways, type SideClassified } from "./lib/classifySide";
 
 const ROOT = path.resolve("ldraw-lib/ldraw");
 const OUT_JSON = path.resolve("src/lib/parts/catalog.json");
@@ -241,6 +242,7 @@ function entryFor(c: Classified, id: string): CatalogEntry {
     mass: r3(vox.filter(Boolean).length / vox.length),
     ldraw: { file: c.file, yaw: 0, origin: c.origin },
     ...(c.inferred ? { inferred: true } : {}),
+    ...("sideStuds" in c ? { snot: true, sideStuds: (c as SideClassified).sideStuds, ...((c as SideClassified).fine.length ? { fine: (c as SideClassified).fine } : {}) } : {}),
   };
 }
 
@@ -279,7 +281,13 @@ for (const f of files) {
     reject(`excluded: ${ex}`, f);
     continue;
   }
-  const r = classify(lib, shadow.snaps(f), f, title);
+  let r = classify(lib, shadow.snaps(f), f, title);
+  // Parts with studs on their sides (carriers for sideways building) go through their own
+  // classifier, only when the normal one rejects them, so upright parts are unaffected.
+  if (!r.ok && !isCore && (r.reason === "not on the grid" || (r.reason === "unsupported connection" && /sideways/.test(r.detail ?? "")))) {
+    const s = classifySideways(lib, shadow.snaps(f), f, title);
+    if (s.ok) r = s;
+  }
   if (isCore) {
     // Cross-check the derivation against the hand-made core definitions.
     const def = CORE.find((p) => p.ldraw.file.toLowerCase() === lower);
@@ -315,7 +323,8 @@ const baseName = (t: string) =>
     .replace(/\b(type|version|old|new|reinforced|hollow|solid|open|closed)\b.*$/, "")
     .replace(/\s+/g, " ")
     .trim();
-const sigOf = (c: Classified) => JSON.stringify([c.w, c.d, c.h, c.studs, c.bottom, c.voxels, c.pins, baseName(c.title), /left/i.test(c.title), /right/i.test(c.title)]);
+const sigOf = (c: Classified) =>
+  JSON.stringify([c.w, c.d, c.h, c.studs, c.bottom, c.voxels, c.pins, baseName(c.title), /left/i.test(c.title), /right/i.test(c.title), ...("sideStuds" in c ? [(c as SideClassified).sideStuds, (c as SideClassified).fine] : [])]);
 const groups = new Map<string, Classified[]>();
 for (const c of kept) (groups.get(sigOf(c)) ?? groups.set(sigOf(c), []).get(sigOf(c))!).push(c);
 const unique: Classified[] = [];
@@ -367,6 +376,7 @@ lines.push(`Meshes: ${(meshBytes / 1e6).toFixed(1)} MB in public/parts/`);
 lines.push(`By category: ${[...byCat].sort((a, b) => b[1] - a[1]).map(([c, n]) => `${c} ${n}`).join(", ")}`);
 lines.push(`Left/right pairs: ${entries.filter((e) => e.mirror).length / 2}`);
 lines.push(`Anti-studs inferred from geometry (no shadow data): ${entries.filter((e) => e.inferred).length}`);
+lines.push(`Side-stud parts for sideways building (loaded only when CONFIG.sideways.enabled): ${entries.filter((e) => e.snot).length}: ${entries.filter((e) => e.snot).map((e) => e.id).join(" ")}`);
 lines.push("\nRejected:");
 for (const [k, v] of [...rejected].sort((a, b) => b[1].length - a[1].length)) lines.push(`  ${String(v.length).padStart(6)}  ${k}`);
 lines.push("\nCore parts, derived from LDraw + shadow data vs the hand-made definitions:");

@@ -96,6 +96,13 @@ function toWorld(pl: Placement, def: PartDef, p: PinDef): WorldPin {
 /** A wheel holder's pins, in world space. */
 export const worldPins = (pl: Placement, def: PartDef): WorldPin[] => (def.pins ?? []).map((p) => toWorld(pl, def, p));
 
+/** Side studs in world space: base point (x/z studs, y plates) and outward direction. */
+export const worldSideStuds = (pl: Placement, def: PartDef): { at: [number, number, number]; dir: Dir }[] =>
+  (def.sideStuds ?? []).map((s) => {
+    const [ox, oz] = rotatePoint(s.at[0], s.at[2], def, pl.rot);
+    return { at: [pl.x + ox, pl.y + s.at[1], pl.z + oz], dir: rotateDir(s.dir, pl.rot) };
+  });
+
 /** A wheel's hub, in world space (null for parts that aren't wheels). */
 export const worldHub = (pl: Placement, def: PartDef): WorldPin | null => (def.hub ? toWorld(pl, def, def.hub) : null);
 

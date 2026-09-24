@@ -277,6 +277,13 @@ Why 885, not 1,000+: most of the rest need connection types the validator doesn'
 
 `ldraw-lib/catalog-report.txt` lists every rejected part and the reason.
 
+**Side-stud parts** (sideways building, in progress) come from a separate classifier (`scripts/lib/classifySide.ts`), which only runs for parts the normal one rejects, so upright parts are classified exactly as before. It covers 41 parts: bricks with studs on one to four sides, brackets and similar.
+- **Side studs:** each is recorded as an exact point with an outward direction. They sit on stud centres along the face and on a quarter-plate grid in height.
+- **Brackets:** framed by their plate. The flange is recorded as an LDU extension box.
+- **Excluded for now:** recessed side studs (the headlight brick) and parts with other side connectors.
+- **Verification:** `verify-ldraw` checks side studs through the exporter, and checks the body against the grid box plus extension boxes. All 41 pass.
+- **Not loaded yet:** the app doesn't load these parts until `CONFIG.sideways.enabled`, which stays off until sideways building is complete. `src/lib/regression.test.ts` snapshots seven saved builds to show upright behaviour is unchanged.
+
 **Licences:**
 - The LDraw parts library is CC BY 2.0 / 4.0 (LDraw.org).
 - The LDCad shadow library is CC BY-SA 4.0 (Roland Melkert and contributors, github.com/RolandMelkert/LDCadShadowLibrary).

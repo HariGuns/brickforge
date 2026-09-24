@@ -45,4 +45,10 @@ export interface CatalogEntry {
   hint?: string;
   /** Anti-studs inferred from the underside geometry because the shadow library has none for this part. */
   inferred?: boolean;
+  /** Has studs on its sides: a carrier for sideways building (loaded only when CONFIG.sideways.enabled). */
+  snot?: boolean;
+  /** Side studs: base point (x/z studs from the min corner, y plates up from the grid bottom) and outward direction. */
+  sideStuds?: { at: [number, number, number]; dir: Dir }[];
+  /** Body outside the grid box (a bracket's flange), boxes in LDU [x0, y0, z0, x1, y1, z1], local frame. */
+  fine?: [number, number, number, number, number, number][];
 }

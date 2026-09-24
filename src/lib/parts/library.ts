@@ -30,6 +30,7 @@
  */
 
 import catalogJson from "./catalog.json";
+import { CONFIG } from "../config";
 import type { CatalogEntry, ConnectorCell, Dir, PinDef } from "./catalogTypes";
 
 export type { ConnectorCell, Dir, PinDef, PinKind } from "./catalogTypes";
@@ -87,6 +88,12 @@ export interface PartDef {
   inferred?: boolean;
   /** BrickLink items when they differ from the LDraw number. */
   bricklink?: { id: string; color?: number }[];
+  /** Studs on the part's sides (a carrier for sideways building): base point and outward direction. */
+  sideStuds?: { at: [number, number, number]; dir: Dir }[];
+  /** Body outside the grid box (a bracket's flange), LDU boxes [x0, y0, z0, x1, y1, z1] in the local frame. */
+  fine?: [number, number, number, number, number, number][];
+  /** A side-stud part (only loaded when CONFIG.sideways.enabled). */
+  snot?: boolean;
   /** Space the part fills, for collisions. Undefined = its whole box. */
   solids?: Solid[];
   shape?: PartShape;
@@ -331,8 +338,7 @@ function window(id: string, name: string, h: number, file: string): PartDef {
 
 for (const p of CORE_PARTS) p.source = "core";
 
-/** Extended catalog, generated from LDraw + LDCad shadow data (see scripts/build-catalog.ts). */
-export const CATALOG_PARTS: PartDef[] = (catalogJson as unknown as { parts: CatalogEntry[] }).parts.map((e) => ({
+const toDef = (e: CatalogEntry): PartDef => ({
   id: e.id,
   name: e.name,
   category: e.cat as PartCategory,
@@ -352,7 +358,15 @@ export const CATALOG_PARTS: PartDef[] = (catalogJson as unknown as { parts: Cata
   ldraw: { file: e.ldraw.file, yaw: e.ldraw.yaw, origin: e.ldraw.origin },
   source: "catalog",
   mesh: true,
-}));
+  ...(e.snot ? { snot: true, sideStuds: e.sideStuds ?? [], ...(e.fine ? { fine: e.fine } : {}) } : {}),
+});
+const catalogEntries = (catalogJson as unknown as { parts: CatalogEntry[] }).parts;
+
+/** Side-stud parts (carriers for sideways building); in PARTS only when CONFIG.sideways.enabled. */
+export const SNOT_PARTS: PartDef[] = catalogEntries.filter((e) => e.snot).map(toDef);
+
+/** Extended catalog, generated from LDraw + LDCad shadow data (see scripts/build-catalog.ts). */
+export const CATALOG_PARTS: PartDef[] = [...catalogEntries.filter((e) => !e.snot).map(toDef), ...(CONFIG.sideways.enabled ? SNOT_PARTS : [])];
 
 /** Every part: the hand-made core first, then the catalog. */
 export const PARTS: PartDef[] = [...CORE_PARTS, ...CATALOG_PARTS];

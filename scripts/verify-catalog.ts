@@ -11,8 +11,8 @@
  *
  * Usage: npm run verify-ldraw   (runs this after the core check)
  */
-import { CATALOG_PARTS, getPart, type PartDef } from "../src/lib/parts/library";
-import { footprint, worldBottom, worldPins, worldStuds } from "../src/lib/model/geometry";
+import { CATALOG_PARTS, getPart, SNOT_PARTS, type PartDef } from "../src/lib/parts/library";
+import { footprint, worldBottom, worldPins, worldSideStuds, worldStuds } from "../src/lib/model/geometry";
 import { ldrawTransform, LDU_PLATE, LDU_STUD, type Mat3 } from "../src/lib/ldraw/export";
 import type { Placement, Rot } from "../src/lib/model/schema";
 import { wheelMount } from "../src/lib/parts/wheels";
@@ -137,8 +137,62 @@ function checkWheel(def: PartDef): string[] {
   return problems;
 }
 
+/**
+ * Side-stud parts: side studs through the exporter (rot 0 and 90), upright studs and
+ * anti-studs as for every part, and the body inside the grid box plus extension boxes.
+ */
+function checkSideParts(def: PartDef): string[] {
+  const problems: string[] = [];
+  for (const rot of [0, 90] as Rot[]) {
+    const pl: Placement = { part: def.id, color: "red", x: 3, y: 4, z: 5, rot };
+    const snaps = placedSnaps(pl, def);
+    const side = snaps.filter((s) => s.kind === "cyl" && s.gender === "M" && Math.abs((s.secs[0]?.[1] ?? 0) - 6) < 0.01 && Math.abs(s.axis[1]) < 0.01);
+    const want = worldSideStuds(pl, def).map((s) => ({ ...s, w: [s.at[0] * LDU_STUD, -s.at[1] * LDU_PLATE, -s.at[2] * LDU_STUD] as V }));
+    const outDir = (a: V) => (Math.abs(a[0]) > Math.abs(a[2]) ? (-a[0] > 0 ? "+x" : "-x") : a[2] > 0 ? "+z" : "-z"); // outward = -axis; local z = -Z
+    for (const s of side) {
+      const hit = want.find((w) => Math.hypot(w.w[0] - s.w[0], w.w[1] - s.w[1], w.w[2] - s.w[2]) < 0.1);
+      if (!hit) problems.push(`rot ${rot}: side stud at ${s.w.map((v) => v.toFixed(1))} isn't in the definition`);
+      else if (hit.dir !== outDir(s.axis)) problems.push(`rot ${rot}: side stud points ${outDir(s.axis)}, definition says ${hit.dir}`);
+    }
+    if (want.length !== new Set(side.map((s) => s.w.map((v) => v.toFixed(1)).join())).size) problems.push(`rot ${rot}: ${want.length} side studs defined, ${side.length} in LDraw`);
+  }
+  // Upright connectors exactly as for other parts (body check below instead of the box check).
+  problems.push(...checkPart(def, 0).filter((p) => !/body|height/.test(p)), ...checkPart(def, 90).filter((p) => !/body|height/.test(p)).map((p) => `rot90 ${p}`));
+  // Body: every mesh point (side studs excluded) inside the grid box or an extension box, native frame.
+  const [ox, oy, oz] = def.ldraw.origin ?? [0, 0, 0];
+  const minX = ox - 10 * def.w, maxZ = oz + 10 * def.d, bottom = oy + 8 * def.h;
+  const boxes = [[0, 0, 0, def.w * 20, def.h * 8, def.d * 20], ...(def.fine ?? [])];
+  const mesh = partMesh(lib, def.ldraw.file, { skipPins: true, keepSideStuds: true });
+  const studCyl = shadow.snaps(def.ldraw.file).filter((s) => s.kind === "cyl" && s.gender === "M" && Math.abs(snapAxis(s)[1]) < 0.01).map((s) => ({ p: s.pos, out: snapAxis(s).map((v) => -v) as V }));
+  let outside = 0;
+  for (let i = 0; i < mesh.tris.length; i += 3) {
+    const X = mesh.tris[i], Y = mesh.tris[i + 1], Z = mesh.tris[i + 2];
+    if (studCyl.some((c) => {
+      const d: V = [X - c.p[0], Y - c.p[1], Z - c.p[2]];
+      const t = d[0] * c.out[0] + d[1] * c.out[1] + d[2] * c.out[2];
+      return t > -0.5 && t < 5 && Math.hypot(d[0] - t * c.out[0], d[1] - t * c.out[1], d[2] - t * c.out[2]) < 6.6;
+    })) continue;
+    const x = X - minX, y = bottom - Y, z = maxZ - Z;
+    const E = 1.6;
+    if (!boxes.some((b) => x >= b[0] - E && x <= b[3] + E && y >= b[1] - E && y <= b[4] + E && z >= b[2] - E && z <= b[5] + E) && !(y > def.h * 8 && y < def.h * 8 + 4.5)) outside++;
+  }
+  if (outside) problems.push(`${outside} mesh points outside the grid box and extension boxes`);
+  return problems;
+}
+
 let failures = 0;
 const inferred: string[] = [];
+for (const def of SNOT_PARTS) {
+  const problems = checkSideParts(def);
+  if (problems.length) {
+    failures++;
+    console.log(`✗ ${def.id.padEnd(10)} ${def.name} (side studs)`);
+    for (const p of [...new Set(problems)].slice(0, 6)) console.log(`    ${p}`);
+  }
+}
+console.log(`Side-stud parts: ${SNOT_PARTS.length - failures} of ${SNOT_PARTS.length} match LDraw.`);
+const sideFailures = failures;
+failures = 0;
 for (const def of CATALOG_PARTS) {
   const first = lib.readLines(def.ldraw.file)?.[0] ?? "";
   const problems = /~Moved to/i.test(first) ? [`${def.ldraw.file} is a redirect`] : [];
@@ -152,4 +206,4 @@ for (const def of CATALOG_PARTS) {
   }
 }
 console.log(`\nCatalog: ${CATALOG_PARTS.length - failures} of ${CATALOG_PARTS.length} parts match LDraw${failures ? `, ${failures} need fixing` : ""}. ${inferred.length} have anti-studs inferred from geometry (not in the shadow library).`);
-process.exit(failures ? 1 : 0);
+process.exit(failures || sideFailures ? 1 : 0);

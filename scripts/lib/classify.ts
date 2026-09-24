@@ -111,6 +111,8 @@ function fitAxis(lo: number, hi: number, studPos: number[], strict = true): [num
   return [a, b];
 }
 
+export { inPin };
+
 /** Triangles entirely inside a pin's cylinder (it's a connector, not body). */
 function inPin(p: V, pins: { pos: V; out: V; len: number; r: number }[]): boolean {
   for (const pin of pins) {
