@@ -13,7 +13,8 @@ import { assemblyJsonSchema, assemblyPrompt, planJsonSchema, planPrompt, subBuil
 import { validate, type Issue } from "../validate/validator";
 import { buildSteps } from "../steps/steps";
 import { DebugRun } from "./debug";
-import { runLoop } from "./loop";
+import { runLoop, type LoopResult, type RoundSummary } from "./loop";
+import { loadCheckpoint, type Checkpoint, type StageCheckpoint } from "./checkpoint";
 import { formatUsage, sumUsage } from "./usage";
 import { getClient, invalidOutput, type GenerateEvent, type GenerateInput, type GenerateOptions, type GenerateResult } from "./generate";
 
@@ -96,15 +97,36 @@ async function pool<T, R>(items: T[], n: number, fn: (item: T) => Promise<R>): P
   return out;
 }
 
-export async function generateDesign(input: GenerateInput, onEvent: (e: GenerateEvent) => void = () => {}, opts: GenerateOptions = {}): Promise<GenerateResult> {
+export interface DesignOptions extends GenerateOptions {
+  /** Resume an interrupted run: reuse its valid plan and sub-builds, redo the rest. */
+  checkpoint?: Checkpoint;
+}
+
+/** A loop result rebuilt from an earlier run's saved rounds. */
+function reusedLoop<T>(cp: StageCheckpoint<T>, value: T, partCount: number): LoopResult<T> {
+  return { best: { value, check: { errors: [], warnings: [], valid: true, partCount } }, rounds: cp.rounds, usage: sumUsage(cp.rounds.map((r) => r.usage)) };
+}
+
+/** Resume the sub-build run saved in `dir` (its debug folder). */
+export async function resumeDesign(dir: string, onEvent: (e: GenerateEvent) => void = () => {}, opts: GenerateOptions = {}): Promise<GenerateResult> {
+  const checkpoint = loadCheckpoint(dir);
+  return generateDesign(checkpoint.input, onEvent, { ...opts, checkpoint });
+}
+
+export async function generateDesign(input: GenerateInput, onEvent: (e: GenerateEvent) => void = () => {}, opts: DesignOptions = {}): Promise<GenerateResult> {
   if (!input.text?.trim() && !input.image) throw new Error("Provide a description or a photo.");
   const anthropic = opts.client ?? getClient();
-  const debug = new DebugRun(`subbuilds-${input.text?.trim() || "photo"}`);
+  const cp = opts.checkpoint;
+  const debug = cp ? DebugRun.open(cp.dir) : new DebugRun(`subbuilds-${input.text?.trim() || "photo"}`);
   onEvent({ type: "start", debugDir: debug.dir });
   const system = systemPrompt();
-  debug.write("input.json", { mode: "build", pipeline: "subbuilds", text: input.text ?? null, size: input.size ?? null, hasImage: !!input.image, config: CONFIG });
-  debug.write("system-prompt.md", system);
-  if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
+  if (!cp) {
+    debug.write("input.json", { mode: "build", pipeline: "subbuilds", text: input.text ?? null, size: input.size ?? null, hasImage: !!input.image, config: CONFIG });
+    debug.write("system-prompt.md", system);
+    if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
+  }
+  // Rounds from the interrupted run whose stage is redone now still count toward the total cost.
+  const earlierRounds: RoundSummary[] = [];
   const ctx = { anthropic, debug, onEvent, signal: opts.signal };
   const withImage = (text: string): Anthropic.MessageParam["content"] =>
     input.image
@@ -117,7 +139,8 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   // --- 1. plan --------------------------------------------------------------------------
   onEvent({ type: "stage", scope: "plan", label: "Planning sub-builds", status: "start" });
   const planText = planPrompt(input.text ?? "", input.size, !!input.image);
-  const planLoop = await runLoop<Plan>(
+  if (cp && !cp.plan.valid) earlierRounds.push(...cp.plan.rounds);
+  const planLoop = cp?.plan.valid ? reusedLoop(cp.plan, cp.plan.valid, 0) : await runLoop<Plan>(
     {
       scope: "plan",
       debugPrefix: "plan.",
@@ -144,6 +167,13 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     const scope = `sub:${sub.id}`;
     onEvent({ type: "stage", scope, label: sub.name, status: "start", copies: sub.copies });
     const text = subBuildPrompt(plan, sub);
+    const saved = cp?.subs.get(sub.id);
+    if (saved?.valid) {
+      const loop = reusedLoop(saved, saved.valid, saved.valid.parts.length);
+      onEvent({ type: "stage", scope, label: sub.name, status: "done", valid: true, parts: saved.valid.parts.length, copies: sub.copies, cost: loop.usage.cost });
+      return { sub, loop };
+    }
+    if (saved) earlierRounds.push(...saved.rounds);
     const loop = await runLoop<BrickModel>(
       {
         scope,
@@ -177,7 +207,9 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     built.map(({ sub, model }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: model.parts.length, maps: surfaceMaps(model) })),
   );
   const designOf = (a: Assembly): BrickDesign => ({ name: a.name, description: a.description, subBuilds, main: { parts: a.parts, uses: a.uses } });
-  const assembly = await runLoop<Assembly>(
+  const savedAssembly = cp?.assembly.valid ? AssemblySchema.safeParse(cp.assembly.valid) : null;
+  if (cp && !savedAssembly?.success) earlierRounds.push(...cp.assembly.rounds);
+  const assembly = savedAssembly?.success ? reusedLoop<Assembly>({ rounds: cp!.assembly.rounds, valid: savedAssembly.data }, savedAssembly.data, 0) : await runLoop<Assembly>(
     {
       scope: "assembly",
       debugPrefix: "assembly.",
@@ -197,8 +229,9 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   onEvent({ type: "stage", scope: "assembly", label: "Assembling", status: "done", valid: assembly.best?.check.valid ?? false, parts: assembly.best?.check.partCount, cost: assembly.usage.cost });
 
   // --- result -------------------------------------------------------------------------------
-  const rounds = [...planLoop.rounds, ...subLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
+  const rounds = [...earlierRounds, ...planLoop.rounds, ...subLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
   const usage = sumUsage(rounds.map((r) => r.usage));
+  const spentNow = sumUsage(rounds.filter((r) => !r.reused).map((r) => r.usage));
   const design = a ? designOf(a) : null;
   const compiled = design ? compileDesign(design, { structure: assembly.best!.check.valid ? "warn" : "error" }) : null;
   const result: GenerateResult = {
@@ -220,9 +253,18 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     subBuilds: subLoops.map(({ sub, loop }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: loop.best?.value.parts.length ?? 0, valid: loop.best?.check.valid ?? false, rounds: loop.rounds.length, cost: loop.usage.cost })),
     assembly: { rounds: assembly.rounds.length, cost: assembly.usage.cost, valid: assembly.best?.check.valid ?? false },
   };
-  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, rounds, total: usage, partCount: result.model?.parts.length ?? 0, compile: compiled?.stats });
+  const resumed = cp
+    ? {
+        reused: { plan: !!cp.plan.valid, subBuilds: subLoops.filter(({ loop }) => loop.rounds.every((r) => r.reused)).map(({ sub }) => sub.id), assembly: !!savedAssembly?.success },
+        costBefore: sumUsage(rounds.filter((r) => r.reused).map((r) => r.usage)).cost,
+        costNow: spentNow.cost,
+      }
+    : undefined;
+  if (resumed) debug.write(`resume-${new Date().toISOString().replace(/[:.]/g, "-")}.json`, resumed);
+  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, rounds, total: usage, ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats });
   if (design) debug.write("final-design.json", design);
   if (result.model) debug.write("final-model.json", result.model);
+  if (resumed) console.log(`[generate] resumed: reused plan=${resumed.reused.plan}, sub-builds [${resumed.reused.subBuilds.join(", ")}], assembly=${resumed.reused.assembly}; earlier $${resumed.costBefore.toFixed(4)}, now $${resumed.costNow.toFixed(4)}`);
   console.log(`[generate] sub-builds done: valid=${result.valid}, ${result.model?.parts.length ?? 0} parts, ${compiled?.stats.copies ?? 0} copies, ${rounds.length} round(s) · total ${formatUsage(usage)} · debug: ${debug.dir}`);
   onEvent({ type: "done", result });
   return result;

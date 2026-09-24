@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
-import { generateDesign, checkPlan } from "./subbuilds";
+import { generateDesign, checkPlan, resumeDesign } from "./subbuilds";
 import type { GenerateEvent } from "./generate";
 import { SAMPLE_VILLAGE } from "../fixtures/designs";
 import { P } from "../fixtures/samples";
@@ -35,9 +35,9 @@ const badMain = { ...goodMain, uses: goodMain.uses.map((u, i) => (i === 1 ? { ..
 /** Top-level properties of the request's JSON output schema (tells plan / sub-build / assembly apart). */
 const schemaProps = (q: Anthropic.MessageCreateParams) => ((q.output_config?.format?.schema ?? {}) as { properties?: Record<string, unknown> }).properties ?? {};
 
-function fakeClient() {
+function fakeClient(opts: { failAssembly?: boolean; assemblyOk?: boolean } = {}) {
   const requests: Anthropic.MessageCreateParams[] = [];
-  let assemblies = 0;
+  let assemblies = opts.assemblyOk ? 1 : 0;
   const client = {
     messages: {
       stream(params: Anthropic.MessageCreateParams) {
@@ -46,7 +46,10 @@ function fakeClient() {
         const first = params.messages[0].content as string;
         let text: string;
         if ("layout" in props) text = JSON.stringify(plan);
-        else if ("uses" in props) text = JSON.stringify(assemblies++ === 0 ? badMain : goodMain);
+        else if ("uses" in props) {
+          if (opts.failAssembly) throw new Error("Your credit balance is too low to access the Anthropic API.");
+          text = JSON.stringify(assemblies++ === 0 ? badMain : goodMain);
+        }
         else if (first.includes('sub-build "Hut"')) text = JSON.stringify({ name: "Hut", description: "hut", parts: hut.parts });
         else text = JSON.stringify({ name: "Pine tree", description: "tree", parts: tree.parts });
         return {
@@ -92,10 +95,43 @@ describe("sub-build generator (fake Claude)", () => {
     expect(JSON.parse(fs.readFileSync(path.join(r.debugDir, "summary.json"), "utf8")).stages.subBuilds).toHaveLength(2);
   });
 
+  it("resumes an interrupted run: reuses the plan and sub-builds, runs only the assembly", async () => {
+    const first = fakeClient({ failAssembly: true });
+    let dir = "";
+    await expect(generateDesign({ text: "a tiny village", size: "small" }, (e) => e.type === "start" && (dir = e.debugDir), { client: first.client })).rejects.toThrow(/credit/);
+    dirs.push(dir);
+    expect(first.requests).toHaveLength(4); // plan + 2 sub-builds + the failed assembly call
+
+    const second = fakeClient({ assemblyOk: true });
+    const r = await resumeDesign(dir, () => {}, { client: second.client });
+    expect(r.debugDir).toBe(dir);
+    expect(second.requests.map((q) => ("uses" in schemaProps(q) ? "assembly" : "other"))).toEqual(["assembly"]);
+    expect(r.valid).toBe(true);
+    expect(r.model!.parts).toHaveLength(2 + 2 * 7 + 2 * 5);
+    expect(r.rounds.filter((x) => x.reused).map((x) => x.scope).sort()).toEqual(["plan", "sub:hut", "sub:pine_tree"]);
+    const summary = JSON.parse(fs.readFileSync(path.join(dir, "summary.json"), "utf8"));
+    expect(summary.resumed.reused).toEqual({ plan: true, subBuilds: ["hut", "pine_tree"], assembly: false });
+    expect(summary.resumed.costBefore).toBeGreaterThan(0);
+  });
+
+  it("refuses to resume something that isn't a sub-build run", async () => {
+    await expect(resumeDesign("src")).rejects.toThrow(/input.json/);
+  });
+
   it("rejects plans outside the limits", () => {
     expect(checkPlan({ ...plan, subBuilds: [] }).length).toBeGreaterThan(0);
     expect(checkPlan({ ...plan, subBuilds: [{ ...plan.subBuilds[0], id: "Bad Id" }] })[0].message).toMatch(/lowercase/);
     expect(checkPlan({ ...plan, subBuilds: [{ ...plan.subBuilds[0], copies: 999 }] }).map((i) => i.message).join(" ")).toMatch(/copies/);
     expect(checkPlan(plan)).toEqual([]);
+  });
+});
+
+describe("debug folders", () => {
+  it("two runs of the same prompt in the same second get separate folders", async () => {
+    const { DebugRun } = await import("./debug");
+    const a = new DebugRun("same prompt");
+    const b = new DebugRun("same prompt");
+    dirs.push(a.dir, b.dir);
+    expect(a.dir).not.toBe(b.dir);
   });
 });

@@ -22,6 +22,8 @@ export interface RoundSummary {
   usage: RoundUsage;
   stopReason: string | null;
   seconds: number;
+  /** Loaded from an earlier, interrupted run (resume) rather than run now. */
+  reused?: boolean;
 }
 
 export type LoopEvent =

@@ -4,13 +4,35 @@ import { CONFIG } from "../config";
 
 /** Per-run debug folder: debug/<timestamp>-<slug>/ holding raw outputs and validator results. */
 export class DebugRun {
-  readonly dir: string;
+  readonly dir!: string;
 
-  constructor(label: string) {
+  constructor(label: string, existingDir?: string) {
+    if (existingDir) {
+      // Resuming: keep writing into the interrupted run's folder.
+      this.dir = path.resolve(existingDir);
+      if (!fs.existsSync(this.dir)) throw new Error(`No debug folder at ${this.dir}`);
+      return;
+    }
     const stamp = new Date().toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
     const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "run";
-    this.dir = path.resolve(CONFIG.debugDir, `${stamp}-${slug}`);
-    fs.mkdirSync(this.dir, { recursive: true });
+    const base = path.resolve(CONFIG.debugDir, `${stamp}-${slug}`);
+    fs.mkdirSync(path.dirname(base), { recursive: true });
+    // Create atomically; two runs of the same prompt in the same second get -2, -3, …
+    for (let n = 1; ; n++) {
+      const dir = n === 1 ? base : `${base}-${n}`;
+      try {
+        fs.mkdirSync(dir);
+        this.dir = dir;
+        return;
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
+      }
+    }
+  }
+
+  /** Continue an existing run's folder (for resume). */
+  static open(dir: string): DebugRun {
+    return new DebugRun("", dir);
   }
 
   write(name: string, data: unknown) {

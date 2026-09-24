@@ -21,6 +21,7 @@ npm run dev                                         # http://localhost:3000
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
 | `npm run gen -- --size small "a rubber duck"` | Target size: `small`, `medium` or `large` (the same choice as the size buttons in the chat) |
 | `npm run gen -- --pipeline subbuilds --size large "a castle"` | Generator path: `single` (default), `subbuilds` or `auto` (sub-builds for Large) |
+| `npm run gen -- --resume debug/<run folder>` | Finish an interrupted sub-build run: reuses its valid plan, sub-builds and assembly, redoes the rest, and writes into the same folder. Earlier and new cost are reported separately |
 | `npm run bench [side]` | Compile benchmark for a large nested design (`side` 5 ≈ 4,600 parts) |
 | `npm run verify-ldraw` | Check every part in the library against the official LDraw library (needs `ldraw-lib/`, see below) |
 | `npm run export-sample` | Export the hand-built sample models to `exports/` |
@@ -79,9 +80,9 @@ Comparison at size Large (claude-opus-5-5, effort high):
 | Steam train, engine + three matching carriages | single | yes | 1 | 215 | – | $0.54 |
 | | sub-builds | yes | 6 (1 assembly repair) | 647 | 4 / 15 | $1.13 |
 | Village square, three houses, trees, well | single | yes | 1 | 247 | – | $0.67 |
-| | sub-builds | not finished | 11 so far (2 sub-build repairs) | – | 8 designed | $2.11 so far |
+| | sub-builds | yes | 14 (2 sub-build + 1 assembly repair) | 1,014 | 8 / 23 | $2.57 |
 
-The village sub-build run stopped at assembly because the API credit ran out; all 8 of its sub-builds were valid.
+The village sub-build run was interrupted at assembly when the API credit ran out. It was finished with `--resume`, which reused the plan and all 8 valid sub-builds ($2.11 already spent) and ran only the assembly ($0.46).
 
 `.mpd` export for designs has one submodel per unique sub-build, with copies as references; the importer expands them back. Compiling ~4,600 parts in 425 nested copies takes about 60 ms (`npm run bench`).
 
