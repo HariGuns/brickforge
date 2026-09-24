@@ -79,7 +79,9 @@ describe("photo builds start with the analysis", () => {
 
     expect(requests).toHaveLength(3); // analysis, design, one comparison (matches)
     expect(requests[0].output_config?.effort).toBe(stageSetting("analysis").effort);
-    expect(requests[0].tools).toBeUndefined();
+    // Same tools as the design call (so the cached prefix is shared), but not callable.
+    expect(requests[0].tools).toEqual(requests[1].tools);
+    expect(requests[0].tool_choice).toEqual({ type: "none" });
     const designText = (requests[1].messages[0].content as Anthropic.ContentBlockParam[]).find((b) => b.type === "text") as Anthropic.TextBlockParam;
     expect(designText.text).toContain("33 studs long (z, front to back) × 14 studs wide");
     expect(events.find((e) => e.type === "analysis")).toMatchObject({ type: "analysis", target: { width: 14, length: 33 } });

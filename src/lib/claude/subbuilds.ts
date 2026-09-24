@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { cacheHit, cacheSummary } from "./usage";
 import { decodeAnswer } from "../diff/codec";
 import { applyAssemblyDiff, applyDesignDiff, applyModelDiff, assemblyDiffJsonSchema, DESIGN_DIFF_INSTRUCTIONS, designDiffJsonSchema, DIFF_INSTRUCTIONS, modelDiffJsonSchema } from "../diff/diff";
 import { codec } from "../diff/format";
@@ -169,6 +170,8 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     {
       scope: "plan",
       stage: "plan",
+      tools: [searchPartsTool],
+      toolChoice: "none",
       debugPrefix: "plan.",
       system,
       firstContent: withImage(planText),
@@ -189,6 +192,12 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   debug.write("plan.json", plan);
 
   // --- 2. unique sub-builds, in parallel ------------------------------------------------
+  // The first request goes alone until it starts streaming (its prompt is cached by then);
+  // the rest then read the cache instead of all writing it at once.
+  let firstStarted!: () => void;
+  const cacheWarm = new Promise<void>((r) => (firstStarted = r));
+  const needCalls = plan.subBuilds.filter((s) => !cp?.subs.get(s.id)?.valid);
+  if (!needCalls.length) firstStarted();
   const subLoops = await pool(plan.subBuilds, CONFIG.subbuilds.concurrency, async (sub) => {
     const scope = `sub:${sub.id}`;
     onEvent({ type: "stage", scope, label: sub.name, status: "start", copies: sub.copies });
@@ -200,6 +209,8 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
       return { sub, loop };
     }
     if (saved) earlierRounds.push(...saved.rounds);
+    const first = sub === needCalls[0];
+    if (!first) await cacheWarm;
     const loop = await runLoop<BrickModel>(
       {
         scope,
@@ -217,8 +228,8 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
           return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: model.parts.length };
         },
       },
-      ctx,
-    );
+      first ? { ...ctx, onStarted: firstStarted } : ctx,
+    ).finally(() => first && firstStarted());
     onEvent({ type: "stage", scope, label: sub.name, status: "done", valid: loop.best?.check.valid ?? false, parts: loop.best?.value.parts.length ?? 0, copies: sub.copies, cost: loop.usage.cost });
     return { sub, loop };
   });
@@ -335,11 +346,11 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   if (resumed) debug.write(`resume-${new Date().toISOString().replace(/[:.]/g, "-")}.json`, resumed);
   const catalog = catalogUsage(result.model);
   console.log(`[generate] ${formatCatalogUsage(catalog)}`);
-  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, rounds, total: usage, ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
+  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, rounds, total: usage, cache: cacheSummary(usage), ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
   if (design) debug.write("final-design.json", design);
   if (result.model) debug.write("final-model.json", result.model);
   if (resumed) console.log(`[generate] resumed: reused plan=${resumed.reused.plan}, sub-builds [${resumed.reused.subBuilds.join(", ")}], assembly=${resumed.reused.assembly}; earlier $${resumed.costBefore.toFixed(4)}, now $${resumed.costNow.toFixed(4)}`);
-  console.log(`[generate] sub-builds done: valid=${result.valid}, ${result.model?.parts.length ?? 0} parts, ${compiled?.stats.copies ?? 0} copies, ${rounds.length} round(s) · total ${formatUsage(usage)} · debug: ${debug.dir}`);
+  console.log(`[generate] sub-builds done: valid=${result.valid}, ${result.model?.parts.length ?? 0} parts, ${compiled?.stats.copies ?? 0} copies, ${rounds.length} round(s) · total ${formatUsage(usage)} · cache hit ${cacheHit(usage)} · debug: ${debug.dir}`);
   onEvent({ type: "done", result });
   return result;
 }

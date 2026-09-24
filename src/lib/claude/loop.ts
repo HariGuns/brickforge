@@ -3,7 +3,7 @@ import { CONFIG, stageSetting, type Effort, type Stage } from "../config";
 import type { Issue } from "../validate/validator";
 import { repairPrompt } from "../prompts/repair";
 import type { DebugRun } from "./debug";
-import { formatUsage, sumUsage, toRoundUsage, type RoundUsage } from "./usage";
+import { cacheHit, formatUsage, sumUsage, toRoundUsage, type RoundUsage } from "./usage";
 
 /**
  * The generate → validate → repair loop, shared by the single-pass generator
@@ -70,6 +70,12 @@ export interface LoopSpec<T> {
   repairText?: (errors: Issue[], warnings: Issue[], round: number) => string;
   /** Client-side tools Claude may call before answering. */
   tools?: LoopTool[];
+  /**
+   * "none": list the tools but don't let Claude call them. Every stage of a run
+   * sends the same tools, so they and the system prompt (with the part menu)
+   * form one cached prefix; a stage without tools would miss the cache.
+   */
+  toolChoice?: "auto" | "none";
   /** Which CONFIG.stages entry sets the model and effort (repair rounds use `repair`). Default "design". */
   stage?: Stage;
   /**
@@ -90,6 +96,13 @@ export interface LoopContext {
   debug: DebugRun;
   onEvent: (e: LoopEvent) => void;
   signal?: AbortSignal;
+  /**
+   * Called once, as soon as the first request starts streaming (its prompt,
+   * and so the cache entry, has been processed). Used to start parallel
+   * requests after the first one, so they read the cache instead of all
+   * writing it.
+   */
+  onStarted?: () => void;
 }
 
 export interface LoopResult<T> {
@@ -109,6 +122,12 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
   let best: LoopResult<T>["best"] = null;
   /** The last answer that parsed (valid or not): what a repair diff applies to. */
   let lastValue: T | null = null;
+  let startedOnce = false;
+  const started = () => {
+    if (startedOnce) return;
+    startedOnce = true;
+    ctx.onStarted?.();
+  };
 
   for (let round = 0; round <= maxRounds; round++) {
     const kind = round === 0 ? "design" : "repair";
@@ -146,11 +165,12 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
           // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next call.
           system: [{ type: "text", text: spec.system, cache_control: { type: "ephemeral" } }],
           cache_control: { type: "ephemeral" },
-          ...(tools.length ? { tools: tools.map((t) => t.def), tool_choice: turn >= MAX_TOOL_TURNS ? { type: "none" as const } : { type: "auto" as const } } : {}),
+          ...(tools.length ? { tools: tools.map((t) => t.def), tool_choice: turn >= MAX_TOOL_TURNS || spec.toolChoice === "none" ? { type: "none" as const } : { type: "auto" as const } } : {}),
           messages,
         },
         { signal: ctx.signal },
       );
+      stream.on("streamEvent", () => started());
       stream.on("thinking", (delta) => {
         thinkingChars += delta.length;
         thinkingTail += delta;
@@ -161,6 +181,7 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
         emitProgress();
       });
       msg = await stream.finalMessage();
+      started();
       callUsage.push(toRoundUsage(msg.usage, setting.model));
       thinkingParts.push(...msg.content.flatMap((b) => (b.type === "thinking" ? [b.thinking] : [])));
       if (msg.stop_reason !== "tool_use") break;
@@ -239,7 +260,7 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     rounds.push(summary);
     ctx.debug.write(f(`round-${round}.validation.json`), { summary, errors: issues, warnings });
     if (value !== null) ctx.debug.write(f(`round-${round}.model.json`), value);
-    console.log(`[generate] ${spec.scope} round ${round} (${kind}, ${setting.model} ${setting.effort}): ${summary.partCount} parts, ${issues.length} errors, ${warnings.length} warnings, ${toolLog.length ? `${toolLog.length} part searches, ` : ""}${seconds.toFixed(1)}s · ${formatUsage(usage)}`);
+    console.log(`[generate] ${spec.scope} round ${round} (${kind}, ${setting.model} ${setting.effort}): ${summary.partCount} parts, ${issues.length} errors, ${warnings.length} warnings, ${toolLog.length ? `${toolLog.length} part searches, ` : ""}${seconds.toFixed(1)}s · ${formatUsage(usage)} · cache hit ${cacheHit(usage)}`);
     ctx.onEvent({ type: "round_end", scope: spec.scope, summary, errors: issues.slice(0, 50) });
 
     if (value !== null && check && (!best || issues.length < best.check.errors.length)) best = { value, check };

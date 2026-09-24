@@ -197,6 +197,7 @@ Where it shows up:
 
 - **Model and effort per stage** (`CONFIG.stages`): analysis, plan, design, sub-build, assembly, edit, comparison, and `repair` for every repair round. Any stage can switch model or effort; each round logs which it used, and its cost uses that model's prices (`CONFIG.pricing`). Defaults: Opus 5.5 at effort high, except analysis and repairs at medium.
 - **Compact parts format** (`CONFIG.outputFormat`, `src/lib/diff/codec.ts`): Claude writes each part as one string, `"brick_2x4 red 3 0 5 90"`, and each copy as `"pine_tree 4 1 0 270"` (`" m"` for a mirror image). The same format is used in the listings it's shown. This is 47% of the JSON objects' size on a real 247-part model. Malformed lines come back as errors with their path; JSON objects are still accepted.
+- **Prompt caching:** the system prompt, which holds the 142-part menu, is cached. Every stage of a run sends the same tool list, so tools and system prompt form one cached prefix. The analysis and plan calls list the tools but can't call them (`tool_choice: none`). Parallel sub-builds start one at a time until the first is streaming, so the rest read the cache instead of all writing it at once. Each round logs its cache hit rate, and `summary.json` has the run's `cache` totals.
 - **Diffs:** repairs, chat edits and photo comparisons return only the changes (remove / set / add by index, copies and new sub-builds for designs), applied by code (`src/lib/diff`).
 
 ## Part catalog

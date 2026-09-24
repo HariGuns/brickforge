@@ -20,7 +20,7 @@ import { codec } from "../diff/format";
 import { validate, type Issue, type ValidationResult } from "../validate/validator";
 import { buildSteps, type BuildStep } from "../steps/steps";
 import { DebugRun } from "./debug";
-import { formatUsage, type RoundUsage } from "./usage";
+import { cacheHit, cacheSummary, formatUsage, type RoundUsage } from "./usage";
 import { runLoop, type LoopEvent, type RoundSummary } from "./loop";
 import type { BrickDesign } from "../design/schema";
 import type { CompileResult } from "../design/compile";
@@ -242,11 +242,12 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
     ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, usage: photo.usage } } : {}),
     ...(refine ? { refine: { rounds: refine.log, usage: refine.usage } } : {}),
     total: result.usage,
+    cache: cacheSummary(result.usage),
     partCount: result.model?.parts.length ?? 0,
     catalog,
   });
   if (result.model) debug.write("final-model.json", result.model);
-  console.log(`[generate] done: valid=${result.valid}, ${loop.rounds.length} design round(s) · total ${formatUsage(result.usage)}${photo ? ` (analysis ${formatUsage(photo.usage)})` : ""}${refine ? ` (comparison ${formatUsage(refine.usage)})` : ""} · debug: ${debug.dir}`);
+  console.log(`[generate] done: valid=${result.valid}, ${loop.rounds.length} design round(s) · total ${formatUsage(result.usage)}${photo ? ` (analysis ${formatUsage(photo.usage)})` : ""}${refine ? ` (comparison ${formatUsage(refine.usage)})` : ""} · cache hit ${cacheHit(result.usage)} · debug: ${debug.dir}`);
   onEvent({ type: "done", result });
   return result;
 }

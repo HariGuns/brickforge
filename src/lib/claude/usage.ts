@@ -38,3 +38,15 @@ export function sumUsage(rounds: RoundUsage[]): RoundUsage {
 export function formatUsage(u: RoundUsage): string {
   return `in ${u.input} · out ${u.output} · cache read ${u.cacheRead} · cache write ${u.cacheWrite} · ~$${u.cost.toFixed(4)}`;
 }
+
+/** Share of the prompt read from the cache, e.g. "92%". */
+export function cacheHit(u: RoundUsage): string {
+  const all = u.input + u.cacheRead + u.cacheWrite;
+  return all ? `${Math.round((u.cacheRead / all) * 100)}%` : "–";
+}
+
+/** Cache totals for summary.json. */
+export function cacheSummary(u: RoundUsage): { read: number; write: number; uncached: number; hitRate: number } {
+  const all = u.input + u.cacheRead + u.cacheWrite;
+  return { read: u.cacheRead, write: u.cacheWrite, uncached: u.input, hitRate: all ? Math.round((u.cacheRead / all) * 1000) / 1000 : 0 };
+}
