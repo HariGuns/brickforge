@@ -10,6 +10,22 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local   # server-side only, gitignore
 npm run dev                                         # http://localhost:3000
 ```
 
+## One-click launcher (Linux)
+
+```bash
+npm run install-launcher              # adds "BrickForge" to your app menu
+scripts/install-launcher.sh --desktop # …and a desktop icon
+scripts/install-launcher.sh --uninstall
+```
+
+Clicking **BrickForge**:
+1. installs dependencies if they're missing;
+2. rebuilds only if the code changed since the last build;
+3. starts the app on http://localhost:3000, or reuses one that's already running;
+4. opens your browser.
+
+Right-click the menu entry for **Stop BrickForge**. The same actions from a terminal are `npm run launch` and `npm run stop`. Logs go to `logs/` (build, server). `BRICKFORGE_PORT` changes the port.
+
 ## Scripts
 
 | Command | What it does |

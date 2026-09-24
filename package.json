@@ -14,7 +14,10 @@
     "export-sample": "tsx scripts/export-sample.ts",
     "verify-ldraw": "tsx scripts/verify-ldraw.ts",
     "bench": "tsx scripts/bench.ts",
-    "probe-ldraw": "tsx scripts/probe-ldraw.ts"
+    "probe-ldraw": "tsx scripts/probe-ldraw.ts",
+    "launch": "scripts/launch.sh",
+    "stop": "scripts/stop.sh",
+    "install-launcher": "scripts/install-launcher.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
