@@ -67,6 +67,8 @@ export interface LoopSpec<T> {
   repairText?: (errors: Issue[], warnings: Issue[], round: number) => string;
   /** Client-side tools Claude may call before answering. */
   tools?: LoopTool[];
+  /** Effort for this loop (default CONFIG.effort). */
+  effort?: "low" | "medium" | "high";
 }
 
 export interface LoopContext {
@@ -121,7 +123,7 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
           model: CONFIG.model,
           max_tokens: CONFIG.maxTokens,
           thinking: { type: "adaptive", display: "summarized" },
-          output_config: { effort: CONFIG.effort, format: { type: "json_schema", schema: spec.schema } },
+          output_config: { effort: spec.effort ?? CONFIG.effort, format: { type: "json_schema", schema: spec.schema } },
           // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next call.
           system: [{ type: "text", text: spec.system, cache_control: { type: "ephemeral" } }],
           cache_control: { type: "ephemeral" },

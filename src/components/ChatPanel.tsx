@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { Issue } from "@/lib/validate/validator";
 import type { RoundSummary } from "@/lib/claude/generate";
-import type { BuildSize } from "@/lib/prompts/design";
+import { DETAILS, type Detail } from "@/lib/detail";
 import { CONFIG } from "@/lib/config";
 import { AVAILABLE_PIPELINES, type Pipeline } from "@/lib/claude/pipeline";
 import * as I from "./icons";
@@ -25,7 +25,7 @@ export interface Turn {
   /** Name of the model being edited (edit turns). */
   baseName?: string;
   text: string;
-  size: BuildSize;
+  detail: Detail;
   image?: { name: string; previewUrl: string };
   status: "running" | "done" | "error" | "cancelled";
   rounds: RoundState[];
@@ -33,6 +33,8 @@ export interface Turn {
   stages?: StageState[];
   /** Part searches Claude made (search_parts), latest last. */
   searches?: string[];
+  /** Photo builds: what the analysis found and the size it set. */
+  analysis?: { subject: string; ratio: string; size: string; cost: number };
   result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string; parts?: number; subBuilds?: number; copies?: number; compileMs?: number };
   error?: string;
 }
@@ -49,24 +51,18 @@ export interface StageState {
 
 export interface Draft {
   text: string;
-  size: BuildSize;
+  detail: Detail;
   /** Generator path for new builds (testing setting). */
   pipeline: Pipeline;
   image: { name: string; mediaType: "image/jpeg"; data: string; previewUrl: string } | null;
 }
 
-const SIZES: { id: BuildSize; label: string }[] = [
-  { id: "small", label: "Small" },
-  { id: "medium", label: "Medium" },
-  { id: "large", label: "Large" },
-];
-
 /** "Try one" suggestions for the empty chat; picking one fills the composer (it doesn't send). */
-const SUGGESTIONS: { label: string; text: string; size: BuildSize; pipeline: Pipeline }[] = [
-  { label: "Cottage with a garden", text: "a cozy cottage with a flower garden and a picket fence", size: "medium", pipeline: "single" },
-  { label: "Red fire truck", text: "a red fire truck with a ladder", size: "medium", pipeline: "single" },
-  { label: "Lighthouse", text: "a striped lighthouse on a rocky island", size: "medium", pipeline: "single" },
-  { label: "Castle (large)", text: "a medieval castle with four corner towers, walls and a gatehouse", size: "large", pipeline: "subbuilds" },
+const SUGGESTIONS: { label: string; text: string; detail: Detail; pipeline: Pipeline }[] = [
+  { label: "Cottage with a garden", text: "a cozy cottage with a flower garden and a picket fence", detail: "standard", pipeline: "auto" },
+  { label: "Red fire truck", text: "a red fire truck with a ladder", detail: "standard", pipeline: "auto" },
+  { label: "Lighthouse", text: "a striped lighthouse on a rocky island", detail: "standard", pipeline: "auto" },
+  { label: "Castle (high detail)", text: "a medieval castle with four corner towers, walls and a gatehouse", detail: "high", pipeline: "auto" },
 ];
 
 const usd = (n: number) => `$${n.toFixed(2)}`;
@@ -94,7 +90,8 @@ function stageRows(t: Turn): Row[] {
   for (const s of t.stages ?? []) {
     const reps = Math.max(0, roundsOf(s.scope).length - 1);
     const label = s.scope.startsWith("sub:") ? `Sub-build · ${s.label}${s.copies && s.copies > 1 ? ` ×${s.copies}` : ""}` : s.scope === "plan" ? "Planning sub-builds" : s.scope === "assembly" ? "Assembling" : s.label;
-    if (s.status === "start") rows.push({ label, state: running ? "active" : "fail", note: running ? live(s.scope) : "" });
+    if (s.scope === "analysis") rows.push(analysisRow(t));
+    else if (s.status === "start") rows.push({ label, state: running ? "active" : "fail", note: running ? live(s.scope) : "" });
     else {
       const what = s.scope === "plan" ? `${s.parts ?? 0} sub-builds` : `${s.parts ?? 0} parts`;
       rows.push({ label, state: s.valid ? "done" : "fail", note: `${what}${reps ? ` · ${reps} repair${reps === 1 ? "" : "s"}` : ""}${s.valid ? "" : " · has problems"}` });
@@ -110,11 +107,23 @@ function stageRows(t: Turn): Row[] {
   return rows;
 }
 
+/** "Reading the photo": the subject, its proportions and the size it set. */
+function analysisRow(t: Turn): Row {
+  const a = t.analysis;
+  return {
+    label: "Reading the photo",
+    state: a ? "done" : t.status === "running" ? "active" : "fail",
+    note: a ? `${a.subject} · ${a.ratio} · ${a.size} · ${usd(a.cost)}` : t.status === "running" ? "proportions, features, colours" : "",
+  };
+}
+
 /** Progress tracker rows derived from the streamed round events. */
 function trackerRows(t: Turn): Row[] {
   if (t.stages?.length) return stageRows(t);
-  const r0 = t.rounds[0];
+  const main = t.rounds.filter((r) => r.scope === "main");
+  const r0 = main[0];
   const rows: Row[] = [];
+  if (t.image && t.kind === "build") rows.push(analysisRow(t));
   const designNote = r0?.summary
     ? r0.summary.partCount
       ? `${r0.summary.partCount} parts`
@@ -136,8 +145,8 @@ function trackerRows(t: Turn): Row[] {
     note: r0?.summary ? (r0.summary.errorCount ? `${r0.summary.errorCount} problem${r0.summary.errorCount === 1 ? "" : "s"}` : "all connected") : "",
   });
 
-  for (const r of t.rounds.slice(1)) {
-    const prev = t.rounds[r.round - 1]?.summary?.errorCount ?? 0;
+  for (const r of main.slice(1)) {
+    const prev = main[r.round - 1]?.summary?.errorCount ?? 0;
     rows.push({
       label: `Repair round ${r.round} of ${CONFIG.maxRepairRounds}`,
       state: r.summary ? "done" : t.status === "running" ? "active" : "fail",
@@ -224,7 +233,7 @@ export function ChatPanel(props: {
                     className="try-chip"
                     onClick={() => {
                       if (props.modelName && editing) props.onToggleEdit();
-                      props.onDraft({ text: s.text, size: s.size, pipeline: s.pipeline });
+                      props.onDraft({ text: s.text, detail: s.detail, pipeline: s.pipeline });
                       requestAnimationFrame(() => document.getElementById("composer")?.focus());
                     }}
                     title={s.text}
@@ -248,7 +257,7 @@ export function ChatPanel(props: {
               <div className="bubble">
                 {t.kind === "edit" && <span className="edit-tag">Edit · {t.baseName}</span>}
                 {t.text || (t.image ? (t.kind === "edit" ? "Match the photo more closely." : "Build the subject of this photo.") : "")}
-                {t.kind === "build" && <span className="size-tag"> · {SIZES.find((s) => s.id === t.size)?.label}</span>}
+                {t.kind === "build" && <span className="size-tag"> · {DETAILS.find((d) => d.id === t.detail)?.label} detail</span>}
               </div>
             </div>
             <div className="msg-ai">
@@ -327,9 +336,9 @@ export function ChatPanel(props: {
               }}
             />
             {!editing && (
-              <div className="seg small" role="radiogroup" aria-label="Model size">
-                {SIZES.map((s) => (
-                  <button key={s.id} role="radio" aria-checked={draft.size === s.id} className={draft.size === s.id ? "on" : ""} onClick={() => props.onDraft({ size: s.id })}>
+              <div className="seg small" role="radiogroup" aria-label="Detail" title="Detail: how big and detailed the model is (target width and part budget). Auto uses sub-builds for High and Very high.">
+                {DETAILS.map((s) => (
+                  <button key={s.id} role="radio" aria-checked={draft.detail === s.id} className={draft.detail === s.id ? "on" : ""} onClick={() => props.onDraft({ detail: s.id })}>
                     {s.label}
                   </button>
                 ))}

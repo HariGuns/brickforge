@@ -50,8 +50,8 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
-| `npm run gen -- --size small "a rubber duck"` | Target size: `small`, `medium` or `large` (the same choice as the size buttons in the chat) |
-| `npm run gen -- --pipeline subbuilds --size large "a castle"` | Generator path: `single` (default), `subbuilds` or `auto` (sub-builds for Large) |
+| `npm run gen -- --detail high "a rubber duck"` | Detail: `standard` (default), `high` or `very_high`, the same choice as the Detail buttons in the chat. The old `--size small/medium/large` still works (small/medium → standard, large → high) |
+| `npm run gen -- --pipeline subbuilds --detail high "a castle"` | Generator path: `single`, `subbuilds` or `auto` (the default: sub-builds for High and Very high) |
 | `npm run gen -- --resume debug/<run folder>` | Finish an interrupted sub-build run: reuses its valid plan, sub-builds and assembly, redoes the rest, and writes into the same folder. Earlier and new cost are reported separately |
 | `npm run bench [side]` | Compile benchmark for a large nested design (`side` 5 ≈ 4,600 parts) |
 | `npm run verify-ldraw` | Check the core parts and the whole catalog against the official LDraw library and LDCad's snap data (needs `ldraw-lib/`, see below) |
@@ -105,7 +105,7 @@ A flat model is a design with no sub-builds, so the single-pass path and older s
 - **Only real weak points:** a part that's also tied into the model another way (bonded walls, spans on other supports) is never flagged.
 - **In the repair loop:** both count as errors during repair rounds, and as warnings after the last round.
 
-**Sub-build generator** (`src/lib/claude/subbuilds.ts`, prompts in `src/lib/prompts/subbuilds.ts`): choose it with the path selector, `--pipeline subbuilds`, or `CONFIG.generator`. The default is **Auto**: sub-builds for Large builds, single pass for Small and Medium.
+**Sub-build generator** (`src/lib/claude/subbuilds.ts`, prompts in `src/lib/prompts/subbuilds.ts`): choose it with the path selector, `--pipeline subbuilds`, or `CONFIG.generator`. The default is **Auto**: sub-builds for High and Very high detail, single pass for Standard.
 1. **Plan:** the sub-builds, each with a size envelope, part budget and copy count, plus a layout.
 2. **Design each unique sub-build once:** 4 in parallel, each validated on its own inside its envelope with its own repair loop.
 3. **Assemble:** copies plus glue parts, placed using a map of each sub-build's top studs and underside. The compiler checks joins, connectivity and structure, and the assembly is repaired until valid.
@@ -141,6 +141,43 @@ The village sub-build run was interrupted at assembly when the API credit ran ou
 - **Swap map** (`src/lib/parts/mirror.ts`): it isn't a hand-written list. It comes from comparing each part's flipped connection data with its left/right counterpart (or itself) at each rotation. 23 parts have no mirror image, and a mirrored copy containing one is reported (`MIRROR_UNSUPPORTED`).
 - **Nested copies:** inside a mirrored copy, they flip too.
 - **Manual and export:** mirrored copies get their own manual section ("Side (mirrored)") and their own `.mpd` submodel, with the parts really swapped.
+
+## Detail and photo analysis
+
+**Detail** (Standard / High / Very high; it replaced Small / Medium / Large) sets the target width of the subject in studs and the part budget (`CONFIG.detail`):
+
+| Detail | Width | Parts | Auto uses |
+|---|---|---|---|
+| Standard | 10 studs | 300 | single pass |
+| High | 16 studs | 700 | sub-builds |
+| Very high | 22 studs | 1,500 | sub-builds |
+
+Photos of vehicles are never narrower than 14 studs. The single pass keeps its 300-part limit, so High and Very high need sub-builds to use their full budget.
+
+**Photo analysis** (`src/lib/claude/analyze.ts`, prompt in `src/lib/prompts/analysis.ts`) runs before designing any photo build. It's a short structured call (effort `CONFIG.analysisEffort`) that returns:
+- the subject;
+- its category;
+- its real length, width and height in metres (published specs where Claude recognises it);
+- 5–8 key features;
+- the main colours;
+- the camera angle;
+- notes.
+
+The code then turns the dimensions into an exact target size:
+- the width comes from the Detail level;
+- length and height keep the real proportions, at 1 stud = 8 mm = 2.5 plates;
+- everything scales down if needed to fit the build area.
+
+For example, a Lamborghini Huracán at High is 37 × 16 studs × 24 plates.
+
+The design prompt (or, with sub-builds, the plan) gets the analysis and target size, plus a fixed orientation: front toward +z, length along z. That orientation also lets the phase 3 renders match the photo's angle.
+
+Where the analysis shows up:
+- **Chat:** a "Reading the photo" row with the subject, proportions, size and cost.
+- **Cost:** it's included in the total and also logged on its own, as `analysis` in `summary.json` and `analysis.json`.
+- **Resume:** a resumed sub-build run reuses it.
+
+**Manual:** wheel holders hanging under a chassis go in the same step as the part they hang from, and wheels go on last.
 
 ## Part catalog
 
@@ -253,5 +290,5 @@ These are end-to-end runs with `claude-opus-5-5` at effort `high`, using the tun
 - **No hanging parts:** a part can't be attached only to the underside of a part above it. Every part must rest on studs below it, which is what makes bottom-up build steps possible.
 - **Slopes block their whole box:** collision treats a slope as filling its full bounding box, so nothing can sit in the empty space above a sloped face.
 - **Structure isn't simulated:** the validator checks stud connections only. It doesn't check balance, weight or clutch strength. A part held by a single stud gets a warning, not an error.
-- **Small library:** v1 has bricks, plates, tiles and 45° slopes only. There are no curved, inverted, SNOT or Technic parts.
+- **Library:** 937 parts (see Part catalog). There are no side studs (SNOT), hinges, clips or Technic beams yet.
 - **Simple step grouping:** steps are grouped by layer and position (up to 6 parts each). No build-order optimisation is done beyond that.

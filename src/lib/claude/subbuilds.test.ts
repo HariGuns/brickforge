@@ -29,6 +29,15 @@ const goodMain = {
     { sub: "pine_tree", x: 6, y: 1, z: 0, rot: 180 },
   ],
 };
+const photoAnalysis = {
+  subject: "A small village",
+  category: "scene",
+  dimensions: { length: 40, width: 40, height: 12 },
+  keyFeatures: ["two huts", "two pine trees", "green base"],
+  colors: [{ area: "grass", color: "green" }],
+  view: { azimuth: 30, elevation: 35 },
+  notes: "",
+};
 // First assembly attempt: a hut floats above the base.
 const badMain = { ...goodMain, uses: goodMain.uses.map((u, i) => (i === 1 ? { ...u, y: 5 } : u)) };
 
@@ -43,9 +52,11 @@ function fakeClient(opts: { failAssembly?: boolean; assemblyOk?: boolean } = {})
       stream(params: Anthropic.MessageCreateParams) {
         requests.push(structuredClone(params));
         const props = schemaProps(params);
-        const first = params.messages[0].content as string;
+        const c0 = params.messages[0].content;
+        const first = typeof c0 === "string" ? c0 : c0.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n");
         let text: string;
-        if ("layout" in props) text = JSON.stringify(plan);
+        if ("keyFeatures" in props) text = JSON.stringify(photoAnalysis);
+        else if ("layout" in props) text = JSON.stringify(plan);
         else if ("uses" in props) {
           if (opts.failAssembly) throw new Error("Your credit balance is too low to access the Anthropic API.");
           text = JSON.stringify(assemblies++ === 0 ? badMain : goodMain);
@@ -73,7 +84,7 @@ describe("sub-build generator (fake Claude)", () => {
   it("plans, designs each sub-build once, assembles, repairs the assembly and compiles", async () => {
     const { client, requests } = fakeClient();
     const events: GenerateEvent[] = [];
-    const r = await generateDesign({ text: "a tiny village", size: "small" }, (e) => events.push(e), { client });
+    const r = await generateDesign({ text: "a tiny village", detail: "standard" }, (e) => events.push(e), { client });
     dirs.push(r.debugDir);
 
     expect(r.pipeline).toBe("subbuilds");
@@ -98,7 +109,7 @@ describe("sub-build generator (fake Claude)", () => {
   it("resumes an interrupted run: reuses the plan and sub-builds, runs only the assembly", async () => {
     const first = fakeClient({ failAssembly: true });
     let dir = "";
-    await expect(generateDesign({ text: "a tiny village", size: "small" }, (e) => e.type === "start" && (dir = e.debugDir), { client: first.client })).rejects.toThrow(/credit/);
+    await expect(generateDesign({ text: "a tiny village", detail: "standard" }, (e) => e.type === "start" && (dir = e.debugDir), { client: first.client })).rejects.toThrow(/credit/);
     dirs.push(dir);
     expect(first.requests).toHaveLength(4); // plan + 2 sub-builds + the failed assembly call
 
@@ -112,6 +123,26 @@ describe("sub-build generator (fake Claude)", () => {
     const summary = JSON.parse(fs.readFileSync(path.join(dir, "summary.json"), "utf8"));
     expect(summary.resumed.reused).toEqual({ plan: true, subBuilds: ["hut", "pine_tree"], assembly: false });
     expect(summary.resumed.costBefore).toBeGreaterThan(0);
+  });
+
+  it("with a photo: analyses first, plans at the target size, and reuses the analysis on resume", async () => {
+    const image = { mediaType: "image/jpeg" as const, data: "AAAA" };
+    const first = fakeClient({ failAssembly: true });
+    let dir = "";
+    const events: GenerateEvent[] = [];
+    await expect(generateDesign({ image, detail: "high" }, (e) => (events.push(e), e.type === "start" && (dir = e.debugDir)), { client: first.client })).rejects.toThrow(/credit/);
+    dirs.push(dir);
+    expect("keyFeatures" in schemaProps(first.requests[0])).toBe(true);
+    const planText = (first.requests[1].messages[0].content as Anthropic.ContentBlockParam[]).flatMap((b) => (b.type === "text" ? [b.text] : [])).join("");
+    expect(planText).toContain("Photo analysis");
+    expect(planText).toContain("16 studs wide (x)");
+    expect(events.some((e) => e.type === "stage" && e.scope === "analysis" && e.status === "done")).toBe(true);
+
+    const second = fakeClient({ assemblyOk: true });
+    const r = await resumeDesign(dir, () => {}, { client: second.client });
+    expect(second.requests.map((q) => ("uses" in schemaProps(q) ? "assembly" : "keyFeatures" in schemaProps(q) ? "analysis" : "other"))).toEqual(["assembly"]);
+    expect(r.analysis?.analysis.subject).toBe("A small village");
+    expect(r.rounds.filter((x) => x.reused).map((x) => x.scope)).toContain("analysis");
   });
 
   it("refuses to resume something that isn't a sub-build run", async () => {

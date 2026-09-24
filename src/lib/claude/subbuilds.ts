@@ -1,4 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { analysisBlock, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
+import { analyzePhoto } from "./analyze";
+import type { RoundUsage } from "./usage";
 import { catalogUsage, formatCatalogUsage } from "../parts/usage";
 import { searchPartsTool } from "./tools";
 import { z } from "zod";
@@ -125,7 +128,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   onEvent({ type: "start", debugDir: debug.dir });
   const system = systemPrompt();
   if (!cp) {
-    debug.write("input.json", { mode: "build", pipeline: "subbuilds", text: input.text ?? null, size: input.size ?? null, hasImage: !!input.image, config: CONFIG });
+    debug.write("input.json", { mode: "build", pipeline: "subbuilds", text: input.text ?? null, detail: input.detail ?? null, hasImage: !!input.image, config: CONFIG });
     debug.write("system-prompt.md", system);
     if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
   }
@@ -140,9 +143,21 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
         ]
       : text;
 
+  // --- 0. photo analysis (photos only; reused on resume) ------------------------------------
+  let photo: { analysis: PhotoAnalysis; target: SizeTarget; rounds: RoundSummary[]; usage: RoundUsage } | null = null;
+  if (input.image) {
+    onEvent({ type: "stage", scope: "analysis", label: "Reading the photo", status: "start" });
+    if (cp?.analysis) {
+      const rounds = cp.analysis.rounds.map((r) => ({ ...r, reused: true }));
+      photo = { analysis: cp.analysis.analysis, target: cp.analysis.target, rounds, usage: sumUsage(rounds.map((r) => r.usage)) };
+    } else photo = await analyzePhoto({ text: input.text, image: input.image, detail: input.detail }, CONFIG.design.grid, ctx, system);
+    onEvent({ type: "analysis", analysis: photo.analysis, target: photo.target, cost: photo.usage.cost });
+    onEvent({ type: "stage", scope: "analysis", label: "Reading the photo", status: "done", valid: true, cost: photo.usage.cost });
+  }
+
   // --- 1. plan --------------------------------------------------------------------------
   onEvent({ type: "stage", scope: "plan", label: "Planning sub-builds", status: "start" });
-  const planText = planPrompt(input.text ?? "", input.size, !!input.image);
+  const planText = planPrompt(input.text ?? "", input.detail, !!input.image, photo ? analysisBlock(photo.analysis, photo.target) : undefined);
   if (cp && !cp.plan.valid) earlierRounds.push(...cp.plan.rounds);
   const planLoop = cp?.plan.valid ? reusedLoop(cp.plan, cp.plan.valid, 0) : await runLoop<Plan>(
     {
@@ -235,7 +250,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   onEvent({ type: "stage", scope: "assembly", label: "Assembling", status: "done", valid: assembly.best?.check.valid ?? false, parts: assembly.best?.check.partCount, cost: assembly.usage.cost });
 
   // --- result -------------------------------------------------------------------------------
-  const rounds = [...earlierRounds, ...planLoop.rounds, ...subLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
+  const rounds = [...(photo?.rounds ?? []), ...earlierRounds, ...planLoop.rounds, ...subLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
   const usage = sumUsage(rounds.map((r) => r.usage));
   const spentNow = sumUsage(rounds.filter((r) => !r.reused).map((r) => r.usage));
   const design = a ? designOf(a) : null;
@@ -253,8 +268,10 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     design: design ?? undefined,
     compile: compiled ? { stats: compiled.stats, tree: compiled.tree, subBuilds: compiled.subBuilds } : undefined,
     pipeline: "subbuilds",
+    ...(photo ? { analysis: { analysis: photo.analysis, target: photo.target, cost: photo.usage.cost } } : {}),
   };
   const stages = {
+    ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, rounds: photo.rounds.length, cost: photo.usage.cost } } : {}),
     plan: { rounds: planLoop.rounds.length, cost: planLoop.usage.cost },
     subBuilds: subLoops.map(({ sub, loop }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: loop.best?.value.parts.length ?? 0, valid: loop.best?.check.valid ?? false, rounds: loop.rounds.length, cost: loop.usage.cost })),
     assembly: { rounds: assembly.rounds.length, cost: assembly.usage.cost, valid: assembly.best?.check.valid ?? false },

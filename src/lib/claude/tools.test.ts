@@ -53,7 +53,7 @@ describe("search_parts tool in the generation loop", () => {
   it("answers Claude's search, continues the same round, and logs catalog use", async () => {
     const { client, requests } = fakeClient();
     const events: GenerateEvent[] = [];
-    const r = await generateModel({ text: "a small red car", size: "small" }, (e) => events.push(e), { client });
+    const r = await generateModel({ text: "a small red car", detail: "standard" }, (e) => events.push(e), { client });
     dirs.push(r.debugDir);
     expect(requests).toHaveLength(2);
     expect(requests[0].tools?.map((t) => (t as Anthropic.Tool).name)).toEqual(["search_parts"]);

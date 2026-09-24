@@ -4,7 +4,7 @@
  * Tune freely.
  */
 import { CONFIG } from "../config";
-import type { BuildSize } from "./design";
+import type { Detail } from "../detail";
 import type { SurfaceMaps } from "../design/surface";
 
 export interface PlannedSubBuild {
@@ -28,18 +28,18 @@ export interface Plan {
   subBuilds: PlannedSubBuild[];
 }
 
-const SIZE_TARGET: Record<BuildSize, string> = {
-  small: "about 60–150 parts in total, at most ~16 studs across",
-  medium: "about 150–500 parts in total, roughly 16–32 studs across",
-  large: "about 400–1,500 parts in total, roughly 32–64 studs across",
-};
+/** Target scale per Detail level (for a photo, the analysis block gives exact numbers instead). */
+function detailTargetText(detail: Detail | undefined): string {
+  const t = CONFIG.detail[detail ?? "high"];
+  return `the subject about ${t.width} studs wide (side to side; vehicles at least ${CONFIG.detail.vehicleMinWidth}), in its real proportions, about ${Math.round(t.parts * 0.5)}–${t.parts} parts in total. Orient it with its front facing +z`;
+}
 
-export function planPrompt(request: string, size: BuildSize | undefined, hasImage: boolean): string {
+export function planPrompt(request: string, detail: Detail | undefined, hasImage: boolean, analysis?: string): string {
   const s = CONFIG.subbuilds;
   return `You are planning a large model as a tree of sub-builds before anyone places a single part.
 
 Request: ${request.trim() || "the main subject of the attached photo"}${hasImage ? "\n(Use the attached photo as the reference.)" : ""}
-Target size: ${SIZE_TARGET[size ?? "large"]}.
+${analysis ? `\n${analysis}\n` : `Target size: ${detailTargetText(detail)}.`}
 
 Split the model into sub-builds: self-contained pieces that are each built on their own as one connected piece, then placed on the main build. Good sub-builds are repeated features (trees, houses, windows bays, towers, wheels sets, fence runs) or big distinct sections (a hull, a tower, a gatehouse). Repeating a sub-build as several copies is the main way to get a large, detailed model cheaply, so use copies wherever the subject repeats. Left/right pairs count as repeats: a copy can be a mirror image (mirror: true in the assembly), so a vehicle's right side panel, wheel arch or wing can be designed once and mirrored for the left side.
 

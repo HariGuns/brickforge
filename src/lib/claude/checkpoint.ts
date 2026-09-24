@@ -1,4 +1,6 @@
 import fs from "node:fs";
+import { PhotoAnalysisSchema, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
+import { toDetail } from "../detail";
 import path from "node:path";
 import { BrickModelSchema, type BrickModel } from "../model/schema";
 import type { Plan } from "../prompts/subbuilds";
@@ -22,6 +24,8 @@ export interface Checkpoint {
   plan: StageCheckpoint<Plan>;
   subs: Map<string, StageCheckpoint<BrickModel>>;
   assembly: StageCheckpoint<unknown>;
+  /** The photo analysis, if the run got that far (reused on resume). */
+  analysis?: { analysis: PhotoAnalysis; target: SizeTarget; rounds: RoundSummary[] };
 }
 
 const readJson = (file: string): unknown => {
@@ -52,7 +56,7 @@ function stage<T>(dir: string, prefix: string, parse: (raw: unknown) => T | null
 
 export function loadCheckpoint(dir: string): Checkpoint {
   const abs = path.resolve(dir);
-  const input = readJson(path.join(abs, "input.json")) as { pipeline?: string; text?: string | null; size?: GenerateInput["size"]; hasImage?: boolean } | null;
+  const input = readJson(path.join(abs, "input.json")) as { pipeline?: string; text?: string | null; detail?: string | null; size?: string | null; hasImage?: boolean } | null;
   if (!input) throw new Error(`${abs} has no input.json; it isn't a generation run.`);
   if (input.pipeline !== "subbuilds") throw new Error("Only sub-build runs can be resumed (single-pass runs are one call; just run them again).");
   let image: GenerateInput["image"];
@@ -71,5 +75,9 @@ export function loadCheckpoint(dir: string): Checkpoint {
     }));
   }
   const assembly = stage<unknown>(abs, "assembly.", (raw) => raw ?? null);
-  return { dir: abs, input: { text: input.text ?? undefined, size: input.size ?? undefined, image }, plan, subs, assembly };
+  const saved = readJson(path.join(abs, "analysis.json")) as { analysis?: unknown; target?: SizeTarget } | null;
+  const parsedAnalysis = PhotoAnalysisSchema.safeParse(saved?.analysis);
+  const analysis = parsedAnalysis.success && saved?.target ? { analysis: parsedAnalysis.data, target: saved.target, rounds: stage<unknown>(abs, "analysis.", (raw) => raw ?? null).rounds } : undefined;
+  // Older runs saved a Small/Medium/Large size; toDetail maps it.
+  return { dir: abs, input: { text: input.text ?? undefined, detail: toDetail(input.detail ?? input.size), image }, plan, subs, assembly, ...(analysis ? { analysis } : {}) };
 }

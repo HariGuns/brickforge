@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { generateModel, type GenerateEvent, type ImageMediaType } from "@/lib/claude/generate";
 import { editDesign, generateDesign } from "@/lib/claude/subbuilds";
 import { BrickDesignSchema as DesignSchema, type BrickDesign } from "@/lib/design/schema";
-import type { BuildSize } from "@/lib/prompts/design";
+import { toDetail } from "@/lib/detail";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
 import { settingsEnabled } from "@/lib/settings/store";
@@ -10,7 +10,6 @@ import { AVAILABLE_PIPELINES, PIPELINES, resolvePipeline, type Pipeline } from "
 
 const IMAGE_TYPES: ImageMediaType[] = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-const SIZES: BuildSize[] = ["small", "medium", "large"];
 
 function friendly(err: unknown): string {
   if (err instanceof Anthropic.AuthenticationError) return settingsEnabled() ? "The Anthropic API key was rejected. Check it in Settings." : "The Anthropic API key was rejected. Check ANTHROPIC_API_KEY in .env.local.";
@@ -21,12 +20,12 @@ function friendly(err: unknown): string {
 }
 
 /**
- * POST { text?, image?: { mediaType, data(base64) }, size?, base?, pipeline? }
+ * POST { text?, image?: { mediaType, data(base64) }, detail?, base?, pipeline? }
  * → text/event-stream of GenerateEvent. `base` = model to edit; `pipeline` =
  * "single" | "subbuilds" | "auto" (default CONFIG.generator).
  */
 export async function POST(req: Request) {
-  let body: { text?: string; image?: { mediaType: string; data: string }; size?: string; base?: unknown; baseDesign?: unknown; pipeline?: string };
+  let body: { text?: string; image?: { mediaType: string; data: string }; detail?: string; size?: string; base?: unknown; baseDesign?: unknown; pipeline?: string };
   try {
     body = await req.json();
   } catch {
@@ -40,7 +39,8 @@ export async function POST(req: Request) {
     image = { mediaType: body.image.mediaType as ImageMediaType, data: body.image.data };
   }
   if (!text?.trim() && !image) return Response.json({ error: "Provide a description or a photo" }, { status: 400 });
-  const size = SIZES.includes(body.size as BuildSize) ? (body.size as BuildSize) : undefined;
+  // Detail (standard | high | very_high); the old size field (small | medium | large) still works.
+  const detail = toDetail(body.detail ?? body.size);
   let base: BrickModel | undefined;
   if (body.base !== undefined) {
     const parsed = BrickModelSchema.safeParse(body.base);
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
     baseDesign = parsed.data;
   }
   if (body.pipeline !== undefined && !PIPELINES.includes(body.pipeline as Pipeline)) return Response.json({ error: `Unknown pipeline "${body.pipeline}"` }, { status: 400 });
-  const pipeline = resolvePipeline(body.pipeline as Pipeline | undefined, size, !!base);
+  const pipeline = resolvePipeline(body.pipeline as Pipeline | undefined, detail, !!base);
   if (!AVAILABLE_PIPELINES.includes(pipeline)) {
     return Response.json({ error: "The sub-build generator isn't built yet. Choose Single pass for now." }, { status: 501 });
   }
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       };
       try {
         if (baseDesign) await editDesign({ text, image, baseDesign }, send, { signal: abort.signal });
-        else await (pipeline === "subbuilds" ? generateDesign : generateModel)({ text, image, size, base }, send, { signal: abort.signal });
+        else await (pipeline === "subbuilds" ? generateDesign : generateModel)({ text, image, detail, base }, send, { signal: abort.signal });
       } catch (err) {
         if (!abort.signal.aborted) {
           console.error("[generate] failed:", err);

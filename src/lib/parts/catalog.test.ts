@@ -97,3 +97,18 @@ describe("wheels on pins", () => {
     expect(u.fromSearch).toBe(1);
   });
 });
+
+describe("wheel holders in the manual", () => {
+  it("are built in the same step as the chassis they hang under, before the wheels", () => {
+    const h1 = P("4600", "black", 2, 2, 1), h2 = P("4600", "black", 2, 2, 7);
+    const wheels = [h1, h2].flatMap((h) => mountsFor(h, "4624c01").map((m) => ({ ...P("4624c01", "white", 0, 0, 0), ...m.at })));
+    const m = model([P("plate_2x8", "red", 2, 3, 1, 90), h1, h2, P("plate_4x8", "red", 1, 4, 1, 90), ...wheels]);
+    const steps = buildSteps(m);
+    const stepOf = (i: number) => steps.findIndex((s) => s.parts.includes(i));
+    expect(stepOf(1)).toBe(stepOf(0)); // holders with the chassis plate
+    expect(stepOf(2)).toBe(stepOf(0));
+    expect(stepOf(0)).toBe(0); // and that's the first step, not a floating holder on its own
+    expect(Math.min(...[4, 5, 6, 7].map(stepOf))).toBe(steps.length - 1); // wheels last
+    expect(checkStepOrder(m, validate(m).connections, steps)).toEqual([]);
+  });
+});

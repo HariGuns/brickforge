@@ -1,5 +1,5 @@
 import type { BrickModel } from "../model/schema";
-import type { BuildStep } from "../steps/steps";
+import { hangers, type BuildStep } from "../steps/steps";
 import { compileDesign, compileSubBuild, type CompileResult } from "./compile";
 import type { BrickDesign } from "./schema";
 import { getPart } from "../parts/library";
@@ -67,6 +67,16 @@ function containerSteps(model: BrickModel, compiled: CompileResult, parent: numb
       parts: inst.parts,
       copy: { sub: variantKey(inst.sub, inst.mirror), name: `${inst.name}${inst.mirror ? " (mirrored)" : ""}` },
     });
+  }
+  // Wheel holders hanging under a part go on with that part (same step): merge them into its unit,
+  // or into its layer if it's inside a copy.
+  const hang = hangers(model, compiled.validation?.connections ?? []);
+  for (const [h, upper] of hang) {
+    const hu = units.findIndex((u) => !u.copy && u.parts.length === 1 && u.parts[0] === h);
+    const uu = units.find((u) => u.parts.includes(upper));
+    if (hu < 0 || !uu) continue;
+    if (uu.copy) units[hu].y = uu.y;
+    else (uu.parts.push(h), units.splice(hu, 1));
   }
   // Wheels go on last, after the holders they hang from.
   const isWheel = (u: (typeof units)[number]) => !u.copy && u.parts.length === 1 && !!getPart(model.parts[u.parts[0]].part)?.hub;

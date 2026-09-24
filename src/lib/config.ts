@@ -17,6 +17,19 @@ export const CONFIG = {
    * plan → sub-builds → assembly, "auto" = sub-builds for Large, single otherwise.
    */
   generator: "auto" as "single" | "subbuilds" | "auto",
+  /**
+   * Detail setting: target width of the subject in studs (its side-to-side
+   * size) and the part budget. Photos of vehicles are never narrower than
+   * vehicleMinWidth. Auto uses the sub-build generator for High and Very high.
+   */
+  detail: {
+    standard: { width: 10, parts: 300 },
+    high: { width: 16, parts: 700 },
+    very_high: { width: 22, parts: 1500 },
+    vehicleMinWidth: 14,
+  },
+  /** Effort for the photo analysis call (a short structured description). */
+  analysisEffort: "medium" as const,
   /** Sub-build generator limits: unique sub-builds, total copies, envelope size (studs), parts per copy, parallel calls. */
   subbuilds: { maxUnique: 8, maxCopies: 64, maxEnvelope: 32, maxSubParts: 250, planRepairRounds: 2, concurrency: 4 },
   /**

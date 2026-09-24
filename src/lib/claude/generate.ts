@@ -6,7 +6,11 @@ import { CONFIG } from "../config";
 import { BrickModelSchema, type BrickModel } from "../model/schema";
 import { brickModelJsonSchema } from "../model/jsonSchema";
 import { systemPrompt } from "../prompts/system";
-import { photoDesignPrompt, textDesignPrompt, type BuildSize } from "../prompts/design";
+import { photoDesignPrompt, textDesignPrompt } from "../prompts/design";
+import { analysisBlock, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
+import type { Detail } from "../detail";
+import { analyzePhoto, type AnalysisEvent } from "./analyze";
+import { sumUsage } from "./usage";
 import { editPrompt } from "../prompts/edit";
 import { validate, type Issue, type ValidationResult } from "../validate/validator";
 import { buildSteps, type BuildStep } from "../steps/steps";
@@ -21,7 +25,8 @@ export type ImageMediaType = "image/jpeg" | "image/png" | "image/webp" | "image/
 export interface GenerateInput {
   text?: string;
   image?: { mediaType: ImageMediaType; data: string /* base64 */ };
-  size?: BuildSize;
+  /** Target width and part budget (see CONFIG.detail). */
+  detail?: Detail;
   /** Current model to edit; `text` is then the change request. */
   base?: BrickModel;
 }
@@ -40,6 +45,8 @@ export interface GenerateResult {
   design?: BrickDesign;
   compile?: Pick<CompileResult, "stats" | "tree" | "subBuilds">;
   pipeline?: "single" | "subbuilds";
+  /** Photo builds: what the analysis found, the size it set, and what it cost (also counted in `usage`). */
+  analysis?: { analysis: PhotoAnalysis; target: SizeTarget; cost: number };
 }
 
 /** A stage of the sub-build path starting or finishing ("plan", "sub:<id>", "assembly"). */
@@ -54,7 +61,7 @@ export interface StageEvent {
   cost?: number;
 }
 
-export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };
+export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | AnalysisEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };
 
 let client: { key: string; api: Anthropic } | null = null;
 /** A client for the current key (Settings, or ANTHROPIC_API_KEY in .env.local); rebuilt when the key changes. */
@@ -104,15 +111,20 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
   onEvent({ type: "start", debugDir: debug.dir });
 
   const system = systemPrompt();
-  const firstText = input.base
-    ? editPrompt(input.base, input.text ?? "", !!input.image)
-    : input.image
-      ? photoDesignPrompt(input.text, input.size)
-      : textDesignPrompt(input.text!, input.size);
-  debug.write("input.json", { mode: input.base ? "edit" : "build", text: input.text ?? null, size: input.size ?? null, hasImage: !!input.image, config: CONFIG });
+  debug.write("input.json", { mode: input.base ? "edit" : "build", text: input.text ?? null, detail: input.detail ?? null, hasImage: !!input.image, config: CONFIG });
   if (input.base) debug.write("base-model.json", input.base);
   debug.write("system-prompt.md", system);
   if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
+
+  // A photo build starts with the analysis: proportions, features, colours, camera angle → target size.
+  const photo = input.image && !input.base ? await analyzePhoto({ text: input.text, image: input.image, detail: input.detail }, CONFIG.grid, { anthropic, debug, onEvent, signal }, system) : null;
+  if (photo) onEvent({ type: "analysis", analysis: photo.analysis, target: photo.target, cost: photo.usage.cost });
+
+  const firstText = input.base
+    ? editPrompt(input.base, input.text ?? "", !!input.image)
+    : input.image
+      ? photoDesignPrompt(input.text, input.detail, photo ? analysisBlock(photo.analysis, photo.target, { partLimit: CONFIG.maxParts }) : undefined)
+      : textDesignPrompt(input.text!, input.detail);
 
   const firstContent: Anthropic.MessageParam["content"] = input.image
     ? [
@@ -152,15 +164,24 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
     validation: v ? { errors: loop.best!.check.errors, warnings: loop.best!.check.warnings, components: v.components, connections: v.connections } : null,
     steps: bestModel ? buildSteps(bestModel) : [],
     rounds: loop.rounds,
-    usage: loop.usage,
+    usage: photo ? sumUsage([photo.usage, loop.usage]) : loop.usage,
     debugDir: debug.dir,
     pipeline: "single",
+    ...(photo ? { analysis: { analysis: photo.analysis, target: photo.target, cost: photo.usage.cost } } : {}),
   };
   const catalog = catalogUsage(result.model);
   console.log(`[generate] ${formatCatalogUsage(catalog)}`);
-  debug.write("summary.json", { pipeline: "single", valid: result.valid, rounds: loop.rounds, total: loop.usage, partCount: result.model?.parts.length ?? 0, catalog });
+  debug.write("summary.json", {
+    pipeline: "single",
+    valid: result.valid,
+    rounds: loop.rounds,
+    ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, usage: photo.usage } } : {}),
+    total: result.usage,
+    partCount: result.model?.parts.length ?? 0,
+    catalog,
+  });
   if (result.model) debug.write("final-model.json", result.model);
-  console.log(`[generate] done: valid=${result.valid}, ${loop.rounds.length} round(s) · total ${formatUsage(loop.usage)} · debug: ${debug.dir}`);
+  console.log(`[generate] done: valid=${result.valid}, ${loop.rounds.length} round(s) · total ${formatUsage(result.usage)}${photo ? ` (analysis ${formatUsage(photo.usage)})` : ""} · debug: ${debug.dir}`);
   onEvent({ type: "done", result });
   return result;
 }

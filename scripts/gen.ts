@@ -2,7 +2,7 @@
  * Run the generate → validate → repair loop from the command line.
  *   npm run gen "a red fire truck"
  *   npm run gen -- --image photo.jpg "optional extra instructions"
- *   npm run gen -- --size small "a rubber duck"      (small | medium | large)
+ *   npm run gen -- --detail high "a rubber duck"      (standard | high | very_high; default standard)
  *   npm run gen -- --base model.json "add a chimney"  (edit an existing model)
  *   npm run gen -- --pipeline single "a castle"         (single | subbuilds | auto; default from CONFIG.generator)
  *   npm run gen -- --resume debug/<run folder>          (finish an interrupted sub-build run)
@@ -23,9 +23,18 @@ const args = process.argv.slice(2);
 let imagePath: string | undefined;
 const i = args.indexOf("--image");
 if (i >= 0) [imagePath] = args.splice(i, 2).slice(1);
-let size: "small" | "medium" | "large" | undefined;
-const si = args.indexOf("--size");
-if (si >= 0) size = args.splice(si, 2)[1] as typeof size;
+const { toDetail } = await import("../src/lib/detail");
+// --detail standard | high | very_high (the old --size small | medium | large still works).
+let detailArg: string | undefined;
+for (const flag of ["--detail", "--size"]) {
+  const k = args.indexOf(flag);
+  if (k >= 0) detailArg = args.splice(k, 2)[1];
+}
+const detail = toDetail(detailArg);
+if (detailArg && !detail) {
+  console.error(`Unknown detail "${detailArg}". Use standard, high or very_high.`);
+  process.exit(2);
+}
 const ri = args.indexOf("--resume");
 const resumeDir = ri >= 0 ? args.splice(ri, 2)[1] : undefined;
 const pi = args.indexOf("--pipeline");
@@ -39,7 +48,7 @@ const mediaType = ({ jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", we
 const image = imagePath ? { mediaType, data: fs.readFileSync(imagePath).toString("base64") } : undefined;
 
 const { resolvePipeline, AVAILABLE_PIPELINES } = await import("../src/lib/claude/pipeline");
-const pipeline = resumeDir ? "subbuilds" : resolvePipeline(pipelineArg, size, !!base);
+const pipeline = resumeDir ? "subbuilds" : resolvePipeline(pipelineArg, detail, !!base);
 if (!AVAILABLE_PIPELINES.includes(pipeline)) {
   console.error(`The ${pipeline} generator isn't built yet. Use --pipeline single.`);
   process.exit(2);
@@ -57,8 +66,8 @@ const onEvent = (e: import("../src/lib/claude/generate").GenerateEvent) => {
 const result = resumeDir
   ? await resumeDesign(resumeDir, onEvent)
   : pipeline === "subbuilds"
-    ? await generateDesign({ text, image, size }, onEvent)
-    : await generateModel({ text, image, size, base }, onEvent);
+    ? await generateDesign({ text, image, detail }, onEvent)
+    : await generateModel({ text, image, detail, base }, onEvent);
 
 console.log(`\nValid: ${result.valid} · parts: ${result.model?.parts.length ?? 0} · steps: ${result.steps.length}${result.compile ? ` · sub-builds: ${result.compile.stats.uniqueSubBuilds} unique, ${result.compile.stats.copies} copies · compile ${result.compile.stats.compileMs} ms` : ""}`);
 for (const r of result.rounds) console.log(`  ${r.scope} round ${r.round}: ${r.errorCount} errors · ${r.seconds.toFixed(0)}s · ${formatUsage(r.usage)}${r.reused ? " (earlier run)" : ""}`);
