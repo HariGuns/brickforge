@@ -109,13 +109,34 @@ export async function renderModel(model: BrickModel, view: View, opts: RenderOpt
   const fov = ((opts.fov ?? 32) * Math.PI) / 180;
   const aspect = W / H;
   const fit = Math.min(fov, 2 * Math.atan(Math.tan(fov / 2) * aspect));
-  const dist = (radius * 1.08) / Math.sin(fit / 2);
   const az = (view.azimuth * Math.PI) / 180, el = (view.elevation * Math.PI) / 180;
-  const eye = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).multiplyScalar(dist).add(centre);
-  const cam = new THREE.PerspectiveCamera((fov * 180) / Math.PI, aspect, dist * 0.05, dist * 4);
-  cam.position.copy(eye);
-  cam.lookAt(centre);
+  const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
+  // Frame the model's projected outline (not its bounding sphere, which leaves long, flat models small):
+  // start from the sphere fit, then move in until the box's corners fill ~88% of the frame, centred.
+  let dist = (radius * 1.08) / Math.sin(fit / 2);
+  const cam = new THREE.PerspectiveCamera((fov * 180) / Math.PI, aspect, 0.01, 1e5);
+  const corners = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z));
+  let target = centre.clone();
+  for (let iter = 0; iter < 6; iter++) {
+    cam.position.copy(dir).multiplyScalar(dist).add(target);
+    cam.lookAt(target);
+    cam.updateMatrixWorld();
+    const pts = corners.map((c) => c.clone().project(cam));
+    const minX = Math.min(...pts.map((p) => p.x)), maxX = Math.max(...pts.map((p) => p.x));
+    const minY = Math.min(...pts.map((p) => p.y)), maxY = Math.max(...pts.map((p) => p.y));
+    const extent = Math.max((maxX - minX) / 2, (maxY - minY) / 2);
+    // Re-centre on the outline's middle, then scale the distance toward 88% fill.
+    const shift = new THREE.Vector3((minX + maxX) / 2, (minY + maxY) / 2, pts[0].z).unproject(cam).sub(new THREE.Vector3(0, 0, pts[0].z).unproject(cam));
+    target = target.add(shift);
+    dist = Math.max(radius * 0.6, dist * (extent / 0.88));
+  }
+  cam.position.copy(dir).multiplyScalar(dist).add(target);
+  cam.near = dist * 0.05;
+  cam.far = dist * 4;
+  cam.lookAt(target);
+  cam.updateProjectionMatrix();
   cam.updateMatrixWorld();
+  const eye = cam.position.clone();
   const vp = new THREE.Matrix4().multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
 
   const depth = new Float32Array(w * h).fill(Infinity);

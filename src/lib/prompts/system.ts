@@ -88,6 +88,7 @@ Colors: ${colorList()}
 - Pick colors that match the subject; use color to show features (windows, wheels, eyes, stripes).
 - The model is viewed from every side, so close off openings you didn't intend. A slope only fills its own footprint: under a pitched roof, the triangular gable ends stay open unless you fill them with stepped bricks (or sideways-facing slopes). Hollow interiors are fine where they can't be seen.
 - Make defining features stand out in the silhouette, e.g. wheels should stick out below and past the sides of a vehicle body rather than hide underneath it.
+- Vehicles: shape the body with slopes, curved slopes and wedge plates (search for them) rather than stacks of flat plates, so the nose tapers, the roof curves and the sides aren't slabs. Rake the windscreen (a windscreen part or slopes in trans-clear or black), set the wheels in open wheel arches (leave the cells around each wheel empty) and keep the body low: its underside only a plate or two above the wheel hubs.
 
 Before answering, check your own placement layer by layer against the rules above: overlaps, the stud under every part, and bonding across seams.
 

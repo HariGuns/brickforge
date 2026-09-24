@@ -64,6 +64,13 @@ export const CONFIG = {
    * "compact" strings ("brick_2x4 red 3 0 5 90") or "json" objects.
    */
   outputFormat: "compact" as "compact" | "json",
+  /**
+   * Keep Claude's earlier thinking in the conversation for repair rounds. Off:
+   * the repair sees the answer (listed with indices) and the errors, and the
+   * earlier thinking isn't re-sent (it's billed as input, and cache-written,
+   * every round).
+   */
+  keepThinkingInRepairs: false,
   /** Default model and effort; each stage can override them (see `stages`). */
   model: "claude-opus-5-5",
   effort: "high" as Effort,
@@ -77,7 +84,8 @@ export const CONFIG = {
     analysis: { effort: "medium" },
     plan: {},
     design: {},
-    subBuild: {},
+    // Medium matched high on the Huracán sub-builds (same plan) for 33% less.
+    subBuild: { effort: "medium" },
     assembly: {},
     edit: {},
     refine: {},
@@ -86,13 +94,13 @@ export const CONFIG = {
   maxTokens: 64000,
   /**
    * USD per million tokens, per model, for cost estimates (cacheWrite = 5-minute
-   * cache writes). Opus 5.5 is the rate this project has used throughout; the
-   * others are included so stages can switch model; check anthropic.com/pricing
-   * before relying on them.
+   * cache writes). From platform.claude.com/docs/en/about-claude/pricing,
+   * checked 2026-09-24 (Opus 5.5 cache reads are 0.05× input; Sonnet 5's
+   * $2/$10 launch price is now its standard price).
    */
   pricing: {
     "claude-opus-5-5": { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 },
-    "claude-sonnet-5": { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3.75 },
+    "claude-sonnet-5": { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 },
     "claude-haiku-4-5-20251001": { input: 1, output: 5, cacheRead: 0.1, cacheWrite: 1.25 },
   } as Record<string, Pricing>,
   debugDir: `${DATA}debug`,

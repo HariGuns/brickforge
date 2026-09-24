@@ -1,5 +1,4 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { searchPartsTool } from "./tools";
 import { analysisJsonSchema, analysisPrompt, PhotoAnalysisSchema, sizeTarget, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
 import type { Detail } from "../detail";
 import type { Issue } from "../validate/validator";
@@ -44,9 +43,8 @@ export async function analyzePhoto(
       firstText: text,
       schema: analysisJsonSchema(),
       stage: "analysis",
-      // Same tools as the design stages (not callable here), so the cached prefix is shared.
-      tools: [searchPartsTool],
-      toolChoice: "none",
+      // One call with its own schema: nothing would read a cache entry back.
+      cache: false,
       maxRepairRounds: 1,
       parse: (raw) => {
         try {

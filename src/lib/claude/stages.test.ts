@@ -56,8 +56,8 @@ describe("model and effort per stage", () => {
       [CONFIG.model, "high"],
       ["claude-sonnet-5", "medium"],
     ]);
-    // 1M output tokens each: $20 on Opus 5.5, $15 on Sonnet 5.
-    expect(r.rounds.map((x) => x.usage.cost)).toEqual([20, 15]);
+    // 1M output tokens each: $20 on Opus 5.5, $10 on Sonnet 5.
+    expect(r.rounds.map((x) => x.usage.cost)).toEqual([20, 10]);
   });
 
   it("prices unknown models at the default model's rates", () => {

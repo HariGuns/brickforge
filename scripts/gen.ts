@@ -35,6 +35,17 @@ if (detailArg && !detail) {
   console.error(`Unknown detail "${detailArg}". Use standard, high or very_high.`);
   process.exit(2);
 }
+// --refine N: photo comparison rounds (0 = off); --stage-effort subBuild=medium; --stage-model repair=claude-sonnet-5 (repeatable).
+const { CONFIG } = await import("../src/lib/config");
+for (let k = args.indexOf("--refine"); k >= 0; k = args.indexOf("--refine")) CONFIG.refine.rounds = Number(args.splice(k, 2)[1]);
+for (const [flag, field] of [["--stage-effort", "effort"], ["--stage-model", "model"]] as const) {
+  for (let k = args.indexOf(flag); k >= 0; k = args.indexOf(flag)) {
+    const [stage, value] = args.splice(k, 2)[1].split("=");
+    const st = stage as keyof typeof CONFIG.stages;
+    if (!(st in CONFIG.stages)) throw new Error(`Unknown stage "${stage}" (${Object.keys(CONFIG.stages).join(", ")})`);
+    CONFIG.stages[st] = { ...CONFIG.stages[st], [field]: value };
+  }
+}
 const ri = args.indexOf("--resume");
 const resumeDir = ri >= 0 ? args.splice(ri, 2)[1] : undefined;
 const pi = args.indexOf("--pipeline");

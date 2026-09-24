@@ -197,8 +197,41 @@ Where it shows up:
 
 - **Model and effort per stage** (`CONFIG.stages`): analysis, plan, design, sub-build, assembly, edit, comparison, and `repair` for every repair round. Any stage can switch model or effort; each round logs which it used, and its cost uses that model's prices (`CONFIG.pricing`). Defaults: Opus 5.5 at effort high, except analysis and repairs at medium.
 - **Compact parts format** (`CONFIG.outputFormat`, `src/lib/diff/codec.ts`): Claude writes each part as one string, `"brick_2x4 red 3 0 5 90"`, and each copy as `"pine_tree 4 1 0 270"` (`" m"` for a mirror image). The same format is used in the listings it's shown. This is 47% of the JSON objects' size on a real 247-part model. Malformed lines come back as errors with their path; JSON objects are still accepted.
-- **Prompt caching:** the system prompt, which holds the 142-part menu, is cached. Every stage of a run sends the same tool list, so tools and system prompt form one cached prefix. The analysis and plan calls list the tools but can't call them (`tool_choice: none`). Parallel sub-builds start one at a time until the first is streaming, so the rest read the cache instead of all writing it at once. Each round logs its cache hit rate, and `summary.json` has the run's `cache` totals.
+- **Prompt caching:** the output schema turned out to be part of the cached prefix. A repair that switched to a diff schema read nothing back from the cache and re-wrote its whole conversation ($0.17 in one run), while a repair that kept its schema read 65% from the cache. So:
+  - **One schema per loop:** each loop uses one merged schema, with the full answer's fields plus the diff's. First answers leave the diff fields empty, and repairs leave the full lists empty.
+  - **No cache writes where nothing reads them:** single-call stages with their own schema (analysis, plan) write no cache. Other stages cache their system prompt and conversation.
+  - **Staggered starts:** parallel sub-builds (same schema) start staggered, so they read one cache entry.
+  - **Logging:** each round logs its cache hit rate, and `summary.json` has the run's `cache` totals.
+- **No earlier thinking in repairs** (`CONFIG.keepThinkingInRepairs`): a finished round's thinking isn't re-sent, since it's billed as input every round. A repair gets its answer (listed with indices) and the errors.
 - **Diffs:** repairs, chat edits and photo comparisons return only the changes (remove / set / add by index, copies and new sub-builds for designs), applied by code (`src/lib/diff`).
+
+### Live results (2026-09-24, $8.77)
+
+**Huracán photo at High** (`docs/huracan-compare.png`: LeoCAD renders next to the photo):
+
+| Run | Parts | Valid | Cost | Cost by stage |
+|---|---|---|---|---|
+| Old (phase 6, no analysis) | 87 | yes | $0.46 | one design call |
+| Phase 2 only (analysis, single pass) | 204 | yes, first try | $1.02 | analysis $0.09 · design $0.93 |
+| Full (sub-builds with a mirrored side panel, comparison) | 393 | yes | $2.72 | analysis $0.09 · plan $0.11 · sub-builds $1.55 · assembly $0.68 · comparison $0.29 |
+| Tuned (single pass, tuned prompts, comparison) | 147 | yes | $1.92 | analysis $0.09 · design $0.91 · comparison $0.93 |
+
+- **Old:** stubby, with block wheels.
+- **Phase 2 and full:** the right long, low proportions and real wheels, but slab-sided and too tall.
+- **Full, comparison rounds:** round 1 removed "stilts", and round 2 called it a match despite big differences.
+- **Tuned:** its comparison lowered the body 3 plates, opened the wheel arches, blackened the wheels, and then added headlights and intakes. It's the closest to the photo.
+
+**Before/after cost**, the same prompts in single pass:
+
+| Prompt | Before: parts / cost | After: parts / cost | Cost per 100 parts, before → after |
+|---|---|---|---|
+| Red house | 37 / $0.12 | 86 / $0.24 | $0.32 → $0.28 |
+| Pickup | 78 / $0.34 | 97 / $0.47 | $0.44 → $0.48 |
+| Train | 215 / $0.54 | 231 / $0.56 | $0.25 → $0.24 |
+
+The models are larger now because the Detail targets are bigger, and cost per part is about flat.
+
+Across these runs, the JSON answer fell from 18% to 5% of the cost, and answer tokens per part from about 22 to about 10. But thinking in the first design call still dominates, and cache re-writes on repairs cost back what diffs saved (fixed since, see caching above). The biggest single lever measured is effort: on the same Huracán plan, sub-builds at **medium** cost **$1.04 instead of $1.55 (−33%)** with equal quality. That's now the default for sub-builds. Details are in `docs/token-report-after.md` against `docs/token-report-before.md`.
 
 ## Part catalog
 

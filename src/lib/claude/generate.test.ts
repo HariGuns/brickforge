@@ -64,14 +64,16 @@ describe("generate/repair loop (fake Claude)", () => {
     const second = requests[1].messages;
     expect(second).toHaveLength(3);
     expect(second[1].role).toBe("assistant");
-    expect((second[1].content as { type: string }[]).map((b) => b.type)).toEqual(["thinking", "text"]);
+    // The finished round's thinking isn't re-sent (it would be billed again as input).
+    expect((second[1].content as { type: string }[]).map((b) => b.type)).toEqual(["text"]);
     expect(second[2].content).toMatch(/FLOATING/);
     expect(second[2].content).toContain(`Your last answer, with indices:\n#0 ${compactCodec.formatPlacement(broken.parts[0])}`);
     expect(requests[0].model).toBe(CONFIG.model);
-    // The repair asks for changes, not the whole model; the result is the house without the stray brick.
+    // One schema for both rounds (it's part of the cached prefix): full-answer fields plus the diff's.
+    // The repair gives changes; the result is the house without the stray brick.
     const schemaProps = (q: Anthropic.MessageCreateParams) => Object.keys(((q.output_config?.format?.schema ?? {}) as { properties?: object }).properties ?? {});
-    expect(schemaProps(requests[0])).toContain("parts");
-    expect(schemaProps(requests[1])).toEqual(["name", "description", "remove", "set", "add"]);
+    expect(schemaProps(requests[0])).toEqual(["name", "description", "parts", "remove", "set", "add"]);
+    expect(requests[1].output_config?.format).toEqual(requests[0].output_config?.format);
     expect(r.model!.parts).toEqual(SAMPLE_HOUSE.parts);
 
     // Usage and cost: 2 rounds × (1000×4 + 2000×20 + 500×0.2 + 100×5) / 1e6

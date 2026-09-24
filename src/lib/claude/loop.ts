@@ -76,6 +76,12 @@ export interface LoopSpec<T> {
    * form one cached prefix; a stage without tools would miss the cache.
    */
   toolChoice?: "auto" | "none";
+  /**
+   * Write the prompt cache (default true). Off for single-call stages: the
+   * output schema is part of the cached prefix, so a stage whose schema no
+   * other call shares only pays the 1.25× write and never reads it back.
+   */
+  cache?: boolean;
   /** Which CONFIG.stages entry sets the model and effort (repair rounds use `repair`). Default "design". */
   stage?: Stage;
   /**
@@ -114,6 +120,22 @@ export interface LoopResult<T> {
 
 const invalidOutput = (message: string): Issue => ({ code: "INVALID_OUTPUT", severity: "error", parts: [], message });
 
+/**
+ * One output schema for every round of a loop: the full answer's fields plus
+ * the diff's. The schema is part of the cached prompt prefix, so switching
+ * schema for repairs would throw the whole cached conversation away (and
+ * re-write it at 1.25×) — more than the diff saves. A first answer leaves the
+ * diff fields empty; a repair leaves the full-answer lists empty.
+ */
+export function mergedSchema(full: Record<string, unknown>, diff: Record<string, unknown>): Record<string, unknown> {
+  const fp = (full.properties ?? {}) as Record<string, Record<string, unknown>>;
+  const dp = (diff.properties ?? {}) as Record<string, Record<string, unknown>>;
+  const props: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(fp)) props[k] = v.type === "array" && !(k in dp) ? { ...v, description: `${v.description ? `${v.description} ` : ""}Your complete answer; leave empty when you're asked for changes.` } : v;
+  for (const [k, v] of Object.entries(dp)) if (!(k in fp)) props[k] = { ...v, description: `${v.description ? `${v.description} ` : ""}Only when you're asked to fix or change your last answer; otherwise leave empty.` };
+  return { type: "object", properties: props, required: Object.keys(props), additionalProperties: false };
+}
+
 export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<LoopResult<T>> {
   const maxRounds = spec.maxRepairRounds ?? CONFIG.maxRepairRounds;
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: spec.firstContent }];
@@ -122,6 +144,7 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
   let best: LoopResult<T>["best"] = null;
   /** The last answer that parsed (valid or not): what a repair diff applies to. */
   let lastValue: T | null = null;
+  const schema = spec.diff ? mergedSchema(spec.schema, spec.diff.schema) : spec.schema;
   let startedOnce = false;
   const started = () => {
     if (startedOnce) return;
@@ -161,10 +184,10 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
           model: setting.model,
           max_tokens: CONFIG.maxTokens,
           thinking: { type: "adaptive", display: "summarized" },
-          output_config: { effort: setting.effort, format: { type: "json_schema", schema: useDiff ? spec.diff!.schema : spec.schema } },
+          output_config: { effort: setting.effort, format: { type: "json_schema", schema } },
           // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next call.
-          system: [{ type: "text", text: spec.system, cache_control: { type: "ephemeral" } }],
-          cache_control: { type: "ephemeral" },
+          system: [{ type: "text", text: spec.system, ...(spec.cache === false ? {} : { cache_control: { type: "ephemeral" as const } }) }],
+          ...(spec.cache === false ? {} : { cache_control: { type: "ephemeral" as const } }),
           ...(tools.length ? { tools: tools.map((t) => t.def), tool_choice: turn >= MAX_TOOL_TURNS || spec.toolChoice === "none" ? { type: "none" as const } : { type: "auto" as const } } : {}),
           messages,
         },
@@ -225,7 +248,11 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
       let parsed: { value: T | null; issues: Issue[] };
       if (useDiff) {
         try {
-          parsed = spec.diff!.apply(diffBase!, JSON.parse(text));
+          const json = JSON.parse(text) as Record<string, unknown>;
+          // A repair that re-sent the whole answer instead of changes: take it as a full answer.
+          const fullKeys = Object.keys((spec.schema.properties ?? {}) as object).filter((k) => Array.isArray(json[k]) && (json[k] as unknown[]).length);
+          const diffKeys = Object.keys((spec.diff!.schema.properties ?? {}) as object).filter((k) => Array.isArray(json[k]) && (json[k] as unknown[]).length && !fullKeys.includes(k));
+          parsed = fullKeys.length && !diffKeys.length ? spec.parse(text) : spec.diff!.apply(diffBase!, json);
         } catch (e) {
           parsed = { value: null, issues: [invalidOutput(`Output was not valid JSON (${(e as Error).message}).`)] };
         }
@@ -268,6 +295,15 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     if (round === maxRounds) break;
 
     messages.push({ role: "assistant", content: msg.content });
+    // The round is finished: its thinking doesn't need to be re-sent (billed as input every round).
+    if (!CONFIG.keepThinkingInRepairs) {
+      for (let k = 0; k < messages.length; k++) {
+        const m = messages[k];
+        if (m.role !== "assistant" || typeof m.content === "string") continue;
+        const kept = m.content.filter((b) => b.type !== "thinking" && b.type !== "redacted_thinking");
+        messages[k] = { role: "assistant", content: kept.length ? kept : [{ type: "text", text: "(no text)" }] };
+      }
+    }
     const diff = spec.diff && lastValue !== null ? { listing: spec.diff.listing(lastValue), instructions: spec.diff.instructions } : undefined;
     messages.push({ role: "user", content: (spec.repairText ?? ((e, w, r) => repairPrompt(e, w, { round: r, diff })))(issues, warnings, round + 1) });
   }

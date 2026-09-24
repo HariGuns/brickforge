@@ -68,19 +68,20 @@ const dirs: string[] = [];
 afterAll(() => dirs.forEach((d) => fs.rmSync(d, { recursive: true, force: true })));
 
 describe("prompt caching", () => {
-  it("every stage sends the same tools and cached system prompt, so they share one cached prefix", async () => {
+  it("builders share tools, system prompt and cache; the single-call plan writes no cache", async () => {
     const { client, requests } = streamingFake();
     const r = await generateDesign({ text: "a tiny village", detail: "standard" }, () => {}, { client });
     dirs.push(r.debugDir);
     expect(requests.length).toBeGreaterThanOrEqual(4);
-    for (const q of requests) {
-      expect(q.tools).toEqual(requests[0].tools);
-      expect(q.system).toEqual(requests[0].system);
+    const [planReq, ...builders] = requests;
+    for (const q of builders) {
+      expect(q.tools).toEqual(builders[0].tools);
+      expect(q.system).toEqual(builders[0].system);
       expect((q.system as Anthropic.TextBlockParam[])[0].cache_control).toEqual({ type: "ephemeral" });
+      expect(q.tool_choice?.type).toBe("auto");
     }
-    // The plan can't call tools (it has them only for the shared prefix); the builders can.
-    expect(requests[0].tool_choice).toEqual({ type: "none" });
-    expect(requests.slice(1).every((q) => q.tool_choice?.type === "auto")).toBe(true);
+    expect(planReq.cache_control).toBeUndefined();
+    expect((planReq.system as Anthropic.TextBlockParam[])[0].cache_control).toBeUndefined();
     const summary = JSON.parse(fs.readFileSync(`${r.debugDir}/summary.json`, "utf8"));
     expect(summary.cache).toEqual({ read: 90 * requests.length, write: 0, uncached: 10 * requests.length, hitRate: 0.9 });
   });

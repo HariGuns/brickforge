@@ -58,7 +58,7 @@ function fakeClient(opts: { failAssembly?: boolean; assemblyOk?: boolean } = {})
         if ("keyFeatures" in props) text = JSON.stringify(photoAnalysis);
         else if ("matches" in props) text = JSON.stringify({ matches: true, differences: [], changes: { name: "", description: "", changes: [], newSubBuilds: [], removeSubBuilds: [] } });
         else if ("layout" in props) text = JSON.stringify(plan);
-        else if ("setCopies" in props) text = JSON.stringify({ name: "", description: "", remove: [], set: [], add: [], removeCopies: [], setCopies: [{ index: 1, ...goodMain.uses[1], mirror: false }], addCopies: [] });
+        else if ("setCopies" in props && params.messages.length > 1) text = JSON.stringify({ name: "", description: "", remove: [], set: [], add: [], removeCopies: [], setCopies: [{ index: 1, ...goodMain.uses[1], mirror: false }], addCopies: [] });
         else if ("uses" in props) {
           if (opts.failAssembly) throw new Error("Your credit balance is too low to access the Anthropic API.");
           text = JSON.stringify(assemblies++ === 0 ? badMain : goodMain);

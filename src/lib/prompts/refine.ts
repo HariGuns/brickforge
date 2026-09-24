@@ -16,7 +16,9 @@ Images, in order: 1. the photo; 2. a render of the current model from about the 
 
 What it should be: ${a.subject}. Target size ${target.length} studs long (z) × ${target.width} studs wide (x) × about ${target.heightPlates} plates tall; front faces +z. Key features: ${a.keyFeatures.join("; ")}.
 
-Compare the renders with the photo. Look first at overall proportions (length vs width vs height, how low or tall it sits, where the mass is), then silhouette and slopes, then the key features and colours. Ignore the background, lighting and the photo's perspective distortion; the model is a simplified brick version, so judge whether it reads as the same object.`;
+Compare the renders with the photo. Look first at overall proportions (length vs width vs height, how low or tall it sits, where the mass is), then silhouette and slopes, then the key features and colours. Ignore the background, lighting and the photo's perspective distortion; the model is a simplified brick version, so judge whether it reads as the same object.
+
+Say matches: true only if nothing important is left to fix: someone who knows the subject would recognise it at a glance and none of your differences is about proportions, silhouette or a key feature. If you list such a difference, matches must be false and you must fix it now. Fix the most important differences first, even when that means rebuilding a whole section (lowering the chassis, reshaping the nose or roof with slopes, curved slopes and wedges, opening wheel arches): remove the parts that are wrong and add new ones. Don't defer a difference because it's a big change; this is the round to make it.`;
 }
 
 export function refinePrompt(a: PhotoAnalysis, target: SizeTarget, model: BrickModel, round: number, rounds: number): string {

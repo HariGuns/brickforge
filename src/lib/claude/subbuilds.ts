@@ -170,8 +170,8 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     {
       scope: "plan",
       stage: "plan",
-      tools: [searchPartsTool],
-      toolChoice: "none",
+      // Its own schema (no other call shares the cached prefix) and usually one call.
+      cache: false,
       debugPrefix: "plan.",
       system,
       firstContent: withImage(planText),
