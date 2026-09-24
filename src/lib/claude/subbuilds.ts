@@ -1,0 +1,229 @@
+import type Anthropic from "@anthropic-ai/sdk";
+import { z } from "zod";
+import { CONFIG } from "../config";
+import { PART_IDS } from "../parts/library";
+import { COLOR_IDS } from "../parts/colors";
+import { BrickModelSchema, PlacementSchema, type BrickModel } from "../model/schema";
+import { brickModelJsonSchema } from "../model/jsonSchema";
+import { InstanceSchema, SUB_ID, type BrickDesign } from "../design/schema";
+import { compileDesign } from "../design/compile";
+import { surfaceMaps } from "../design/surface";
+import { systemPrompt } from "../prompts/system";
+import { assemblyJsonSchema, assemblyPrompt, planJsonSchema, planPrompt, subBuildPrompt, type Plan } from "../prompts/subbuilds";
+import { validate, type Issue } from "../validate/validator";
+import { buildSteps } from "../steps/steps";
+import { DebugRun } from "./debug";
+import { runLoop } from "./loop";
+import { formatUsage, sumUsage } from "./usage";
+import { getClient, invalidOutput, type GenerateEvent, type GenerateInput, type GenerateOptions, type GenerateResult } from "./generate";
+
+/**
+ * Sub-build generator: plan the model as a tree of sub-builds, design each
+ * unique sub-build once (in parallel, each with its own repair loop, validated
+ * on its own inside its envelope), then assemble copies plus glue parts. The
+ * assembly is checked by the deterministic compiler (joins, connectivity,
+ * structure) and repaired until it's valid.
+ */
+
+const PlanSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  layout: z.string(),
+  subBuilds: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      purpose: z.string(),
+      w: z.number().int(),
+      d: z.number().int(),
+      h: z.number().int(),
+      parts: z.number().int(),
+      copies: z.number().int(),
+    }),
+  ),
+});
+
+const AssemblySchema = z.object({ name: z.string(), description: z.string(), parts: z.array(PlacementSchema), uses: z.array(InstanceSchema) });
+type Assembly = z.infer<typeof AssemblySchema>;
+
+function parseJson<T>(text: string, schema: z.ZodType<T>): { value: T | null; issues: Issue[] } {
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    return { value: null, issues: [invalidOutput(`Output was not valid JSON (${(e as Error).message}).`)] };
+  }
+  const r = schema.safeParse(json);
+  return r.success ? { value: r.data, issues: [] } : { value: null, issues: r.error.issues.slice(0, 20).map((i) => invalidOutput(`${i.path.join(".")}: ${i.message}`)) };
+}
+
+/** Plan limits (ids, envelopes, budgets). */
+export function checkPlan(plan: Plan): Issue[] {
+  const s = CONFIG.subbuilds;
+  const out: Issue[] = [];
+  const bad = (m: string) => out.push(invalidOutput(m));
+  if (!plan.subBuilds.length) bad("Plan at least one sub-build.");
+  if (plan.subBuilds.length > s.maxUnique) bad(`Use at most ${s.maxUnique} unique sub-builds (you planned ${plan.subBuilds.length}).`);
+  const ids = new Set<string>();
+  for (const b of plan.subBuilds) {
+    if (!SUB_ID.test(b.id)) bad(`Sub-build id "${b.id}" must be lowercase letters, digits and _, starting with a letter.`);
+    if (ids.has(b.id)) bad(`Sub-build id "${b.id}" is used twice.`);
+    ids.add(b.id);
+    if (b.w < 1 || b.d < 1 || b.w > s.maxEnvelope || b.d > s.maxEnvelope) bad(`${b.id}: footprint ${b.w}×${b.d} must be between 1 and ${s.maxEnvelope} studs.`);
+    if (b.h < 1 || b.h > 90) bad(`${b.id}: height ${b.h} plates must be between 1 and 90.`);
+    if (b.parts < 3 || b.parts > s.maxSubParts) bad(`${b.id}: part budget ${b.parts} must be between 3 and ${s.maxSubParts}.`);
+    if (b.copies < 1) bad(`${b.id}: plan at least one copy.`);
+  }
+  const copies = plan.subBuilds.reduce((n, b) => n + b.copies, 0);
+  if (copies > s.maxCopies) bad(`Plan at most ${s.maxCopies} copies in total (you planned ${copies}).`);
+  const total = plan.subBuilds.reduce((n, b) => n + b.parts * b.copies, 0);
+  if (total > CONFIG.design.maxParts - 400) bad(`Parts × copies add up to ${total}; keep it under ${CONFIG.design.maxParts - 400}.`);
+  return out;
+}
+
+/** Run `fn` over items with at most `n` at a time, keeping order. */
+async function pool<T, R>(items: T[], n: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(n, items.length) }, async () => {
+      while (next < items.length) {
+        const i = next++;
+        out[i] = await fn(items[i]);
+      }
+    }),
+  );
+  return out;
+}
+
+export async function generateDesign(input: GenerateInput, onEvent: (e: GenerateEvent) => void = () => {}, opts: GenerateOptions = {}): Promise<GenerateResult> {
+  if (!input.text?.trim() && !input.image) throw new Error("Provide a description or a photo.");
+  const anthropic = opts.client ?? getClient();
+  const debug = new DebugRun(`subbuilds-${input.text?.trim() || "photo"}`);
+  onEvent({ type: "start", debugDir: debug.dir });
+  const system = systemPrompt();
+  debug.write("input.json", { mode: "build", pipeline: "subbuilds", text: input.text ?? null, size: input.size ?? null, hasImage: !!input.image, config: CONFIG });
+  debug.write("system-prompt.md", system);
+  if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
+  const ctx = { anthropic, debug, onEvent, signal: opts.signal };
+  const withImage = (text: string): Anthropic.MessageParam["content"] =>
+    input.image
+      ? [
+          { type: "image", source: { type: "base64", media_type: input.image.mediaType, data: input.image.data } },
+          { type: "text", text },
+        ]
+      : text;
+
+  // --- 1. plan --------------------------------------------------------------------------
+  onEvent({ type: "stage", scope: "plan", label: "Planning sub-builds", status: "start" });
+  const planText = planPrompt(input.text ?? "", input.size, !!input.image);
+  const planLoop = await runLoop<Plan>(
+    {
+      scope: "plan",
+      debugPrefix: "plan.",
+      system,
+      firstContent: withImage(planText),
+      firstText: planText,
+      schema: planJsonSchema(),
+      parse: (t) => parseJson(t, PlanSchema),
+      check: (plan) => {
+        const errors = checkPlan(plan);
+        return { errors, warnings: [], valid: !errors.length, partCount: plan.subBuilds.reduce((n, b) => n + b.parts * b.copies, 0) };
+      },
+      maxRepairRounds: CONFIG.subbuilds.planRepairRounds,
+    },
+    ctx,
+  );
+  const plan = planLoop.best?.check.valid ? planLoop.best.value : null;
+  onEvent({ type: "stage", scope: "plan", label: "Planning sub-builds", status: "done", valid: !!plan, parts: plan?.subBuilds.length, cost: planLoop.usage.cost });
+  if (!plan) throw new Error("Couldn't make a valid sub-build plan; see the debug folder.");
+  debug.write("plan.json", plan);
+
+  // --- 2. unique sub-builds, in parallel ------------------------------------------------
+  const subLoops = await pool(plan.subBuilds, CONFIG.subbuilds.concurrency, async (sub) => {
+    const scope = `sub:${sub.id}`;
+    onEvent({ type: "stage", scope, label: sub.name, status: "start", copies: sub.copies });
+    const text = subBuildPrompt(plan, sub);
+    const loop = await runLoop<BrickModel>(
+      {
+        scope,
+        debugPrefix: `sub-${sub.id}.`,
+        system,
+        firstContent: text,
+        firstText: text,
+        schema: brickModelJsonSchema(),
+        parse: (t) => parseJson(t, BrickModelSchema),
+        check: (model, last) => {
+          const v = validate(model, { grid: { x: sub.w, z: sub.d, y: sub.h }, maxParts: Math.min(CONFIG.maxParts, Math.ceil(sub.parts * 1.6) + 10), structure: last ? "warn" : "error" });
+          return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: model.parts.length };
+        },
+      },
+      ctx,
+    );
+    onEvent({ type: "stage", scope, label: sub.name, status: "done", valid: loop.best?.check.valid ?? false, parts: loop.best?.value.parts.length ?? 0, copies: sub.copies, cost: loop.usage.cost });
+    return { sub, loop };
+  });
+  const built = subLoops.filter((s) => s.loop.best).map(({ sub, loop }) => ({ sub, model: loop.best!.value, valid: loop.best!.check.valid }));
+  if (!built.length) throw new Error("None of the sub-builds could be designed; see the debug folder.");
+  const subBuilds: BrickDesign["subBuilds"] = built.map(({ sub, model }) => ({ id: sub.id, name: sub.name, parts: model.parts, uses: [] }));
+  debug.write("subbuilds.json", subBuilds);
+
+  // --- 3. assembly ------------------------------------------------------------------------
+  onEvent({ type: "stage", scope: "assembly", label: "Assembling", status: "start" });
+  const request = input.text ?? "";
+  const aText = assemblyPrompt(
+    request,
+    plan,
+    built.map(({ sub, model }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: model.parts.length, maps: surfaceMaps(model) })),
+  );
+  const designOf = (a: Assembly): BrickDesign => ({ name: a.name, description: a.description, subBuilds, main: { parts: a.parts, uses: a.uses } });
+  const assembly = await runLoop<Assembly>(
+    {
+      scope: "assembly",
+      debugPrefix: "assembly.",
+      system,
+      firstContent: withImage(aText),
+      firstText: aText,
+      schema: assemblyJsonSchema(PART_IDS, COLOR_IDS, subBuilds.map((s) => s.id)),
+      parse: (t) => parseJson(t, AssemblySchema),
+      check: (a, last) => {
+        const c = compileDesign(designOf(a), { structure: last ? "warn" : "error" });
+        return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
+      },
+    },
+    ctx,
+  );
+  const a = assembly.best?.value;
+  onEvent({ type: "stage", scope: "assembly", label: "Assembling", status: "done", valid: assembly.best?.check.valid ?? false, parts: assembly.best?.check.partCount, cost: assembly.usage.cost });
+
+  // --- result -------------------------------------------------------------------------------
+  const rounds = [...planLoop.rounds, ...subLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
+  const usage = sumUsage(rounds.map((r) => r.usage));
+  const design = a ? designOf(a) : null;
+  const compiled = design ? compileDesign(design, { structure: assembly.best!.check.valid ? "warn" : "error" }) : null;
+  const result: GenerateResult = {
+    model: compiled?.model ?? null,
+    valid: !!compiled && compiled.errors.length === 0,
+    validation: compiled?.validation
+      ? { errors: compiled.errors, warnings: compiled.warnings, components: compiled.validation.components, connections: compiled.validation.connections }
+      : null,
+    steps: compiled ? buildSteps(compiled.model) : [],
+    rounds,
+    usage,
+    debugDir: debug.dir,
+    design: design ?? undefined,
+    compile: compiled ? { stats: compiled.stats, tree: compiled.tree, subBuilds: compiled.subBuilds } : undefined,
+    pipeline: "subbuilds",
+  };
+  const stages = {
+    plan: { rounds: planLoop.rounds.length, cost: planLoop.usage.cost },
+    subBuilds: subLoops.map(({ sub, loop }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: loop.best?.value.parts.length ?? 0, valid: loop.best?.check.valid ?? false, rounds: loop.rounds.length, cost: loop.usage.cost })),
+    assembly: { rounds: assembly.rounds.length, cost: assembly.usage.cost, valid: assembly.best?.check.valid ?? false },
+  };
+  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, rounds, total: usage, partCount: result.model?.parts.length ?? 0, compile: compiled?.stats });
+  if (design) debug.write("final-design.json", design);
+  if (result.model) debug.write("final-model.json", result.model);
+  console.log(`[generate] sub-builds done: valid=${result.valid}, ${result.model?.parts.length ?? 0} parts, ${compiled?.stats.copies ?? 0} copies, ${rounds.length} round(s) · total ${formatUsage(usage)} · debug: ${debug.dir}`);
+  onEvent({ type: "done", result });
+  return result;
+}

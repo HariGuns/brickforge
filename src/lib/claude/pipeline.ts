@@ -3,8 +3,8 @@ import type { BuildSize } from "../prompts/design";
 
 export type Pipeline = "single" | "subbuilds" | "auto";
 export const PIPELINES: Pipeline[] = ["single", "subbuilds", "auto"];
-/** Paths that can actually run today (the sub-build path arrives in phase 3). */
-export const AVAILABLE_PIPELINES: Pipeline[] = ["single"];
+/** Paths that can run (all of them since phase 3). */
+export const AVAILABLE_PIPELINES: Pipeline[] = ["single", "subbuilds", "auto"];
 
 /** Which generator runs: "auto" picks sub-builds for Large builds, single pass otherwise. */
 export function resolvePipeline(requested: Pipeline | undefined, size: BuildSize | undefined, isEdit = false): "single" | "subbuilds" {

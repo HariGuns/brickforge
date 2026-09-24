@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { BrickModelSchema, type BrickModel } from "../model/schema";
-import { BrickDesignSchema } from "../design/schema";
+import { BrickDesignSchema, type BrickDesign } from "../design/schema";
 
 /**
  * A build is a document with an append-only list of versions. Undo/redo is a
@@ -58,8 +58,8 @@ export function newId(prefix = "v"): string {
   return `${prefix}${Date.now().toString(36)}${(counter++).toString(36)}-${rand}`.toLowerCase();
 }
 
-export function createWorkspace(model: BrickModel, label: string, source: Version["source"], now = new Date().toISOString()): Workspace {
-  const v: Version = { id: newId(), model, label, createdAt: now, source };
+export function createWorkspace(model: BrickModel, label: string, source: Version["source"], now = new Date().toISOString(), design?: BrickDesign): Workspace {
+  const v: Version = { id: newId(), model, label, createdAt: now, source, ...(design ? { design } : {}) };
   const doc: BuildDoc = { id: newId("b"), name: model.name, versions: [v], currentId: v.id, createdAt: now, updatedAt: now };
   return { doc, history: { stack: [v.id], index: 0 }, rev: 0, savedRev: null };
 }

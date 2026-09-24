@@ -24,6 +24,7 @@ import {
   type Workspace,
 } from "@/lib/builds/doc";
 import type { BuildSummary } from "@/lib/builds/store";
+import type { BrickDesign } from "@/lib/design/schema";
 import { exportFileNames, exportLdr, exportMpd } from "@/lib/ldraw/export";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
@@ -104,7 +105,7 @@ export default function Page() {
     if (window.matchMedia("(max-width: 959px)").matches) window.scrollTo({ top: 0, behavior: "smooth" });
     return true;
   }
-  const openModel = (m: BrickModel, label: string, source: Version["source"]) => open(createWorkspace(m, label, source));
+  const openModel = (m: BrickModel, label: string, source: Version["source"], design?: BrickDesign) => open(createWorkspace(m, label, source, undefined, design));
 
   function apply(fn: (w: Workspace) => Workspace) {
     setWs((w) => (w ? fn(w) : w));
@@ -230,7 +231,8 @@ export default function Page() {
     abortRef.current = ac;
     try {
       const body = { text: d.text, size: d.size, pipeline: d.pipeline, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined, base };
-      for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev, base, docId, d.text.trim());
+      const baseHadDesign = !!(base && version?.design);
+      for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev, base, docId, d.text.trim(), baseHadDesign);
     } catch (e) {
       if (ac.signal.aborted) updateTurn(id, (t) => ({ ...t, status: "cancelled" }));
       else updateTurn(id, (t) => ({ ...t, status: "error", error: (e as Error).message }));
@@ -240,16 +242,27 @@ export default function Page() {
     }
   }
 
-  function onEvent(id: number, ev: GenerateEvent, base?: BrickModel, docId?: string, prompt = "") {
+  function onEvent(id: number, ev: GenerateEvent, base?: BrickModel, docId?: string, prompt = "", baseHadDesign = false) {
     switch (ev.type) {
+      case "stage":
+        updateTurn(id, (t) => {
+          const stages = t.stages ?? [];
+          const i = stages.findIndex((s) => s.scope === ev.scope);
+          const next = { scope: ev.scope, label: ev.label, status: ev.status, valid: ev.valid, parts: ev.parts, copies: ev.copies, cost: ev.cost };
+          return { ...t, stages: i < 0 ? [...stages, next] : stages.map((s, j) => (j === i ? { ...s, ...next, copies: next.copies ?? s.copies } : s)) };
+        });
+        break;
       case "round_start":
-        updateTurn(id, (t) => ({ ...t, rounds: [...t.rounds, { round: ev.round, thinkingChars: 0, outputChars: 0 }] }));
+        updateTurn(id, (t) => ({ ...t, rounds: [...t.rounds, { scope: ev.scope, round: ev.round, thinkingChars: 0, outputChars: 0 }] }));
         break;
       case "progress":
-        updateTurn(id, (t) => ({ ...t, rounds: t.rounds.map((r) => (r.round === ev.round ? { ...r, thinkingChars: ev.thinkingChars, outputChars: ev.outputChars, thinking: ev.thinking } : r)) }));
+        updateTurn(id, (t) => ({
+          ...t,
+          rounds: t.rounds.map((r) => (r.scope === ev.scope && r.round === ev.round ? { ...r, thinkingChars: ev.thinkingChars, outputChars: ev.outputChars, thinking: ev.thinking } : r)),
+        }));
         break;
       case "round_end":
-        updateTurn(id, (t) => ({ ...t, rounds: t.rounds.map((r) => (r.round === ev.summary.round ? { ...r, summary: ev.summary, errors: ev.errors } : r)) }));
+        updateTurn(id, (t) => ({ ...t, rounds: t.rounds.map((r) => (r.scope === ev.scope && r.round === ev.summary.round ? { ...r, summary: ev.summary, errors: ev.errors } : r)) }));
         break;
       case "done": {
         const r = ev.result;
@@ -268,7 +281,11 @@ export default function Page() {
             problems: r.validation?.errors.length ?? 0,
             cost: r.usage.cost,
             debugDir: r.debugDir,
-            change: base ? describeDiff(diffModels(base, r.model!)) : undefined,
+            change: base ? `${describeDiff(diffModels(base, r.model!))}${baseHadDesign ? " (as a flat model: editing sub-builds directly comes later)" : ""}` : undefined,
+            parts: r.model!.parts.length,
+            subBuilds: r.compile?.stats.uniqueSubBuilds,
+            copies: r.compile?.stats.copies,
+            compileMs: r.compile?.stats.compileMs,
           },
         }));
         const debugDir = r.debugDir.split("/").pop();
@@ -282,7 +299,8 @@ export default function Page() {
             setNotice("That edit finished after you opened a different build, so it wasn't applied. It's in the Library under Generated.");
           }
         } else {
-          if (openModel(r.model, prompt ? `Built from “${quote(prompt)}”` : "Built from a photo", source)) setSelected(`debug:${debugDir}`);
+          const label = `${prompt ? `Built from “${quote(prompt)}”` : "Built from a photo"}${r.design ? " (sub-builds)" : ""}`;
+          if (openModel(r.model, label, source, r.design)) setSelected(`debug:${debugDir}`);
         }
         setTab("model");
         loadLibrary();

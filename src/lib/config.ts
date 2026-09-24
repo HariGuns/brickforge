@@ -10,6 +10,8 @@ export const CONFIG = {
    * plan → sub-builds → assembly, "auto" = sub-builds for Large, single otherwise.
    */
   generator: "single" as "single" | "subbuilds" | "auto",
+  /** Sub-build generator limits: unique sub-builds, total copies, envelope size (studs), parts per copy, parallel calls. */
+  subbuilds: { maxUnique: 8, maxCopies: 64, maxEnvelope: 32, maxSubParts: 250, planRepairRounds: 2, concurrency: 4 },
   /**
    * Structural estimate (see validate/structure.ts). Mass: grams per 1 stud × 1 stud
    * × 1 plate of part volume (a 2×4 brick ≈ 2.3 g); slopes are ~75% solid.

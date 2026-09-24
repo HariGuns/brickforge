@@ -9,6 +9,8 @@ import { AVAILABLE_PIPELINES, type Pipeline } from "@/lib/claude/pipeline";
 import * as I from "./icons";
 
 export interface RoundState {
+  /** "main" for single pass; "plan", "sub:<id>" or "assembly" for the sub-build path. */
+  scope: string;
   round: number;
   thinkingChars: number;
   outputChars: number;
@@ -27,8 +29,20 @@ export interface Turn {
   image?: { name: string; previewUrl: string };
   status: "running" | "done" | "error" | "cancelled";
   rounds: RoundState[];
-  result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string };
+  /** Sub-build path stages, in the order they started. */
+  stages?: StageState[];
+  result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string; parts?: number; subBuilds?: number; copies?: number; compileMs?: number };
   error?: string;
+}
+
+export interface StageState {
+  scope: string;
+  label: string;
+  status: "start" | "done";
+  valid?: boolean;
+  parts?: number;
+  copies?: number;
+  cost?: number;
 }
 
 export interface Draft {
@@ -55,8 +69,40 @@ interface Row {
   note: string;
 }
 
+/** Tracker rows for the sub-build path: planning, one row per unique sub-build, assembly. */
+function stageRows(t: Turn): Row[] {
+  const rows: Row[] = [];
+  const roundsOf = (scope: string) => t.rounds.filter((r) => r.scope === scope);
+  const live = (scope: string) => {
+    const rs = roundsOf(scope);
+    const cur = rs.at(-1);
+    if (!cur) return "starting";
+    if (cur.summary) return cur.summary.errorCount ? `${cur.summary.errorCount} problem${cur.summary.errorCount === 1 ? "" : "s"}` : "checking";
+    return `${cur.round ? `repair ${cur.round} · ` : ""}${cur.outputChars ? `writing ${k(cur.outputChars)}` : `thinking ${k(cur.thinkingChars)}`}`;
+  };
+  const running = t.status === "running";
+  for (const s of t.stages ?? []) {
+    const reps = Math.max(0, roundsOf(s.scope).length - 1);
+    const label = s.scope === "plan" ? "Planning sub-builds" : s.scope === "assembly" ? "Assembling" : `Sub-build · ${s.label}${s.copies && s.copies > 1 ? ` ×${s.copies}` : ""}`;
+    if (s.status === "start") rows.push({ label, state: running ? "active" : "fail", note: running ? live(s.scope) : "" });
+    else {
+      const what = s.scope === "plan" ? `${s.parts ?? 0} sub-builds` : `${s.parts ?? 0} parts`;
+      rows.push({ label, state: s.valid ? "done" : "fail", note: `${what}${reps ? ` · ${reps} repair${reps === 1 ? "" : "s"}` : ""}${s.valid ? "" : " · has problems"}` });
+    }
+  }
+  if (t.status === "error" || t.status === "cancelled") rows.push({ label: t.status === "cancelled" ? "Cancelled" : "Failed", state: "fail", note: "" });
+  else
+    rows.push({
+      label: "Done",
+      state: t.status === "done" ? "done" : "todo",
+      note: t.result ? `${t.result.valid ? "buildable" : `${t.result.problems} left`} · ${t.result.subBuilds ?? 0} sub-builds, ${t.result.copies ?? 0} copies` : "",
+    });
+  return rows;
+}
+
 /** Progress tracker rows derived from the streamed round events. */
 function trackerRows(t: Turn): Row[] {
+  if (t.stages?.length) return stageRows(t);
   const r0 = t.rounds[0];
   const rows: Row[] = [];
   const designNote = r0?.summary

@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generateModel, type GenerateEvent, type ImageMediaType } from "@/lib/claude/generate";
+import { generateDesign } from "@/lib/claude/subbuilds";
 import type { BuildSize } from "@/lib/prompts/design";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
@@ -65,7 +66,8 @@ export async function POST(req: Request) {
         }
       };
       try {
-        await generateModel({ text, image, size, base }, send, { signal: abort.signal });
+        const run = pipeline === "subbuilds" ? generateDesign : generateModel;
+        await run({ text, image, size, base }, send, { signal: abort.signal });
       } catch (err) {
         if (!abort.signal.aborted) {
           console.error("[generate] failed:", err);

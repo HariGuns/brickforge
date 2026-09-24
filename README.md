@@ -20,7 +20,7 @@ npm run dev                                         # http://localhost:3000
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
 | `npm run gen -- --size small "a rubber duck"` | Target size: `small`, `medium` or `large` (the same choice as the size buttons in the chat) |
-| `npm run gen -- --pipeline single "a castle"` | Generator path: `single` (default), `subbuilds` or `auto` (sub-builds for Large). Sub-builds arrive in phase 3 |
+| `npm run gen -- --pipeline subbuilds --size large "a castle"` | Generator path: `single` (default), `subbuilds` or `auto` (sub-builds for Large) |
 | `npm run bench [side]` | Compile benchmark for a large nested design (`side` 5 ≈ 4,600 parts) |
 | `npm run verify-ldraw` | Check every part in the library against the official LDraw library (needs `ldraw-lib/`, see below) |
 | `npm run export-sample` | Export the hand-built sample models to `exports/` |
@@ -47,7 +47,7 @@ The UI follows `design/brickforge-v2.html`.
   - **Unsaved work:** switching builds or leaving the page asks first. Logic: `src/lib/builds/doc.ts`; storage: `src/lib/builds/store.ts`.
 - **Not built yet:** Showcase, sub-builds and shared builds are disabled placeholders.
 
-## Sub-builds (in progress)
+## Sub-builds
 
 A **design** (`src/lib/design/schema.ts`) describes a model as a tree of sub-builds: each unique sub-build is defined once in its own frame, and `uses` place copies (x, y, z, rot). The deterministic compiler (`src/lib/design/compile.ts`) turns a design into a flat model:
 - It expands copies (rotating each inside its footprint box, nested up to 4 levels) and tags every part with the copy it came from (e.g. `Grove #1 › Pine tree #2`).
@@ -62,6 +62,26 @@ A flat model is a design with no sub-builds, so the single-pass path and older s
 - **`OVERSTRESSED`:** an overhang whose leverage per supporting stud is over the limit.
 - **Only real weak points:** a part that's also tied into the model another way (bonded walls, spans on other supports) is never flagged.
 - **In the repair loop:** both count as errors during repair rounds, and as warnings after the last round.
+
+**Sub-build generator** (`src/lib/claude/subbuilds.ts`, prompts in `src/lib/prompts/subbuilds.ts`): choose it with the path selector, `--pipeline subbuilds`, or `CONFIG.generator`.
+1. **Plan:** the sub-builds, each with a size envelope, part budget and copy count, plus a layout.
+2. **Design each unique sub-build once:** 4 in parallel, each validated on its own inside its envelope with its own repair loop.
+3. **Assemble:** copies plus glue parts, placed using a map of each sub-build's top studs and underside. The compiler checks joins, connectivity and structure, and the assembly is repaired until valid.
+
+All stages share the loop in `src/lib/claude/loop.ts` and the cached system prompt. Every stage writes `plan.*`, `sub-<id>.*` and `assembly.*` files to the run's debug folder.
+
+Comparison at size Large (claude-opus-5-5, effort high):
+
+| Prompt | Path | Valid | Rounds | Parts | Sub-builds / copies | Cost |
+|---|---|---|---|---|---|---|
+| Medieval castle with four corner towers, walls, gatehouse | single | yes | 1 | 244 | – | $0.50 |
+| | sub-builds | yes | 9 (no repairs) | 2,394 | 7 / 29 | $2.90 |
+| Steam train, engine + three matching carriages | single | yes | 1 | 215 | – | $0.54 |
+| | sub-builds | yes | 6 (1 assembly repair) | 647 | 4 / 15 | $1.13 |
+| Village square, three houses, trees, well | single | yes | 1 | 247 | – | $0.67 |
+| | sub-builds | not finished | 11 so far (2 sub-build repairs) | – | 8 designed | $2.11 so far |
+
+The village sub-build run stopped at assembly because the API credit ran out; all 8 of its sub-builds were valid.
 
 `.mpd` export for designs has one submodel per unique sub-build, with copies as references; the importer expands them back. Compiling ~4,600 parts in 425 nested copies takes about 60 ms (`npm run bench`).
 
