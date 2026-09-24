@@ -25,6 +25,7 @@ import {
 import type { BuildSummary } from "@/lib/builds/store";
 import { designFromModel, type BrickDesign } from "@/lib/design/schema";
 import { exportDesignMpd, exportFileNames, exportLdr, exportMpd } from "@/lib/ldraw/export";
+import { exportWantedList } from "@/lib/bricklink/wantedList";
 import { compileDesign } from "@/lib/design/compile";
 import { designSteps } from "@/lib/design/steps";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
@@ -339,12 +340,13 @@ export default function Page() {
     }
   }
 
-  function downloadModel(kind: "ldr" | "mpd" | "json") {
+  function downloadModel(kind: "ldr" | "mpd" | "bricklink" | "json") {
     if (!model) return;
     const names = exportFileNames(model);
     if (kind === "ldr") download(names.ldr, exportLdr(model, steps));
     // Designs with sub-builds: one submodel per unique sub-build.
     if (kind === "mpd") download(names.mpd, version?.design && compiled ? exportDesignMpd(version.design, compiled) : exportMpd(model, steps));
+    if (kind === "bricklink") download(names.ldr.replace(/\.ldr$/, "_bricklink.xml"), exportWantedList(model), "application/xml");
     if (kind === "json") download(names.ldr.replace(/\.ldr$/, ".json"), version?.design ? JSON.stringify(version.design, null, 1) : compactJson(model), "application/json");
   }
 

@@ -42,7 +42,7 @@ export function TopBar(props: {
   problems: number;
   theme: "light" | "dark";
   onToggleTheme: () => void;
-  onDownload: (kind: "ldr" | "mpd") => void;
+  onDownload: (kind: "ldr" | "mpd" | "bricklink") => void;
   onOpenJson: (file: File) => void;
   canUndo: boolean;
   canRedo: boolean;
@@ -160,6 +160,10 @@ export function TopBar(props: {
               <button role="menuitem" className="menu-item" disabled={!model} onClick={() => (props.onDownload("mpd"), setOpen(false))}>
                 <b>Download .mpd</b>
                 <span>{model ? "Multi-part document wrapper" : "No model loaded"}</span>
+              </button>
+              <button role="menuitem" className="menu-item" disabled={!model} onClick={() => (props.onDownload("bricklink"), setOpen(false))}>
+                <b>BrickLink wanted list (.xml)</b>
+                <span>{model ? "Upload at BrickLink › Wanted › Upload to buy the parts" : "No model loaded"}</span>
               </button>
               <div className="menu-sep" />
               <button role="menuitem" className="menu-link" onClick={() => fileRef.current?.click()}>

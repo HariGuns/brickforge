@@ -56,7 +56,8 @@ The UI follows `design/brickforge-v2.html`.
   - **Manual:** an instruction book with one cream page per step. Each page has an isometric three.js render (new parts outlined in orange), a parts callout with 3D icons, zoom, a Go to menu and a thumbnail strip. **Manual PDF** exports it as one A4 page per step.
   - **Parts:** parts list grouped by category.
   - **Design:** the model JSON plus stats.
-- **Other:** dark mode, and the Download menu (.ldr, .mpd, Open model JSON).
+- **Other:** dark mode, and the Download menu (.ldr, .mpd, BrickLink wanted list, Open model JSON).
+- **BrickLink wanted list:** `src/lib/bricklink/` maps each part and colour to BrickLink catalogue numbers (these differ from LDraw in places, e.g. 6141 → 4073, and BrickLink colour numbers are its own). Windows are listed as frame plus trans-clear glass, and the door as frame plus door. Upload the .xml at BrickLink › Wanted › Upload.
 - **Versions, undo/redo and Save:**
   - **Versions:** every chat edit adds a version to the open build, and the Versions menu lists them all (click one to restore it).
   - **Undo/redo:** the top-bar buttons, or ⌘/Ctrl+Z and ⌘/Ctrl+Shift+Z, step through your changes. A new edit clears the redo steps but never deletes a version.
@@ -84,7 +85,7 @@ A flat model is a design with no sub-builds, so the single-pass path and older s
 - **Only real weak points:** a part that's also tied into the model another way (bonded walls, spans on other supports) is never flagged.
 - **In the repair loop:** both count as errors during repair rounds, and as warnings after the last round.
 
-**Sub-build generator** (`src/lib/claude/subbuilds.ts`, prompts in `src/lib/prompts/subbuilds.ts`): choose it with the path selector, `--pipeline subbuilds`, or `CONFIG.generator`.
+**Sub-build generator** (`src/lib/claude/subbuilds.ts`, prompts in `src/lib/prompts/subbuilds.ts`): choose it with the path selector, `--pipeline subbuilds`, or `CONFIG.generator`. The default is **Auto**: sub-builds for Large builds, single pass for Small and Medium.
 1. **Plan:** the sub-builds, each with a size envelope, part budget and copy count, plus a layout.
 2. **Design each unique sub-build once:** 4 in parallel, each validated on its own inside its envelope with its own repair loop.
 3. **Assemble:** copies plus glue parts, placed using a map of each sub-build's top studs and underside. The compiler checks joins, connectivity and structure, and the assembly is repaired until valid.

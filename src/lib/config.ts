@@ -9,7 +9,7 @@ export const CONFIG = {
    * Generator path: "single" = one design call + repair (current), "subbuilds" =
    * plan → sub-builds → assembly, "auto" = sub-builds for Large, single otherwise.
    */
-  generator: "single" as "single" | "subbuilds" | "auto",
+  generator: "auto" as "single" | "subbuilds" | "auto",
   /** Sub-build generator limits: unique sub-builds, total copies, envelope size (studs), parts per copy, parallel calls. */
   subbuilds: { maxUnique: 8, maxCopies: 64, maxEnvelope: 32, maxSubParts: 250, planRepairRounds: 2, concurrency: 4 },
   /**
