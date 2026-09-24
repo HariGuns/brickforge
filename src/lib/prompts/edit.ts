@@ -41,7 +41,7 @@ ${designListing(base)}
 Change request: ${request.trim() || "Adjust the model to match the attached photo more closely."}${hasImage ? "\n\nUse the attached photo as a reference for the change." : ""}
 
 Return the complete updated design: every sub-build (id, name, parts, uses) and the main build (parts, uses).
-- To change something that repeats (every tree, every tower…), change its sub-build once; all copies follow.
+- To change something that repeats (every tree, every tower…), change its sub-build once; all copies follow, including mirrored ones (mirror: true), which show the change mirrored.
 - To change one copy only, give it its own new sub-build, or change the main build around it.
 - Keep ids, parts and copies that the change doesn't touch exactly as they are.
 - A sub-build keeps its lowest parts at y = 0 and its min corner at x = z = 0. If a sub-build's footprint or height changes, check its copies still sit on studs and don't overlap anything.

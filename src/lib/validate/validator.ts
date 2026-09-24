@@ -38,7 +38,8 @@ export type IssueCode =
   | "UNUSED_SUBBUILD"
   | "DETACHED_SUBBUILD"
   | "SUBBUILD_UNSUPPORTED"
-  | "INTERLOCKED";
+  | "INTERLOCKED"
+  | "MIRROR_UNSUPPORTED";
 
 export interface Issue {
   code: IssueCode;

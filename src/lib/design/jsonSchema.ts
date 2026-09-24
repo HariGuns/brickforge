@@ -17,8 +17,8 @@ export function designJsonSchema(): Record<string, unknown> {
   };
   const instance = {
     type: "object",
-    properties: { sub: { type: "string" }, x: { type: "integer" }, y: { type: "integer" }, z: { type: "integer" }, rot: { type: "integer", enum: [0, 90, 180, 270] } },
-    required: ["sub", "x", "y", "z", "rot"],
+    properties: { sub: { type: "string" }, x: { type: "integer" }, y: { type: "integer" }, z: { type: "integer" }, rot: { type: "integer", enum: [0, 90, 180, 270] }, mirror: { type: "boolean" } },
+    required: ["sub", "x", "y", "z", "rot", "mirror"],
     additionalProperties: false,
   };
   return {

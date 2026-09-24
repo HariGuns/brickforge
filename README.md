@@ -135,6 +135,13 @@ The village sub-build run was interrupted at assembly when the API credit ran ou
 
 `.mpd` export for designs has one submodel per unique sub-build, with copies as references; the importer expands them back. Compiling ~4,600 parts in 425 nested copies takes about 60 ms (`npm run bench`).
 
+**Mirrored copies** (`mirror: true` on a copy) are left/right mirror images of a sub-build, so a vehicle's right side can be designed once and mirrored for the left:
+- **How it flips:** the copy is flipped along the sub-build's own x axis before it's rotated.
+- **Parts:** each part becomes its mirror image. Handed parts swap (wedge right ↔ left), and symmetric parts stay or turn (a wheel turns to face the other way).
+- **Swap map** (`src/lib/parts/mirror.ts`): it isn't a hand-written list. It comes from comparing each part's flipped connection data with its left/right counterpart (or itself) at each rotation. 23 parts have no mirror image, and a mirrored copy containing one is reported (`MIRROR_UNSUPPORTED`).
+- **Nested copies:** inside a mirrored copy, they flip too.
+- **Manual and export:** mirrored copies get their own manual section ("Side (mirrored)") and their own `.mpd` submodel, with the parts really swapped.
+
 ## Part catalog
 
 Claude can use **937 parts**:

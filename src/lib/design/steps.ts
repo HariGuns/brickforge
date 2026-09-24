@@ -14,6 +14,7 @@ import { getPart } from "../parts/library";
  */
 
 export interface CopyItem {
+  /** Sub-build id, with "~m" for mirrored copies (they're a different build: see variantKey). */
   sub: string;
   name: string;
   count: number;
@@ -26,8 +27,11 @@ export interface DesignStep extends BuildStep {
   copies: CopyItem[];
 }
 
+/** Section / copy key: the sub-build id, plus "~m" for its mirror image. */
+export const variantKey = (sub: string, mirror: boolean) => (mirror ? `${sub}~m` : sub);
+
 export interface StepSection {
-  /** Sub-build id, or null for the main build. */
+  /** Sub-build id ("~m" suffix for its mirror image), or null for the main build. */
   sub: string | null;
   /** "Pine tree" or the model's name for the main build. */
   name: string;
@@ -61,7 +65,7 @@ function containerSteps(model: BrickModel, compiled: CompileResult, parent: numb
       z: Math.min(...ps.map((p) => p.z)),
       x: Math.min(...ps.map((p) => p.x)),
       parts: inst.parts,
-      copy: { sub: inst.sub, name: inst.name },
+      copy: { sub: variantKey(inst.sub, inst.mirror), name: `${inst.name}${inst.mirror ? " (mirrored)" : ""}` },
     });
   }
   // Wheels go on last, after the holders they hang from.
@@ -111,9 +115,14 @@ export function designSteps(design: BrickDesign, compiled: CompileResult = compi
   const sections: StepSection[] = [];
   for (const id of buildOrder(design, compiled)) {
     const info = compiled.subBuilds.find((s) => s.id === id)!;
-    const alone = compileSubBuild(design, id, { structure: "off" });
-    // The sub-build alone is one copy at index 0; its container is that copy.
-    sections.push({ sub: id, name: info.name, copies: info.copies, model: alone.model, steps: containerSteps(alone.model, alone, 0) });
+    // A sub-build and its mirror image (if any copies are mirrored) are built separately.
+    for (const mirror of [false, true]) {
+      const copies = compiled.instances.filter((c) => c.sub === id && c.mirror === mirror).length;
+      if (!copies) continue;
+      const alone = compileSubBuild(design, id, { structure: "off", mirror });
+      // The sub-build alone is one copy at index 0; its container is that copy.
+      sections.push({ sub: variantKey(id, mirror), name: `${info.name}${mirror ? " (mirrored)" : ""}`, copies, model: alone.model, steps: containerSteps(alone.model, alone, 0) });
+    }
   }
   const mainSteps = containerSteps(compiled.model, compiled, -1);
   sections.push({ sub: null, name: design.name, copies: 1, model: compiled.model, steps: mainSteps });

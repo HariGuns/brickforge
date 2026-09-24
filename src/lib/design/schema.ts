@@ -18,6 +18,11 @@ export const InstanceSchema = z.object({
   y: z.number().int(),
   z: z.number().int(),
   rot: RotSchema,
+  /**
+   * Mirror image (left/right): the copy is flipped along the sub-build's own x
+   * axis before it's turned by `rot`. Handed parts swap (wedge right ↔ left).
+   */
+  mirror: z.boolean().optional(),
 });
 
 export const SubBuildSchema = z.object({

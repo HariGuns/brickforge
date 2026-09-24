@@ -1,5 +1,6 @@
 import { COLOR_MAP } from "../parts/colors";
 import { getPart, type PartDef } from "../parts/library";
+import { mirrorPlacement } from "../parts/mirror";
 import { footprint } from "../model/geometry";
 import type { BrickModel, Placement } from "../model/schema";
 import type { BuildStep } from "../steps/steps";
@@ -114,8 +115,8 @@ export function instanceLine(inst: Instance, box: Box, file: string): string {
 }
 
 /** Submodel file for a sub-build (prefixed so it can't collide with the main model's file). */
-export function submodelFile(id: string): string {
-  return `sub_${id}.ldr`;
+export function submodelFile(id: string, mirror = false): string {
+  return `sub_${id}${mirror ? "_mirrored" : ""}.ldr`;
 }
 
 /** Group placements (parts or copies) by height into STEP blocks, bottom first. */
@@ -135,20 +136,40 @@ function stepBlocks(items: { y: number; line: string }[]): string[] {
  * Requires a successful compile (for each sub-build's local box).
  */
 export function exportDesignMpd(design: BrickDesign, compiled: Pick<CompileResult, "boxes">): string {
-  const subFiles = new Set(design.subBuilds.map((s) => submodelFile(s.id).toLowerCase()));
+  const subFiles = new Set(design.subBuilds.flatMap((s) => [submodelFile(s.id), submodelFile(s.id, true)].map((f) => f.toLowerCase())));
   let mainName = `${safeName(design.name)}.ldr`;
   if (subFiles.has(mainName.toLowerCase())) mainName = `main_${mainName}`;
+  const byId = new Map(design.subBuilds.map((s) => [s.id, s]));
   const block = (file: string, title: string, description: string, parts: Placement[], uses: Instance[]) => {
     const items = [
       ...parts.map((p) => ({ y: p.y, line: partLine(p) })),
-      ...uses.filter((u) => compiled.boxes[u.sub]).map((u) => ({ y: u.y, line: instanceLine(u, compiled.boxes[u.sub], submodelFile(u.sub)) })),
+      ...uses.filter((u) => compiled.boxes[u.sub]).map((u) => ({ y: u.y, line: instanceLine(u, compiled.boxes[u.sub], submodelFile(u.sub, !!u.mirror)) })),
     ];
     return [`0 FILE ${file}`, `0 ${title}`, `0 Name: ${file}`, `0 Author: Brick Builder`, `0 !LDRAW_ORG Unofficial_Model`, ...(description ? [`0 // ${description.replace(/\s+/g, " ")}`] : []), "", ...stepBlocks(items), "0 NOFILE"];
   };
   const lines = block(mainName, design.name, design.description, design.main.parts, design.main.uses);
-  for (const s of design.subBuilds) {
-    if (!compiled.boxes[s.id]) continue; // unused or broken
-    lines.push(...block(submodelFile(s.id), s.name, "", s.parts, s.uses));
+  // Every (sub-build, mirrored?) variant the model reaches gets its own submodel: a mirror
+  // image is a real build with left/right parts swapped, not an LDraw mirror matrix.
+  const done = new Set<string>();
+  const queue: [string, boolean][] = design.main.uses.map((u) => [u.sub, !!u.mirror]);
+  while (queue.length) {
+    const [id, mirror] = queue.shift()!;
+    const s = byId.get(id), box = compiled.boxes[id];
+    if (!s || !box || done.has(`${id}|${mirror}`)) continue; // unused or broken
+    done.add(`${id}|${mirror}`);
+    const W = box.maxX - box.minX;
+    const parts = mirror ? s.parts.map((p) => mirrorPlacement(p, box.minX, W) ?? p) : s.parts;
+    const uses = mirror ? s.uses.map((u) => mirrorInstance(u, compiled.boxes[u.sub], box.minX, W)) : s.uses;
+    for (const u of uses) queue.push([u.sub, !!u.mirror]);
+    lines.push(...block(submodelFile(id, mirror), `${s.name}${mirror ? " (mirrored)" : ""}`, "", parts, uses));
   }
   return lines.join("\r\n") + "\r\n";
+}
+
+/** A nested copy seen in a mirror: mirrored position in the parent's box, rotation negated, mirror flag toggled. */
+function mirrorInstance(u: Instance, childBox: Box | undefined, minX: number, width: number): Instance {
+  if (!childBox) return u;
+  const W = childBox.maxX - childBox.minX, D = childBox.maxZ - childBox.minZ;
+  const sx = u.rot === 90 || u.rot === 270 ? D : W;
+  return { ...u, x: minX + (width - (u.x - minX) - sx), rot: ((360 - u.rot) % 360) as Instance["rot"], mirror: !u.mirror };
 }

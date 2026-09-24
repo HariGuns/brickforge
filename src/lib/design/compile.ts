@@ -4,6 +4,7 @@ import { rotatedSize } from "../model/geometry";
 import type { BrickModel, Placement, Rot } from "../model/schema";
 import { validate, type Issue, type ValidationResult } from "../validate/validator";
 import type { BrickDesign, Instance, SubBuild } from "./schema";
+import { mirrorPlacement } from "../parts/mirror";
 
 /**
  * Deterministic compiler: expands a design (tree of sub-builds) into a flat
@@ -24,6 +25,8 @@ export interface CompiledInstance {
   depth: number;
   /** Indices into model.parts of every part in this copy (including nested copies). */
   parts: number[];
+  /** A mirror image of the sub-build (counting mirrors along the path: two mirrors cancel). */
+  mirror: boolean;
 }
 
 export interface SubBuildInfo {
@@ -170,7 +173,19 @@ export function compileDesign(design: BrickDesign, opts: CompileOptions = {}): C
       const child = local(u.sub, [...visiting, owner], owner);
       if (!child || !child.length) return;
       const box = boxes.get(u.sub)!;
-      for (const c of child) out.push({ pl: transformPlacement(c.pl, box, u), tag: [ui, ...c.tag] });
+      for (const c of child) {
+        // A mirrored copy: flip each part (its mirror image, mirrored position) inside the box first.
+        let pl = c.pl;
+        if (u.mirror) {
+          const m = mirrorPlacement(pl, box.minX, box.maxX - box.minX);
+          if (m) pl = m;
+          else if (!reported.has(`mirror:${u.sub}:${pl.part}`)) {
+            reported.add(`mirror:${u.sub}:${pl.part}`);
+            errors.push(err("MIRROR_UNSUPPORTED", `A mirrored copy of "${u.sub}" contains ${pl.part} (${getPart(pl.part)?.name ?? "unknown"}), which has no mirror image in the catalog. Use a symmetric part or a left/right pair, or don't mirror this copy.`));
+          }
+        }
+        out.push({ pl: transformPlacement(pl, box, u), tag: [ui, ...c.tag] });
+      }
     });
   }
 
@@ -235,7 +250,8 @@ export function compileDesign(design: BrickDesign, opts: CompileOptions = {}): C
     const copy = (copyCount.get(inst.sub) ?? 0) + 1;
     copyCount.set(inst.sub, copy);
     const index = instances.length;
-    instances.push({ index, sub: inst.sub, name, copy, path: `${parent >= 0 ? `${instances[parent].path} › ` : ""}${name} #${copy}`, parent, depth: tag.length, parts: [] });
+    const mirror = !!inst.mirror !== (parent >= 0 && instances[parent].mirror);
+    instances.push({ index, sub: inst.sub, name, copy, path: `${parent >= 0 ? `${instances[parent].path} › ` : ""}${name}${mirror ? " (mirrored)" : ""} #${copy}`, parent, depth: tag.length, parts: [], mirror });
     byTag.set(key, index);
     return index;
   }
@@ -422,6 +438,6 @@ function sccs(graph: Map<string, Set<string>>): string[][] {
 }
 
 /** Compile one sub-build on its own (at the origin), for its standalone repair loop. */
-export function compileSubBuild(design: BrickDesign, id: string, opts: CompileOptions = {}): CompileResult {
-  return compileDesign({ ...design, main: { parts: [], uses: [{ sub: id, x: 0, y: 0, z: 0, rot: 0 }] } }, opts);
+export function compileSubBuild(design: BrickDesign, id: string, opts: CompileOptions & { mirror?: boolean } = {}): CompileResult {
+  return compileDesign({ ...design, main: { parts: [], uses: [{ sub: id, x: 0, y: 0, z: 0, rot: 0, ...(opts.mirror ? { mirror: true } : {}) }] } }, opts);
 }

@@ -41,7 +41,7 @@ export function planPrompt(request: string, size: BuildSize | undefined, hasImag
 Request: ${request.trim() || "the main subject of the attached photo"}${hasImage ? "\n(Use the attached photo as the reference.)" : ""}
 Target size: ${SIZE_TARGET[size ?? "large"]}.
 
-Split the model into sub-builds: self-contained pieces that are each built on their own as one connected piece, then placed on the main build. Good sub-builds are repeated features (trees, houses, windows bays, towers, wheels sets, fence runs) or big distinct sections (a hull, a tower, a gatehouse). Repeating a sub-build as several copies is the main way to get a large, detailed model cheaply, so use copies wherever the subject repeats.
+Split the model into sub-builds: self-contained pieces that are each built on their own as one connected piece, then placed on the main build. Good sub-builds are repeated features (trees, houses, windows bays, towers, wheels sets, fence runs) or big distinct sections (a hull, a tower, a gatehouse). Repeating a sub-build as several copies is the main way to get a large, detailed model cheaply, so use copies wherever the subject repeats. Left/right pairs count as repeats: a copy can be a mirror image (mirror: true in the assembly), so a vehicle's right side panel, wheel arch or wing can be designed once and mirrored for the left side.
 
 The main build holds the base (plates the copies stand on) and glue parts that tie copies together; it is designed last, once every sub-build exists.
 
@@ -128,7 +128,8 @@ ${built.map((b) => `- ${b.id} "${b.name}" (${b.parts} parts, planned ${b.copies}
 
 Return the main build:
 - parts: the main build's own parts — the base the copies stand on and glue parts that tie copies together or finish the model. Same rules as always.
-- uses: the copies, each { sub, x, y, z, rot }. (x, z) is where the min corner of the copy's (rotated) footprint goes; y is the height of the copy's bottom. A copy's cells rotate like a part's: at rot 90 a w × d footprint becomes d × w and its local cell (cx, cz) lands at (d-1-cz, cx) inside it; at rot 180 at (w-1-cx, d-1-cz); at rot 270 at (cz, w-1-cx).
+- uses: the copies, each { sub, x, y, z, rot, mirror }. (x, z) is where the min corner of the copy's (rotated) footprint goes; y is the height of the copy's bottom. A copy's cells rotate like a part's: at rot 90 a w × d footprint becomes d × w and its local cell (cx, cz) lands at (d-1-cz, cx) inside it; at rot 180 at (w-1-cx, d-1-cz); at rot 270 at (cz, w-1-cx).
+- mirror: true makes the copy the mirror image of the sub-build (left/right): it's flipped along the sub-build's own x axis (local cell (cx, cz) → (w-1-cx, cz)) before rot is applied, and handed parts are swapped automatically (wedge right ↔ left, wheels turn to face the other way). Use it for the opposite side of a symmetric subject; use mirror: false for plain copies. A few parts have no mirror image; the checker names them.
 
 Rules the compiler checks:
 - Each copy is placed as one piece: its underside cells (o) must sit on studs of the main build or another copy directly below it (its y = the top height there), or on the ground at y = 0.
@@ -169,8 +170,9 @@ export function assemblyJsonSchema(partIds: readonly string[], colorIds: readonl
             y: { type: "integer" },
             z: { type: "integer" },
             rot: { type: "integer", enum: [0, 90, 180, 270] },
+            mirror: { type: "boolean" },
           },
-          required: ["sub", "x", "y", "z", "rot"],
+          required: ["sub", "x", "y", "z", "rot", "mirror"],
           additionalProperties: false,
         },
       },
