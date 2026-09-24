@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { PARTS } from "../parts/library";
+import { CORE_PARTS, PARTS } from "../parts/library";
 import { COLORS } from "../parts/colors";
-import { BRICKLINK_COLORS, BRICKLINK_PARTS } from "./ids";
+import { BRICKLINK_COLORS, BRICKLINK_PARTS, bricklinkFor } from "./ids";
 import { exportWantedList, wantedItems } from "./wantedList";
 import { P, SAMPLE_HOUSE } from "../fixtures/samples";
 import type { BrickModel } from "../model/schema";
@@ -10,9 +10,18 @@ const model = (parts: BrickModel["parts"]): BrickModel => ({ name: "t", descript
 
 describe("BrickLink wanted list", () => {
   it("has a BrickLink ID for every part and colour", () => {
-    expect(PARTS.filter((p) => !BRICKLINK_PARTS[p.id]?.length).map((p) => p.id)).toEqual([]);
+    expect(CORE_PARTS.filter((p) => !BRICKLINK_PARTS[p.id]?.length).map((p) => p.id)).toEqual([]);
+    expect(PARTS.filter((p) => !bricklinkFor(p.id)?.length).map((p) => p.id)).toEqual([]);
     expect(COLORS.filter((c) => BRICKLINK_COLORS[c.id] === undefined).map((c) => c.id)).toEqual([]);
     expect(Object.keys(BRICKLINK_PARTS).filter((id) => !PARTS.some((p) => p.id === id))).toEqual([]);
+  });
+
+  it("lists catalog parts by LDraw number and wheels as rim plus black tyre", () => {
+    expect(bricklinkFor("3823")).toEqual([{ id: "3823" }]);
+    expect(wantedItems(model([P("4624c01", "red", 0, 0, 0), P("4624c01", "red", 0, 0, 4)]))).toEqual([
+      { id: "3641", color: 11, qty: 2 },
+      { id: "4624", color: 5, qty: 2 },
+    ]);
   });
 
   it("maps IDs that differ between LDraw and BrickLink", () => {

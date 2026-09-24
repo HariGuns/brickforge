@@ -57,3 +57,28 @@ describe("LDraw import: design .mpd with submodels", () => {
     expect(importLdr(text).skipped.map((s) => s.reason)).toEqual(["submodel loop.ldr includes itself"]);
   });
 });
+
+describe("LDraw round trip with catalog parts", () => {
+  it("exports and re-imports curved slopes, wedges, windscreens and wheels in every rotation", async () => {
+    const { exportLdr } = await import("./export");
+    const { buildSteps } = await import("../steps/steps");
+    const { P } = await import("../fixtures/samples");
+    const { mountsFor } = await import("../parts/wheels");
+    const holder = P("4600", "black", 20, 3, 20);
+    const parts = [
+      P("11477", "red", 0, 0, 0),
+      P("41769b", "blue", 4, 0, 0, 90),
+      P("41770b", "blue", 10, 0, 0, 180),
+      P("3823", "trans_clear", 0, 0, 10, 270),
+      P("3933", "white", 10, 0, 10, 90),
+      P("54200", "red", 30, 0, 0),
+      holder,
+      ...mountsFor(holder, "4624c01").map((m) => ({ ...P("4624c01", "yellow", 0, 0, 0), ...m.at })),
+    ];
+    const model = { name: "Catalog", description: "", parts };
+    const back = importLdr(exportLdr(model, buildSteps(model)));
+    expect(back.skipped).toEqual([]);
+    const key = (p: (typeof parts)[number]) => `${p.part}|${p.color}|${p.x},${p.y},${p.z}|${p.rot}`;
+    expect(back.model.parts.map(key).sort()).toEqual(parts.map(key).sort());
+  });
+});

@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { PART_IDS } from "../parts/library";
 import { COLOR_IDS } from "../parts/colors";
 
 /** Rotation about the vertical axis, degrees (see geometry.ts for the exact sense). */
 export const RotSchema = z.union([z.literal(0), z.literal(90), z.literal(180), z.literal(270)]);
 
 export const PlacementSchema = z.object({
-  part: z.enum(PART_IDS),
+  /** A part id (core or catalog); unknown ids are reported by the validator. */
+  part: z.string().min(1),
   color: z.enum(COLOR_IDS),
   /** Min-x corner of the rotated footprint, in studs. */
   x: z.number().int(),

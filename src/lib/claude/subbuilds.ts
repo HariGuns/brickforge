@@ -1,4 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { catalogUsage, formatCatalogUsage } from "../parts/usage";
+import { searchPartsTool } from "./tools";
 import { z } from "zod";
 import { CONFIG } from "../config";
 import { PART_IDS } from "../parts/library";
@@ -184,6 +186,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
         firstContent: text,
         firstText: text,
         schema: brickModelJsonSchema(),
+        tools: [searchPartsTool],
         parse: (t) => parseJson(t, BrickModelSchema),
         check: (model, last) => {
           const v = validate(model, { grid: { x: sub.w, z: sub.d, y: sub.h }, maxParts: Math.min(CONFIG.maxParts, Math.ceil(sub.parts * 1.6) + 10), structure: last ? "warn" : "error" });
@@ -219,6 +222,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
       firstContent: withImage(aText),
       firstText: aText,
       schema: assemblyJsonSchema(PART_IDS, COLOR_IDS, subBuilds.map((s) => s.id)),
+      tools: [searchPartsTool],
       parse: (t) => parseJson(t, AssemblySchema),
       check: (a, last) => {
         const c = compileDesign(designOf(a), { structure: last ? "warn" : "error" });
@@ -263,7 +267,9 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
       }
     : undefined;
   if (resumed) debug.write(`resume-${new Date().toISOString().replace(/[:.]/g, "-")}.json`, resumed);
-  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, rounds, total: usage, ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats });
+  const catalog = catalogUsage(result.model);
+  console.log(`[generate] ${formatCatalogUsage(catalog)}`);
+  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, rounds, total: usage, ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
   if (design) debug.write("final-design.json", design);
   if (result.model) debug.write("final-model.json", result.model);
   if (resumed) console.log(`[generate] resumed: reused plan=${resumed.reused.plan}, sub-builds [${resumed.reused.subBuilds.join(", ")}], assembly=${resumed.reused.assembly}; earlier $${resumed.costBefore.toFixed(4)}, now $${resumed.costNow.toFixed(4)}`);
@@ -305,6 +311,7 @@ export async function editDesign(input: GenerateInput & { baseDesign: BrickDesig
       firstContent: content,
       firstText: text,
       schema: designJsonSchema(),
+      tools: [searchPartsTool],
       parse: (t) => parseJson(t, BrickDesignSchema),
       check: (d, last) => {
         const c = compileDesign(d, { structure: last ? "warn" : "error" });
@@ -328,7 +335,9 @@ export async function editDesign(input: GenerateInput & { baseDesign: BrickDesig
     compile: compiled ? { stats: compiled.stats, tree: compiled.tree, subBuilds: compiled.subBuilds } : undefined,
     pipeline: "subbuilds",
   };
-  debug.write("summary.json", { pipeline: "design-edit", valid: result.valid, rounds: loop.rounds, total: loop.usage, partCount: result.model?.parts.length ?? 0, compile: compiled?.stats });
+  const catalog = catalogUsage(result.model);
+  console.log(`[generate] ${formatCatalogUsage(catalog)}`);
+  debug.write("summary.json", { pipeline: "design-edit", valid: result.valid, rounds: loop.rounds, total: loop.usage, partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
   if (design) debug.write("final-design.json", design);
   if (result.model) debug.write("final-model.json", result.model);
   console.log(`[generate] design edit done: valid=${result.valid}, ${result.model?.parts.length ?? 0} parts · ${formatUsage(loop.usage)} · debug: ${debug.dir}`);

@@ -54,12 +54,17 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | `npm run gen -- --pipeline subbuilds --size large "a castle"` | Generator path: `single` (default), `subbuilds` or `auto` (sub-builds for Large) |
 | `npm run gen -- --resume debug/<run folder>` | Finish an interrupted sub-build run: reuses its valid plan, sub-builds and assembly, redoes the rest, and writes into the same folder. Earlier and new cost are reported separately |
 | `npm run bench [side]` | Compile benchmark for a large nested design (`side` 5 ≈ 4,600 parts) |
-| `npm run verify-ldraw` | Check every part in the library against the official LDraw library (needs `ldraw-lib/`, see below) |
+| `npm run verify-ldraw` | Check the core parts and the whole catalog against the official LDraw library and LDCad's snap data (needs `ldraw-lib/`, see below) |
+| `npm run build-catalog` | Regenerate the part catalog (`src/lib/parts/catalog.json`, meshes in `public/parts/`) from LDraw + the LDCad shadow library; report in `ldraw-lib/catalog-report.txt` |
+| `npm run catalog-usage` | Which catalog parts generations used, and what Claude searched for, across all runs in `debug/` |
 | `npm run export-sample` | Export the hand-built sample models to `exports/` |
 | `scripts/leocad-render.sh exports/X.ldr [out.png] [step]` | Render an export with LeoCAD (flatpak `org.leocad.LeoCAD`) to confirm it opens |
 
-LDraw library for `verify-ldraw` and LeoCAD rendering:
+LDraw library for `verify-ldraw`, `build-catalog` and LeoCAD rendering:
 `mkdir ldraw-lib && curl -L https://library.ldraw.org/library/updates/complete.zip -o ldraw-lib/complete.zip && (cd ldraw-lib && unzip -q complete.zip)`
+
+LDCad shadow library (connection data) for `build-catalog` and `verify-ldraw`:
+`mkdir -p ldraw-lib/shadow && curl -sL https://codeload.github.com/RolandMelkert/LDCadShadowLibrary/tar.gz/refs/heads/main | tar xz -C ldraw-lib/shadow --strip-components=1`
 
 ## The app
 
@@ -129,6 +134,55 @@ The village sub-build run was interrupted at assembly when the API credit ran ou
 - **Speed:** the viewer uses instanced meshes and merged outlines. The 2,394-part castle draws in 187 draw calls instead of ~7,000.
 
 `.mpd` export for designs has one submodel per unique sub-build, with copies as references; the importer expands them back. Compiling ~4,600 parts in 425 nested copies takes about 60 ms (`npm run bench`).
+
+## Part catalog
+
+Claude can use **937 parts**:
+- **Hand-made core:** 52 parts in `src/lib/parts/library.ts`.
+- **Generated catalog:** 885 parts in `src/lib/parts/catalog.json`.
+
+The prompt lists a **core menu** of 142: the core parts plus the most useful catalog parts (`src/lib/parts/core.ts`, vehicle parts first). Claude finds the rest with the **`search_parts` tool** during design, which returns ids, sizes and connection info. Each run's `summary.json` records which catalog parts the model used and how many came from search; `npm run catalog-usage` adds them up.
+
+**How the catalog is made** (`npm run build-catalog`, about 25 s):
+1. **Filter** every official LDraw part, dropping prints, stickers, aliases, minifig/Duplo/other systems and assemblies.
+2. **Resolve connection data** the way LDCad does: walk each part's subfile tree and apply the **LDCad shadow library**'s snap info (`scripts/lib/snaps.ts`).
+3. **Keep only parts with complete connection data** (`scripts/lib/classify.ts`). Every connection must be one the validator understands, and must sit exactly on the grid:
+   - studs and anti-studs, which may be on lower steps (`(x,z)@level`), not just the top and bottom;
+   - wheel pins (thin wheel pins, or Technic pins on bricks and plates).
+
+   Rejected:
+   - clips, hinges, bars and side studs;
+   - off-grid studs;
+   - bodies that aren't a whole number of studs and plates (up to 2.5 LDU of overhang is allowed).
+4. **Infer missing anti-studs.** Where the shadow library lacks them (96 parts), anti-studs come from the LDraw geometry's standard underside tubes, and the part is marked `inferred`.
+5. **Compute the space each part fills** from its surfaces, per 1 × 1 stud × 1 plate cell, so a curved slope's thin end or an arch's opening stays free.
+6. **Merge near-duplicates** ("with/without bottom tube" variants), and **pair left/right versions** (22 pairs) for mirrored sub-builds.
+7. **Frame the wheels** (rim + tyre assemblies, e.g. `4624c01`) so their hub lands exactly on a holder's pin.
+8. **Write compact meshes.** Real LDraw geometry goes to `public/parts/<id>.bin` (13 MB; each part loads on demand). Tyres and glass keep their own colour. The viewer, manual and PDF render catalog parts from these meshes.
+
+**Wheels** attach only through holders:
+- A wheel's hub must sit exactly on a free pin of the same kind, facing it. Otherwise the error is `LOOSE_WHEEL`, and it names the exact placement to use.
+- Wheels hold their holders up.
+- Wheels go on in the last build step.
+
+**Verification** (`npm run verify-ldraw`) places every catalog part at rot 0 and rot 90 through the exporter's transform and checks:
+- the real stud and anti-stud snaps land on exactly the cells and heights the validator uses;
+- the body fits the footprint;
+- the pins are where the validator says.
+
+It also mounts every wheel on a real holder and checks, in LDraw space, that the hub is on the pin's axis and flush against the holder. **All 885 catalog parts pass.**
+
+Why 885, not 1,000+: most of the rest need connection types the validator doesn't have yet:
+- Technic beams, axles and gears;
+- hinges and clips;
+- side studs (brackets, headlight bricks), for the later sideways-building phase.
+
+`ldraw-lib/catalog-report.txt` lists every rejected part and the reason.
+
+**Licences:**
+- The LDraw parts library is CC BY 2.0 / 4.0 (LDraw.org).
+- The LDCad shadow library is CC BY-SA 4.0 (Roland Melkert and contributors, github.com/RolandMelkert/LDCadShadowLibrary).
+- The generated `catalog.json` and meshes are derived from both, so they're shared under CC BY-SA 4.0 with this attribution.
 
 ## Where to tune things
 

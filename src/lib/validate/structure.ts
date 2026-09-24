@@ -95,8 +95,9 @@ export function analyzeStructure(model: BrickModel, connections: Connection[], s
         x0 = Math.min(x0, x); x1 = Math.max(x1, x + 1); z0 = Math.min(z0, z); z1 = Math.max(z1, z + 1);
       }
     }
-    const dx = Math.max(x0 - p.com[0], 0, p.com[0] - x1);
-    const dz = Math.max(z0 - p.com[1], 0, p.com[1] - z1);
+    // Held only by a wheel's pin: no stud area to lever around.
+    const dx = x0 === Infinity ? 0 : Math.max(x0 - p.com[0], 0, p.com[0] - x1);
+    const dz = z0 === Infinity ? 0 : Math.max(z0 - p.com[1], 0, p.com[1] - z1);
     p.momentGS = p.carriedG * Math.hypot(dx, dz);
 
     // Pass the load down, split by stud count.

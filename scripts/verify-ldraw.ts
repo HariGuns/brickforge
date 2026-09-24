@@ -12,7 +12,7 @@
  *
  * Usage: npm run verify-ldraw   (download: see README)
  */
-import { PARTS, type PartDef } from "../src/lib/parts/library";
+import { CORE_PARTS as PARTS, type PartDef } from "../src/lib/parts/library";
 import { footprint, worldStuds } from "../src/lib/model/geometry";
 import { ldrawTransform, LDU_PLATE, LDU_STUD } from "../src/lib/ldraw/export";
 import type { Rot } from "../src/lib/model/schema";

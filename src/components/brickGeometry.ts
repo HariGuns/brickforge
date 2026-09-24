@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { getPart, localSolids, localStuds, type PartDef } from "@/lib/parts/library";
+import { parseMesh } from "@/lib/parts/meshFormat";
+import { COLORS } from "@/lib/parts/colors";
 
 /** Viewer units: 1 stud pitch = 1, 1 plate = 0.4 (real proportions: 8 mm / 3.2 mm). */
 export const PLATE_H = 0.4;
@@ -12,6 +14,74 @@ const SLOPE_LIP = 0.2;
 const bodyCache = new Map<string, THREE.BufferGeometry>();
 const fullCache = new Map<string, THREE.BufferGeometry>();
 const edgeCache = new Map<string, THREE.EdgesGeometry>();
+
+// --- catalog meshes (real LDraw geometry, loaded on demand) -------------------------------
+const meshGeo = new Map<string, THREE.BufferGeometry>();
+/** Fixed-colour pieces of a catalog part (black tyres, clear glass), by our colour id. */
+const fixedGeo = new Map<string, { colorId: string; geo: THREE.BufferGeometry }[]>();
+
+/** Our colour id for an LDraw colour code (256 rubber black → black). */
+function colorIdForLdraw(code: number): string {
+  if (code === 256) return "black";
+  return COLORS.find((c) => c.ldraw === code)?.id ?? (code === 47 || code === 40 ? "trans_clear" : "black");
+}
+const meshLoads = new Map<string, Promise<boolean>>();
+
+/** Load the meshes of any catalog parts among `partIds`. Resolves true if something new arrived (rebuild the scene). */
+export async function loadPartMeshes(partIds: Iterable<string>): Promise<boolean> {
+  const wanted = [...new Set(partIds)].filter((id) => getPart(id)?.mesh && !meshGeo.has(id));
+  const results = await Promise.all(
+    wanted.map((id) => {
+      let p = meshLoads.get(id);
+      if (!p) {
+        p = fetch(`/parts/${encodeURIComponent(id)}.bin`)
+          .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(`HTTP ${r.status}`))))
+          .then((buf) => {
+            const { positions, indices, groups } = parseMesh(buf);
+            const g = new THREE.BufferGeometry();
+            // LDU → viewer units: 20 LDU per stud across, 8 LDU per plate (PLATE_H) up.
+            const scaled = new Float32Array(positions.length);
+            for (let i = 0; i < positions.length; i += 3) {
+              scaled[i] = positions[i] / 20;
+              scaled[i + 1] = (positions[i + 1] / 8) * PLATE_H;
+              scaled[i + 2] = positions[i + 2] / 20;
+            }
+            g.setAttribute("position", new THREE.BufferAttribute(scaled, 3));
+            const piece = (start: number, count: number) => {
+              const p = g.clone();
+              p.setIndex(new THREE.BufferAttribute(indices.slice(start, start + count), 1));
+              const flat = p.toNonIndexed();
+              flat.computeVertexNormals();
+              return flat;
+            };
+            const own = groups.filter((gr) => gr.color === 16);
+            meshGeo.set(id, own.length ? piece(own[0].start, own[0].count) : new THREE.BufferGeometry());
+            const def = getPart(id)!;
+            fixedGeo.set(
+              id,
+              groups
+                .filter((gr) => gr.color !== 16)
+                .map((gr) => {
+                  const geo = piece(gr.start, gr.count);
+                  geo.translate(-def.w / 2, 0, -def.d / 2);
+                  return { colorId: colorIdForLdraw(gr.color), geo };
+                }),
+            );
+            for (const c of [bodyCache, fullCache, edgeCache]) c.delete(id);
+            return true;
+          })
+          .catch((e) => {
+            console.warn(`No mesh for ${id}:`, e);
+            meshLoads.delete(id);
+            return false;
+          });
+        meshLoads.set(id, p);
+      }
+      return p;
+    }),
+  );
+  return results.some(Boolean);
+}
 
 type G = THREE.BufferGeometry;
 
@@ -62,7 +132,15 @@ function bodyGeometry(def: PartDef): THREE.BufferGeometry {
   const top = h - GAP;
   const { w, d } = def;
   let g: G;
-  switch (def.shape ?? (def.category === "slope" ? "slope" : "box")) {
+  const mesh = def.mesh ? meshGeo.get(def.id) : undefined;
+  if (mesh) {
+    g = mesh.clone();
+    g.translate(-w / 2, 0, -d / 2);
+    bodyCache.set(def.id, g);
+    return g;
+  }
+  // Catalog parts show as their filled cells until the mesh has loaded.
+  switch (def.mesh ? "box" : (def.shape ?? (def.category === "slope" ? "slope" : "box"))) {
     case "slope":
       // Full height over the stud row (z 0..1), then the slope down to a low lip at the front.
       g = extrudeProfile(def, [[GAP, 0], [d - GAP, 0], [d - GAP, SLOPE_LIP], [1, top], [GAP, top]]);
@@ -126,10 +204,11 @@ export function partGeometry(partId: string): THREE.BufferGeometry | null {
   const def = getPart(partId);
   if (!def) return null;
   const pieces: THREE.BufferGeometry[] = [bodyGeometry(def).clone()];
-  const top = def.h * PLATE_H - GAP;
-  for (const [cx, cz] of localStuds(def)) {
+  // Studs from the connection data (catalog meshes leave them out), on the surface they stand on.
+  const gap = def.mesh ? 0 : GAP;
+  for (const [cx, cz, level] of localStuds(def)) {
     const s = new THREE.CylinderGeometry(STUD_R, STUD_R, STUD_H, 12).toNonIndexed();
-    s.translate(cx + 0.5 - def.w / 2, top + STUD_H / 2, cz + 0.5 - def.d / 2);
+    s.translate(cx + 0.5 - def.w / 2, level * PLATE_H - gap + STUD_H / 2, cz + 0.5 - def.d / 2);
     pieces.push(s);
   }
   for (const p of pieces) {
@@ -150,4 +229,9 @@ export function partEdges(partId: string): THREE.EdgesGeometry | null {
   const e = new THREE.EdgesGeometry(bodyGeometry(def), 30);
   edgeCache.set(partId, e);
   return e;
+}
+
+/** Pieces of a part that keep their own colour whatever the part's colour (black tyres, clear glass), centred like partGeometry. */
+export function partFixedPieces(partId: string): { colorId: string; geo: THREE.BufferGeometry }[] {
+  return fixedGeo.get(partId) ?? [];
 }

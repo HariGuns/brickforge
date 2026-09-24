@@ -15,7 +15,7 @@ describe("validator: valid models", () => {
   it("accepts an offset stack and counts studs", () => {
     const r = validate(SAMPLE_STACK);
     expect(r.valid).toBe(true);
-    expect(r.connections).toEqual([{ lower: 0, upper: 1, studs: 4 }]);
+    expect(r.connections).toEqual([{ lower: 0, upper: 1, studs: 4, kind: "stud" }]);
   });
   it("accepts a single part on the ground", () => {
     expect(validate(model(P("brick_2x2", "red", 0, 0, 0))).valid).toBe(true);

@@ -1,10 +1,10 @@
-import { PART_IDS } from "../parts/library";
 import { COLOR_IDS } from "../parts/colors";
 
 /**
  * JSON schema for Claude's structured output (output_config.format). Written by
- * hand (rather than derived from Zod) so enums and integer types are enforced by
- * the API. Keep in sync with BrickModelSchema in schema.ts.
+ * hand (rather than derived from Zod) so colour/rotation enums and integer types
+ * are enforced by the API. Part ids are free strings (the catalog is too big for
+ * an enum); the validator reports unknown ones with suggestions. Keep in sync with BrickModelSchema in schema.ts.
  */
 export function brickModelJsonSchema() {
   return {
@@ -17,7 +17,8 @@ export function brickModelJsonSchema() {
         items: {
           type: "object",
           properties: {
-            part: { type: "string", enum: PART_IDS },
+            // Not an enum: the catalog is too large; unknown ids are reported by the validator.
+            part: { type: "string" },
             color: { type: "string", enum: COLOR_IDS },
             x: { type: "integer" },
             y: { type: "integer" },

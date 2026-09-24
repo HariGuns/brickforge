@@ -4,7 +4,7 @@ import { getPart } from "@/lib/parts/library";
 import { footprint } from "@/lib/model/geometry";
 import type { BrickModel } from "@/lib/model/schema";
 import type { BuildStep } from "@/lib/steps/steps";
-import { partEdges, partGeometry, PLATE_H } from "../brickGeometry";
+import { loadPartMeshes, partEdges, partFixedPieces, partGeometry, PLATE_H } from "../brickGeometry";
 
 /**
  * Offscreen renderer for instruction pages. One shared WebGL context renders
@@ -44,7 +44,7 @@ function material(colorId: string, faded: boolean): THREE.MeshStandardMaterial {
     const c = COLOR_MAP.get(colorId);
     const color = new THREE.Color(c?.hex ?? "#ff00ff");
     if (faded) color.lerp(FADE_TOWARD, FADE);
-    m = new THREE.MeshStandardMaterial({ color, roughness: 0.4, metalness: 0, transparent: !!c?.transparent, opacity: c?.transparent ? 0.6 : 1 });
+    m = new THREE.MeshStandardMaterial({ color, roughness: 0.4, metalness: 0, transparent: !!c?.transparent, opacity: c?.transparent ? 0.6 : 1, side: THREE.DoubleSide });
     matCache.set(key, m);
   }
   return m;
@@ -135,11 +135,27 @@ interface ModelScene {
   box: THREE.Box3;
   /** Per-part world bounds, for framing partial builds. */
   bounds: THREE.Box3[];
+}
+const scenes = new WeakMap<BrickModel, ModelScene>();
+
+/** Per-model render caches (kept apart from the scene, which is only built once meshes have loaded). */
+interface RenderCache {
   cache: Map<string, Promise<string>>;
   /** Finished renders, readable synchronously so cached pages show without a flash. */
   done: Map<string, string>;
 }
-const scenes = new WeakMap<BrickModel, ModelScene>();
+const caches = new WeakMap<BrickModel, RenderCache>();
+function renderCache(model: BrickModel): RenderCache {
+  let c = caches.get(model);
+  if (!c) caches.set(model, (c = { cache: new Map(), done: new Map() }));
+  return c;
+}
+
+/** The model's scene, built after its catalog parts' meshes have loaded. */
+async function readyScene(model: BrickModel): Promise<ModelScene> {
+  await loadPartMeshes(model.parts.map((p) => p.part));
+  return modelScene(model);
+}
 
 function modelScene(model: BrickModel): ModelScene {
   let ms = scenes.get(model);
@@ -159,6 +175,7 @@ function modelScene(model: BrickModel): ModelScene {
       const mesh = new THREE.Mesh(geo, material(pl.color, false));
       const line = new THREE.LineSegments(eg, OLD_EDGE);
       g.add(mesh, line);
+      for (const piece of partFixedPieces(pl.part)) g.add(new THREE.Mesh(piece.geo, material(piece.colorId, false)));
       meshes.push(mesh);
       edges.push(line);
       const b = new THREE.Box3(new THREE.Vector3(fp.x0, fp.y0 * PLATE_H, fp.z0), new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H + 0.2, fp.z0 + fp.sz));
@@ -173,7 +190,7 @@ function modelScene(model: BrickModel): ModelScene {
     scene.add(g);
   });
   if (box.isEmpty()) box.set(new THREE.Vector3(), new THREE.Vector3(1, 1, 1));
-  ms = { scene, groups, edges, meshes, box, bounds, cache: new Map(), done: new Map() };
+  ms = { scene, groups, edges, meshes, box, bounds };
   scenes.set(model, ms);
   return ms;
 }
@@ -182,7 +199,7 @@ const stepKey = (n: number, size: { w: number; h: number }) => `step|${n}|${size
 
 /** A finished render if it's already cached (synchronous), else undefined. */
 export function peekStep(model: BrickModel, n: number, size: { w: number; h: number } = STEP_SIZE): string | undefined {
-  return scenes.get(model)?.done.get(stepKey(n, size));
+  return caches.get(model)?.done.get(stepKey(n, size));
 }
 
 /**
@@ -201,11 +218,12 @@ function stepBox(ms: ModelScene, visible: Set<number>): THREE.Box3 {
  * is fixed; framing covers the full footprint and the height built so far.
  */
 export function renderStep(model: BrickModel, steps: BuildStep[], n: number, size: { w: number; h: number } = STEP_SIZE, priority: "high" | "low" = "high"): Promise<string> {
-  const ms = modelScene(model);
+  const rc = renderCache(model);
   const key = stepKey(n, size);
-  let p = ms.cache.get(key);
+  let p = rc.cache.get(key);
   if (!p) {
     p = enqueue(async () => {
+      const ms = await readyScene(model);
       const placed = new Set(steps.slice(0, n - 1).flatMap((s) => s.parts));
       const fresh = new Set(steps[n - 1]?.parts ?? []);
       const visible = new Set<number>();
@@ -217,11 +235,11 @@ export function renderStep(model: BrickModel, steps: BuildStep[], n: number, siz
         ms.edges[i].material = isNew ? NEW_EDGE : OLD_EDGE;
       });
       const url = await snapshot(ms.scene, isoCamera(stepBox(ms, visible), size.w / size.h), size);
-      ms.done.set(key, url);
+      rc.done.set(key, url);
       return url;
     }, priority);
-    ms.cache.set(key, p);
-    p.catch(() => ms.cache.delete(key));
+    rc.cache.set(key, p);
+    p.catch(() => rc.cache.delete(key));
   }
   return p;
 }
@@ -241,6 +259,7 @@ export function renderPartIcon(partId: string, colorId: string): Promise<PartIco
   let p = iconCache.get(key);
   if (!p) {
     p = enqueue(async () => {
+      await loadPartMeshes([partId]);
       const def = getPart(partId), geo = partGeometry(partId), eg = partEdges(partId);
       const scene = new THREE.Scene();
       lights(scene);
@@ -248,6 +267,7 @@ export function renderPartIcon(partId: string, colorId: string): Promise<PartIco
       if (def && geo && eg) {
         const g = new THREE.Group();
         g.add(new THREE.Mesh(geo, material(colorId, false)), new THREE.LineSegments(eg, OLD_EDGE));
+        for (const piece of partFixedPieces(partId)) g.add(new THREE.Mesh(piece.geo, material(piece.colorId, false)));
         scene.add(g);
         box.set(new THREE.Vector3(-def.w / 2, 0, -def.d / 2), new THREE.Vector3(def.w / 2, def.h * PLATE_H + 0.2, def.d / 2));
       } else box.set(new THREE.Vector3(), new THREE.Vector3(1, 1, 1));
@@ -270,22 +290,23 @@ export const MODEL_ICON_SIZE = { w: 240, h: 180 } as const;
 
 /** The whole model in its own colours (nothing faded or outlined), for a sub-build's callout icon. */
 export function renderModelIcon(model: BrickModel): Promise<string> {
-  const ms = modelScene(model);
+  const rc = renderCache(model);
   const key = "icon";
-  let p = ms.cache.get(key);
+  let p = rc.cache.get(key);
   if (!p) {
     p = enqueue(async () => {
+      const ms = await readyScene(model);
       model.parts.forEach((pl, i) => {
         ms.groups[i].visible = true;
         ms.meshes[i].material = material(pl.color, false);
         ms.edges[i].material = OLD_EDGE;
       });
       const url = await snapshot(ms.scene, isoCamera(ms.box, MODEL_ICON_SIZE.w / MODEL_ICON_SIZE.h, 1.02), MODEL_ICON_SIZE);
-      ms.done.set(key, url);
+      rc.done.set(key, url);
       return url;
     });
-    ms.cache.set(key, p);
-    p.catch(() => ms.cache.delete(key));
+    rc.cache.set(key, p);
+    p.catch(() => rc.cache.delete(key));
   }
   return p;
 }

@@ -44,7 +44,8 @@ describe("design compiler: rotation", () => {
       const out = transformPlacement(pl, box, { x: 10, y: 3, z: 20, rot: irot });
       const local = (cells: [number, number][]) => cells.map(([x, z]) => rotCell([x - 5, z - 7], W, D, irot)).map(([x, z]) => [x + 10, z + 20] as [number, number]);
       expect(sortCells(footprintCells(footprint(out, def)))).toEqual(sortCells(local(footprintCells(footprint(pl, def)))));
-      expect(sortCells(worldStuds(out, def))).toEqual(sortCells(local(worldStuds(pl, def))));
+      const xz = (s: [number, number, number][]) => s.map(([x, z]) => [x, z] as [number, number]);
+      expect(sortCells(xz(worldStuds(out, def)))).toEqual(sortCells(local(xz(worldStuds(pl, def)))));
       expect(out.y).toBe(3);
     }
   });

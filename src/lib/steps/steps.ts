@@ -1,4 +1,5 @@
 import type { BrickModel } from "../model/schema";
+import { getPart } from "../parts/library";
 import type { Connection } from "../validate/validator";
 
 export interface BuildStep {
@@ -30,7 +31,10 @@ export function buildSteps(model: BrickModel, opts: StepOptions = {}): BuildStep
   const parts = model.parts;
 
   const layers = new Map<number, number[]>();
+  const wheels: number[] = [];
   parts.forEach((p, i) => {
+    // Wheels go on last, once their holders are in place (they hang below them).
+    if (getPart(p.part)?.hub) return void wheels.push(i);
     const l = layers.get(p.y) ?? [];
     l.push(i);
     layers.set(p.y, l);
@@ -40,6 +44,10 @@ export function buildSteps(model: BrickModel, opts: StepOptions = {}): BuildStep
   for (const y of [...layers.keys()].sort((a, b) => a - b)) {
     const layer = layers.get(y)!.sort((a, b) => parts[a].z - parts[b].z || parts[a].x - parts[b].x || a - b);
     for (const g of chunk(layer, maxPerStep)) steps.push({ n: steps.length + 1, parts: g, y });
+  }
+  if (wheels.length) {
+    wheels.sort((a, b) => parts[a].z - parts[b].z || parts[a].x - parts[b].x || a - b);
+    for (const g of chunk(wheels, maxPerStep)) steps.push({ n: steps.length + 1, parts: g, y: Math.min(...g.map((i) => parts[i].y)) });
   }
   return steps;
 }
@@ -63,6 +71,8 @@ export function checkStepOrder(model: BrickModel, connections: Connection[], ste
   model.parts.forEach((p, i) => {
     if (!placedAt.has(i)) return bad.push(i);
     if (p.y === 0) return;
+    // Wheels and their holders hold each other through the pin; wheels go on last.
+    if (connections.some((c) => c.kind === "pin" && (c.lower === i || c.upper === i))) return;
     const ok = connections.some((c) => c.upper === i && (placedAt.get(c.lower) ?? Infinity) < placedAt.get(i)!);
     if (!ok) bad.push(i);
   });

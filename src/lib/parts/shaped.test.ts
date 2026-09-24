@@ -29,7 +29,7 @@ describe("shaped parts", () => {
 
   it("rotated arches keep their legs at the ends", () => {
     const m = model(P("plate_1x4", "red", 0, 0, 0, 90), P("arch_1x4", "tan", 0, 1, 0, 90));
-    expect(validate(m).connections).toEqual([{ lower: 0, upper: 1, studs: 2 }]);
+    expect(validate(m).connections).toEqual([{ lower: 0, upper: 1, studs: 2, kind: "stud" }]);
   });
 
   it("the door takes studs on its two middle cells only", () => {

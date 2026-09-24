@@ -24,12 +24,25 @@ export interface RoundSummary {
   seconds: number;
   /** Loaded from an earlier, interrupted run (resume) rather than run now. */
   reused?: boolean;
+  /** Tool calls (part searches) made during this round. */
+  toolCalls?: number;
 }
+
+/** A client-side tool Claude can call during a round (e.g. search_parts). */
+export interface LoopTool {
+  def: Anthropic.Tool;
+  /** Returns the tool result text, plus a short summary for logs and the UI. */
+  run: (input: Record<string, unknown>) => { text: string; summary: string };
+}
+
+/** Most tool turns in one round before Claude must answer. */
+const MAX_TOOL_TURNS = 10;
 
 export type LoopEvent =
   | { type: "round_start"; scope: string; round: number; kind: "design" | "repair" }
   | { type: "progress"; scope: string; round: number; thinkingChars: number; outputChars: number; thinking?: string }
-  | { type: "round_end"; scope: string; summary: RoundSummary; errors: Issue[] };
+  | { type: "round_end"; scope: string; summary: RoundSummary; errors: Issue[] }
+  | { type: "tool"; scope: string; round: number; name: string; input: Record<string, unknown>; summary: string };
 
 export interface CheckResult {
   errors: Issue[];
@@ -52,6 +65,8 @@ export interface LoopSpec<T> {
   check: (value: T, last: boolean) => CheckResult;
   maxRepairRounds?: number;
   repairText?: (errors: Issue[], warnings: Issue[], round: number) => string;
+  /** Client-side tools Claude may call before answering. */
+  tools?: LoopTool[];
 }
 
 export interface LoopContext {
@@ -83,20 +98,6 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     ctx.debug.write(f(`round-${round}.prompt.md`), round === 0 ? spec.firstText : (messages.at(-1)!.content as string));
     const t0 = Date.now();
 
-    const stream = ctx.anthropic.messages.stream(
-      {
-        model: CONFIG.model,
-        max_tokens: CONFIG.maxTokens,
-        thinking: { type: "adaptive", display: "summarized" },
-        output_config: { effort: CONFIG.effort, format: { type: "json_schema", schema: spec.schema } },
-        // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next round.
-        system: [{ type: "text", text: spec.system, cache_control: { type: "ephemeral" } }],
-        cache_control: { type: "ephemeral" },
-        messages,
-      },
-      { signal: ctx.signal },
-    );
-
     let thinkingChars = 0;
     let outputChars = 0;
     let lastEmit = 0;
@@ -107,23 +108,62 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
       lastEmit = now;
       ctx.onEvent({ type: "progress", scope: spec.scope, round, thinkingChars, outputChars, thinking: thinkingTail.slice(-400) });
     };
-    stream.on("thinking", (delta) => {
-      thinkingChars += delta.length;
-      thinkingTail += delta;
-      emitProgress();
-    });
-    stream.on("text", (delta) => {
-      outputChars += delta.length;
-      emitProgress();
-    });
 
-    const msg = await stream.finalMessage();
+    // One round = one answer; with tools, Claude may search first (several API calls, same round).
+    const tools = spec.tools ?? [];
+    const toolLog: { name: string; input: unknown; summary: string }[] = [];
+    const thinkingParts: string[] = [];
+    const callUsage: RoundUsage[] = [];
+    let msg: Anthropic.Message;
+    for (let turn = 0; ; turn++) {
+      const stream = ctx.anthropic.messages.stream(
+        {
+          model: CONFIG.model,
+          max_tokens: CONFIG.maxTokens,
+          thinking: { type: "adaptive", display: "summarized" },
+          output_config: { effort: CONFIG.effort, format: { type: "json_schema", schema: spec.schema } },
+          // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next call.
+          system: [{ type: "text", text: spec.system, cache_control: { type: "ephemeral" } }],
+          cache_control: { type: "ephemeral" },
+          ...(tools.length ? { tools: tools.map((t) => t.def), tool_choice: turn >= MAX_TOOL_TURNS ? { type: "none" as const } : { type: "auto" as const } } : {}),
+          messages,
+        },
+        { signal: ctx.signal },
+      );
+      stream.on("thinking", (delta) => {
+        thinkingChars += delta.length;
+        thinkingTail += delta;
+        emitProgress();
+      });
+      stream.on("text", (delta) => {
+        outputChars += delta.length;
+        emitProgress();
+      });
+      msg = await stream.finalMessage();
+      callUsage.push(toRoundUsage(msg.usage));
+      thinkingParts.push(...msg.content.flatMap((b) => (b.type === "thinking" ? [b.thinking] : [])));
+      if (msg.stop_reason !== "tool_use") break;
+
+      const results: Anthropic.ToolResultBlockParam[] = [];
+      for (const b of msg.content) {
+        if (b.type !== "tool_use") continue;
+        const tool = tools.find((t) => t.def.name === b.name);
+        const input = (b.input ?? {}) as Record<string, unknown>;
+        const out = tool ? tool.run(input) : { text: `Unknown tool ${b.name}`, summary: "unknown tool" };
+        toolLog.push({ name: b.name, input, summary: out.summary });
+        ctx.onEvent({ type: "tool", scope: spec.scope, round, name: b.name, input, summary: out.summary });
+        results.push({ type: "tool_result", tool_use_id: b.id, content: out.text });
+      }
+      messages.push({ role: "assistant", content: msg.content });
+      messages.push({ role: "user", content: results });
+    }
     emitProgress(true);
     const seconds = (Date.now() - t0) / 1000;
-    const usage = toRoundUsage(msg.usage);
+    const usage = sumUsage(callUsage);
+    if (toolLog.length) ctx.debug.write(f(`round-${round}.tools.json`), toolLog);
 
     const text = msg.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("");
-    const thinking = msg.content.flatMap((b) => (b.type === "thinking" ? [b.thinking] : [])).join("\n\n");
+    const thinking = thinkingParts.join("\n\n");
     ctx.debug.write(f(`round-${round}.raw.json.txt`), text);
     if (thinking) ctx.debug.write(f(`round-${round}.thinking.md`), thinking);
 
@@ -163,11 +203,12 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
       usage,
       stopReason: msg.stop_reason,
       seconds,
+      ...(toolLog.length ? { toolCalls: toolLog.length } : {}),
     };
     rounds.push(summary);
     ctx.debug.write(f(`round-${round}.validation.json`), { summary, errors: issues, warnings });
     if (value !== null) ctx.debug.write(f(`round-${round}.model.json`), value);
-    console.log(`[generate] ${spec.scope} round ${round} (${kind}): ${summary.partCount} parts, ${issues.length} errors, ${warnings.length} warnings, ${seconds.toFixed(1)}s · ${formatUsage(usage)}`);
+    console.log(`[generate] ${spec.scope} round ${round} (${kind}): ${summary.partCount} parts, ${issues.length} errors, ${warnings.length} warnings, ${toolLog.length ? `${toolLog.length} part searches, ` : ""}${seconds.toFixed(1)}s · ${formatUsage(usage)}`);
     ctx.onEvent({ type: "round_end", scope: spec.scope, summary, errors: issues.slice(0, 50) });
 
     if (value !== null && check && (!best || issues.length < best.check.errors.length)) best = { value, check };

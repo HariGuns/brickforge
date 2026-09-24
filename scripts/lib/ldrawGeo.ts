@@ -33,11 +33,11 @@ const TOP_STUD = /^stud(2a?|10|13|15|17a?|18a)?\.dat$/;
 
 export function openLibrary(root = path.resolve("ldraw-lib/ldraw")) {
   const index = new Map<string, string>();
-  for (const dir of ["parts", "parts/s", "p", "p/48"]) {
+  for (const dir of ["parts", "parts/s", "p", "p/48", "p/8"]) {
     const full = path.join(root, dir);
     if (!fs.existsSync(full)) continue;
     for (const f of fs.readdirSync(full)) {
-      const rel = (dir.startsWith("parts/s") ? "s/" : dir === "p/48" ? "48/" : "") + f;
+      const rel = (dir.startsWith("parts/s") ? "s/" : dir === "p/48" ? "48/" : dir === "p/8" ? "8/" : "") + f;
       const k = rel.toLowerCase();
       if (!index.has(k)) index.set(k, path.join(full, f));
     }

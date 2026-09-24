@@ -1,4 +1,3 @@
-import { PART_IDS } from "../parts/library";
 import { COLOR_IDS } from "../parts/colors";
 
 /** JSON schema for a whole design (structured output for design edits). Keep in sync with BrickDesignSchema. */
@@ -6,7 +5,7 @@ export function designJsonSchema(): Record<string, unknown> {
   const placement = {
     type: "object",
     properties: {
-      part: { type: "string", enum: PART_IDS },
+      part: { type: "string" },
       color: { type: "string", enum: COLOR_IDS },
       x: { type: "integer" },
       y: { type: "integer" },

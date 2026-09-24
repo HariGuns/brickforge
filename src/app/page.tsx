@@ -289,6 +289,9 @@ export default function Page() {
           rounds: t.rounds.map((r) => (r.scope === ev.scope && r.round === ev.round ? { ...r, thinkingChars: ev.thinkingChars, outputChars: ev.outputChars, thinking: ev.thinking } : r)),
         }));
         break;
+      case "tool":
+        updateTurn(id, (t) => ({ ...t, searches: [...(t.searches ?? []), ev.summary] }));
+        break;
       case "round_end":
         updateTurn(id, (t) => ({ ...t, rounds: t.rounds.map((r) => (r.scope === ev.scope && r.round === ev.summary.round ? { ...r, summary: ev.summary, errors: ev.errors } : r)) }));
         break;

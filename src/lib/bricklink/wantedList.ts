@@ -1,5 +1,5 @@
 import type { BrickModel } from "../model/schema";
-import { BRICKLINK_COLORS, BRICKLINK_PARTS } from "./ids";
+import { BRICKLINK_COLORS, bricklinkFor } from "./ids";
 
 export interface WantedItem {
   id: string;
@@ -11,7 +11,7 @@ export interface WantedItem {
 export function wantedItems(model: BrickModel): WantedItem[] {
   const items = new Map<string, WantedItem>();
   for (const p of model.parts) {
-    const pieces = BRICKLINK_PARTS[p.part];
+    const pieces = bricklinkFor(p.part);
     if (!pieces) throw new Error(`No BrickLink ID for part ${p.part}`);
     const color = BRICKLINK_COLORS[p.color];
     if (color === undefined) throw new Error(`No BrickLink colour for ${p.color}`);

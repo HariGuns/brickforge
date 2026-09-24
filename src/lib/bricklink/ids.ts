@@ -6,6 +6,8 @@
  * its frame) list each piece.
  */
 
+import { getPart } from "../parts/library";
+
 export interface BrickLinkItem {
   /** BrickLink part number. */
   id: string;
@@ -68,6 +70,18 @@ export const BRICKLINK_PARTS: Record<string, BrickLinkItem[]> = {
   flower_1x1: [{ id: "24866" }],
   flower_1x1_tabs: [{ id: "33291" }],
 };
+
+/**
+ * BrickLink items for any part: the table above for core parts; for catalog
+ * parts their own list (wheels = rim + tyre) or, by default, the LDraw
+ * number, which BrickLink uses for the great majority of parts.
+ */
+export function bricklinkFor(partId: string): BrickLinkItem[] | null {
+  if (BRICKLINK_PARTS[partId]) return BRICKLINK_PARTS[partId];
+  const def = getPart(partId);
+  if (!def) return null;
+  return def.bricklink ?? [{ id: def.ldraw.file.replace(/\.dat$/i, "") }];
+}
 
 /** Our colour id → BrickLink colour number. */
 export const BRICKLINK_COLORS: Record<string, number> = {

@@ -4,21 +4,23 @@
  */
 import { CONFIG } from "../config";
 import { COLORS } from "../parts/colors";
-import { PARTS, type PartDef } from "../parts/library";
+import { PARTS } from "../parts/library";
+import { partRow, PART_TABLE_HEADER } from "../parts/describe";
+import { coreMenu } from "../parts/search";
+import { mountsFor } from "../parts/wheels";
 
-function cellsText(cells: [number, number][] | undefined): string {
-  if (!cells) return "all";
-  if (cells.length === 0) return "none";
-  return cells.map(([x, z]) => `(${x},${z})`).join(" ");
+/** The core menu as a table (the rest of the catalog is found with search_parts). */
+export function partTable(): string {
+  return [PART_TABLE_HEADER, ...coreMenu().map(partRow)].join("\n");
 }
 
-export function partTable(): string {
-  const rows = PARTS.map((p) => `| ${p.id} | ${p.w}×${p.d} | ${p.h} | ${cellsText(p.studs)} | ${cellsText(p.bottom)} | ${p.hint ?? ""} |`);
-  return [
-    "| id | footprint at rot 0 (x×z studs) | height (plates) | top studs (local x,z) | underside takes studs at | notes |",
-    "|---|---|---|---|---|---|",
-    ...rows,
-  ].join("\n");
+/** A worked wheel example, computed from the real part data so it's always right. */
+function wheelExample(): string {
+  const holder = { part: "4600", color: "black", x: 10, y: 2, z: 5, rot: 0 as const };
+  const m = mountsFor(holder, "4624c01");
+  if (m.length < 2) return "";
+  const at = (i: number) => `{"part":"4624c01","x":${m[i].at.x},"y":${m[i].at.y},"z":${m[i].at.z},"rot":${m[i].at.rot}}`;
+  return `Example: a plate 2×2 with wheel pins (4600) at x=10, y=2, z=5, rot 0 has pins on its +x and −x sides. Small wheels go at ${at(0)} (right) and ${at(1)} (left); they reach down to y=0, so the car stands on its wheels.`;
 }
 
 export function colorList(): string {
@@ -37,7 +39,10 @@ export function systemPrompt(): string {
 - Build area: x 0..${grid.x - 1}, z 0..${grid.z - 1}, y 0..${grid.y - 1}. At most ${maxParts} parts.
 
 # Parts
+Core menu (${coreMenu().length} of ${PARTS.length} parts; find the others with the search_parts tool):
 ${partTable()}
+
+Studs and anti-studs: a stud "(x,z)" is on top of the part; "(x,z)@n" stands on a surface n plates above the part's bottom (a lower step). "all" = every cell on top / underneath. An anti-stud "(x,z)@n" is a recess n plates up that takes a stud from a part below whose top is at that height.
 
 Slopes (slope45_*, slope33_*): the slope face descends away from the stud row, and only the stud row has studs.
 - rot 0: studs on the min-z row, slope faces front (+z)
@@ -46,6 +51,16 @@ Slopes (slope45_*, slope33_*): the slope face descends away from the stud row, a
 - rot 270: studs on the min-x column, slope faces right (+x)
 33° slopes are 3 deep (a gentler roof). Ridges (ridge45_*) slope down on both long sides and cap a roof; nothing attaches on top.
 Slopes and ridges occupy their whole bounding box for collision purposes.
+
+Catalog slopes, curved slopes, wedges and windscreens (ids that are LDraw part numbers) use the same convention as slope45_*: at rot 0 the high, studded side is the min-z row and the part descends/tapers toward +z. Left and right versions of a part are separate ids. Parts fill only their own shape for collisions (e.g. under a curved slope's thin end).
+
+# Finding more parts: the search_parts tool
+The catalog has ${PARTS.length} parts. Before designing, search for anything the core menu lacks: curved and wedge shapes, specific sizes, grilles, mudguards, windscreens, wheels, holders, round and panel parts. Search by what the part is ("curved slope 4x1", "wedge plate right", "mudguard", "tile 1x6"). Use only ids from the core menu or from search results; don't invent ids.
+
+# Wheels (vehicles)
+A wheel attaches only through a holder's pin: its hub must sit exactly on a free pin of the same kind (wheel pin "wpin" or Technic pin "tpin"). The wheel's table row says which. A wheel at rot 0 has its hub facing −x, so it mounts on a pin pointing +x (right side); use rot 180 for a pin pointing −x (left side), rot 90 / 270 for pins along z.
+${wheelExample()}
+The checker names the exact placement if a wheel is off its pin. Holders with pins: plate 2×2 with wheel pins (4600), car bases with wheel pins, brick 2×4 with Technic pins (6249), plate 2×4 with pins (30157a). Put holders under the chassis so the wheels reach the ground and stick out past the body; wheels have no studs, so nothing attaches to them.
 
 Other shaped parts:
 - Arches (arch_1x*) stand on their two end cells (the only underside connectors). The span between is just the top plate, leaving an opening 2 plates tall underneath for other parts. Studs run along the whole top.
@@ -56,8 +71,8 @@ Colors: ${colorList()}
 
 # Physical rules (all are checked)
 1. No two parts may occupy the same unit cell (1 stud × 1 stud × 1 plate).
-2. Connections exist only through studs: part B is attached to part A when B's bottom (B.y) equals A's top (A.y + A height) and A has a stud in at least one cell that B covers. Parts that merely touch side by side are NOT connected.
-3. Every part above the ground must sit on studs of at least one part directly below it. A part held only from above (hanging) is not allowed, because the model is built bottom-up.
+2. Connections exist only through studs (and wheels on pins): part B is attached to part A when one of A's studs is in a cell where B has an anti-stud at the same height (normally B's bottom, B.y, equals A's top, A.y + A height). Parts that merely touch side by side are NOT connected.
+3. Every part above the ground must sit on studs of at least one part below it, or hang on a wheel through a pin (holders and wheels). A part held only from above (hanging) is not allowed, because the model is built bottom-up.
 4. The whole model must be one connected structure through stud connections. Standing on the ground does not connect parts to each other.
 5. Tiles and the sloped part of slopes have no studs, so nothing can attach on top of them.
 

@@ -26,6 +26,15 @@ const CATEGORY_LABEL: Record<PartCategory, string> = {
   door: "Doors",
   fence: "Fences",
   flower: "Flowers",
+  curved: "Curved slopes",
+  wedge: "Wedges",
+  windscreen: "Windscreens",
+  panel: "Panels",
+  holder: "Wheel holders",
+  wheel: "Wheels",
+  vehicle: "Vehicle parts",
+  technic: "Technic bricks",
+  other: "Other",
 };
 
 /** Part × colour counts for the given part indices (default: all), in library order. */

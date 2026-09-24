@@ -1,4 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { catalogUsage, formatCatalogUsage } from "../parts/usage";
+import { searchPartsTool } from "./tools";
 import { apiKey, settingsEnabled } from "../settings/store";
 import { CONFIG } from "../config";
 import { BrickModelSchema, type BrickModel } from "../model/schema";
@@ -127,6 +129,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
       firstContent,
       firstText,
       schema: brickModelJsonSchema(),
+      tools: [searchPartsTool],
       parse: (text) => {
         const r = parseModel(text);
         return { value: r.model, issues: r.issues };
@@ -153,7 +156,9 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
     debugDir: debug.dir,
     pipeline: "single",
   };
-  debug.write("summary.json", { pipeline: "single", valid: result.valid, rounds: loop.rounds, total: loop.usage, partCount: result.model?.parts.length ?? 0 });
+  const catalog = catalogUsage(result.model);
+  console.log(`[generate] ${formatCatalogUsage(catalog)}`);
+  debug.write("summary.json", { pipeline: "single", valid: result.valid, rounds: loop.rounds, total: loop.usage, partCount: result.model?.parts.length ?? 0, catalog });
   if (result.model) debug.write("final-model.json", result.model);
   console.log(`[generate] done: valid=${result.valid}, ${loop.rounds.length} round(s) · total ${formatUsage(loop.usage)} · debug: ${debug.dir}`);
   onEvent({ type: "done", result });

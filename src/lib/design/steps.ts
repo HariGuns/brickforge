@@ -2,6 +2,7 @@ import type { BrickModel } from "../model/schema";
 import type { BuildStep } from "../steps/steps";
 import { compileDesign, compileSubBuild, type CompileResult } from "./compile";
 import type { BrickDesign } from "./schema";
+import { getPart } from "../parts/library";
 
 /**
  * Build steps for a design, like printed manuals: each unique sub-build is
@@ -63,7 +64,9 @@ function containerSteps(model: BrickModel, compiled: CompileResult, parent: numb
       copy: { sub: inst.sub, name: inst.name },
     });
   }
-  units.sort((a, b) => a.y - b.y || a.z - b.z || a.x - b.x);
+  // Wheels go on last, after the holders they hang from.
+  const isWheel = (u: (typeof units)[number]) => !u.copy && u.parts.length === 1 && !!getPart(model.parts[u.parts[0]].part)?.hub;
+  units.sort((a, b) => Number(isWheel(a)) - Number(isWheel(b)) || a.y - b.y || a.z - b.z || a.x - b.x);
 
   const steps: DesignStep[] = [];
   const push = (y: number, group: typeof units) => {
@@ -72,9 +75,11 @@ function containerSteps(model: BrickModel, compiled: CompileResult, parent: numb
     steps.push({ n: 0, y, parts: group.flatMap((u) => u.parts), ownParts: group.filter((u) => !u.copy).flatMap((u) => u.parts), copies: [...copies.values()] });
   };
   // Per layer: copies of the same sub-build together (up to 4 per step), loose parts in balanced chunks.
-  const ys = [...new Set(units.map((u) => u.y))];
-  for (const y of ys) {
-    const layer = units.filter((u) => u.y === y);
+  const layerOf = (u: (typeof units)[number]) => (isWheel(u) ? Infinity : u.y);
+  const ys = [...new Set(units.map(layerOf))];
+  for (const ly of ys) {
+    const layer = units.filter((u) => layerOf(u) === ly);
+    const y = ly === Infinity ? Math.min(...layer.map((u) => u.y)) : ly;
     const bySub = new Map<string, typeof units>();
     for (const u of layer.filter((u) => u.copy)) (bySub.get(u.copy!.sub) ?? bySub.set(u.copy!.sub, []).get(u.copy!.sub)!).push(u);
     for (const group of bySub.values()) for (let i = 0; i < group.length; i += MAX_COPIES_PER_STEP) push(y, group.slice(i, i + MAX_COPIES_PER_STEP));

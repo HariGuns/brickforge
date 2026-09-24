@@ -143,7 +143,7 @@ export function assemblyJsonSchema(partIds: readonly string[], colorIds: readonl
   const placement = {
     type: "object",
     properties: {
-      part: { type: "string", enum: partIds },
+      part: { type: "string" },
       color: { type: "string", enum: colorIds },
       x: { type: "integer" },
       y: { type: "integer" },

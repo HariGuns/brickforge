@@ -12,13 +12,15 @@
     "typecheck": "tsc --noEmit",
     "gen": "tsx scripts/gen.ts",
     "export-sample": "tsx scripts/export-sample.ts",
-    "verify-ldraw": "tsx scripts/verify-ldraw.ts",
+    "verify-ldraw": "tsx scripts/verify-ldraw.ts && tsx scripts/verify-catalog.ts",
     "bench": "tsx scripts/bench.ts",
     "probe-ldraw": "tsx scripts/probe-ldraw.ts",
     "launch": "scripts/launch.sh",
     "stop": "scripts/stop.sh",
     "install-launcher": "scripts/install-launcher.sh",
-    "appimage": "scripts/build-appimage.sh"
+    "appimage": "scripts/build-appimage.sh",
+    "build-catalog": "tsx scripts/build-catalog.ts",
+    "catalog-usage": "tsx scripts/catalog-usage.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

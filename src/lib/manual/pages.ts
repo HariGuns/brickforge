@@ -32,6 +32,8 @@ export interface ManualPage {
 export function sizeLabel(partId: string): string {
   const def = getPart(partId);
   if (!def) return partId;
+  // Catalog parts: their (shortened) LDraw name says what they are better than a size does.
+  if (def.source === "catalog") return def.name.replace(/^(Slope Brick|Plate|Brick) /, "").replace(/ \(.*\)$/, "").slice(0, 26);
   const dims = `${Math.min(def.w, def.d)}×${Math.max(def.w, def.d)}`;
   const tall = `${dims}×${def.h / 3}`;
   switch (def.category) {

@@ -31,6 +31,8 @@ export interface Turn {
   rounds: RoundState[];
   /** Sub-build path stages, in the order they started. */
   stages?: StageState[];
+  /** Part searches Claude made (search_parts), latest last. */
+  searches?: string[];
   result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string; parts?: number; subBuilds?: number; copies?: number; compileMs?: number };
   error?: string;
 }
@@ -122,6 +124,10 @@ function trackerRows(t: Turn): Row[] {
         ? `writing · ${k(r0.outputChars)} chars`
         : `thinking · ${k(r0.thinkingChars)} chars`
       : "";
+  if (t.searches?.length) {
+    const last = t.searches.at(-1)!.split(" → ")[0];
+    rows.push({ label: "Finding parts", state: r0?.summary || r0?.outputChars ? "done" : "active", note: `${t.searches.length} search${t.searches.length === 1 ? "" : "es"} · ${last}` });
+  }
   rows.push({ label: "Designing", state: r0?.summary ? "done" : t.status === "running" ? "active" : "todo", note: designNote });
 
   rows.push({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -9,7 +9,7 @@ import { COLOR_MAP } from "@/lib/parts/colors";
 import { getPart } from "@/lib/parts/library";
 import { footprint } from "@/lib/model/geometry";
 import type { BrickModel } from "@/lib/model/schema";
-import { partEdges, partGeometry, PLATE_H } from "./brickGeometry";
+import { loadPartMeshes, partEdges, partFixedPieces, partGeometry, PLATE_H } from "./brickGeometry";
 
 export interface ViewerProps {
   model: BrickModel | null;
@@ -45,6 +45,8 @@ function material(colorId: string, variant: "normal" | "highlight"): THREE.MeshS
       // Highlight brightens the part in its own hue so colours stay recognizable.
       emissive: variant === "highlight" ? new THREE.Color(c?.hex ?? "#ff00ff") : new THREE.Color("#000000"),
       emissiveIntensity: variant === "highlight" ? 0.3 : 0,
+      // LDraw meshes don't all have consistent winding.
+      side: THREE.DoubleSide,
     });
     materialCache.set(key, m);
   }
@@ -75,6 +77,15 @@ function InstancedGroup({ geo, mat, matrices }: { geo: THREE.BufferGeometry; mat
  * style, so thousands of parts take a few dozen draw calls instead of two each.
  */
 function Parts({ model, visible, highlight, errorParts, warnParts }: ViewerProps) {
+  // Catalog parts render from their LDraw meshes; rebuild once they've loaded.
+  const [meshTick, setMeshTick] = useState(0);
+  useEffect(() => {
+    let live = true;
+    if (model) loadPartMeshes(model.parts.map((p) => p.part)).then((changed) => live && changed && setMeshTick((t) => t + 1));
+    return () => {
+      live = false;
+    };
+  }, [model]);
   const scene = useMemo(() => {
     const groups = new Map<string, { geo: THREE.BufferGeometry; mat: THREE.Material; matrices: THREE.Matrix4[] }>();
     const edgeVerts: Record<"normal" | "highlight" | "error" | "warn", number[]> = { normal: [], highlight: [], error: [], warn: [] };
@@ -96,6 +107,12 @@ function Parts({ model, visible, highlight, errorParts, warnParts }: ViewerProps
       let g = groups.get(key);
       if (!g) groups.set(key, (g = { geo, mat: material(pl.color, hi ? "highlight" : "normal"), matrices: [] }));
       g.matrices.push(m);
+      partFixedPieces(pl.part).forEach((piece, k) => {
+        const fk = `${pl.part}|fixed${k}|${hi}`;
+        let fg = groups.get(fk);
+        if (!fg) groups.set(fk, (fg = { geo: piece.geo, mat: material(piece.colorId, hi ? "highlight" : "normal"), matrices: [] }));
+        fg.matrices.push(m);
+      });
 
       const err = errorParts?.has(i) ?? false;
       const style = err ? "error" : hi ? "highlight" : !err && warnParts?.has(i) ? "warn" : "normal";
@@ -114,7 +131,8 @@ function Parts({ model, visible, highlight, errorParts, warnParts }: ViewerProps
         return { key: k, geo: g, mat: k === "error" ? errorEdgeMat : k === "highlight" ? highlightEdgeMat : k === "warn" ? warnEdgeMat : edgeMat };
       });
     return { groups: [...groups.entries()], lines };
-  }, [model, visible, highlight, errorParts, warnParts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- meshTick: rebuild when meshes arrive
+  }, [model, visible, highlight, errorParts, warnParts, meshTick]);
 
   // Merged outline geometries are rebuilt on every change; free the old ones.
   useEffect(() => () => scene.lines.forEach((l) => l.geo.dispose()), [scene]);

@@ -21,9 +21,40 @@
  *
  * To add a part: add an entry here, run `npm run verify-ldraw`, and it becomes
  * available to Claude automatically (the prompt lists the library).
+ *
+ * The extended catalog (catalog.json, ~900 parts) is generated from the LDraw
+ * library and LDCad's shadow library by scripts/build-catalog.ts. Catalog
+ * parts can have studs and anti-studs at several heights, wheel pins and hubs,
+ * and render from real LDraw meshes (public/parts/<id>.bin). Claude sees the
+ * core menu (core.ts) in its prompt and finds the rest with the search_parts tool.
  */
 
-export type PartCategory = "brick" | "plate" | "tile" | "slope" | "round" | "cone" | "fence" | "arch" | "window" | "door" | "flower";
+import catalogJson from "./catalog.json";
+import type { CatalogEntry, ConnectorCell, Dir, PinDef } from "./catalogTypes";
+
+export type { ConnectorCell, Dir, PinDef, PinKind } from "./catalogTypes";
+
+export type PartCategory =
+  | "brick"
+  | "plate"
+  | "tile"
+  | "slope"
+  | "curved"
+  | "wedge"
+  | "round"
+  | "cone"
+  | "arch"
+  | "window"
+  | "windscreen"
+  | "door"
+  | "panel"
+  | "fence"
+  | "flower"
+  | "holder"
+  | "wheel"
+  | "vehicle"
+  | "technic"
+  | "other";
 
 /** How the 3D viewer draws the part (LDraw export always uses the real part). */
 export type PartShape = "box" | "slope" | "ridge" | "round" | "cone" | "fence" | "arch" | "window" | "door" | "flower";
@@ -38,10 +69,24 @@ export interface PartDef {
   w: number;
   d: number;
   h: number;
-  /** Top cells with studs, local [cx, cz]. Undefined = all cells. */
-  studs?: [number, number][];
-  /** Underside cells that take a stud from below, local [cx, cz]. Undefined = all cells. */
-  bottom?: [number, number][];
+  /** Studs, local [cx, cz] on top, or [cx, cz, level] at `level` plates above the bottom. Undefined = every top cell. */
+  studs?: ConnectorCell[];
+  /** Anti-studs (take a stud from below), local [cx, cz] at the bottom or [cx, cz, level]. Undefined = every cell at the bottom. */
+  bottom?: ConnectorCell[];
+  /** Wheel pins sticking out of the part (wheel holders). */
+  pins?: PinDef[];
+  /** A wheel's hub: it attaches only by sitting exactly on a free pin of its kind. */
+  hub?: PinDef;
+  /** Left/right counterpart (for mirrored sub-builds). */
+  mirror?: string;
+  /** "core": hand-made, always in Claude's prompt. "catalog": generated, found with search_parts. */
+  source?: "core" | "catalog";
+  /** Rendered from its LDraw mesh (public/parts/<id>.bin) rather than a hand-made shape. */
+  mesh?: boolean;
+  /** Anti-studs inferred from geometry (the shadow library has none for this part). */
+  inferred?: boolean;
+  /** BrickLink items when they differ from the LDraw number. */
+  bricklink?: { id: string; color?: number }[];
   /** Space the part fills, for collisions. Undefined = its whole box. */
   solids?: Solid[];
   shape?: PartShape;
@@ -113,7 +158,7 @@ function slope(w: number, file: string): PartDef {
   };
 }
 
-export const PARTS: PartDef[] = [
+export const CORE_PARTS: PartDef[] = [
   brick(1, 1, "3005.dat"),
   brick(2, 1, "3004.dat"),
   brick(3, 1, "3622.dat"),
@@ -284,6 +329,34 @@ function window(id: string, name: string, h: number, file: string): PartDef {
   return { id, name, category: "window", shape: "window", w: 2, d: 1, h, massFactor: 0.4, ldraw: { file, yaw: 0 }, hint: `frame with clear glass, ${h / BRICK} bricks tall; 2 studs on top` };
 }
 
+for (const p of CORE_PARTS) p.source = "core";
+
+/** Extended catalog, generated from LDraw + LDCad shadow data (see scripts/build-catalog.ts). */
+export const CATALOG_PARTS: PartDef[] = (catalogJson as unknown as { parts: CatalogEntry[] }).parts.map((e) => ({
+  id: e.id,
+  name: e.name,
+  category: e.cat as PartCategory,
+  w: e.w,
+  d: e.d,
+  h: e.h,
+  ...(e.studs ? { studs: e.studs } : {}),
+  ...(e.bottom ? { bottom: e.bottom } : {}),
+  ...(e.solids ? { solids: e.solids } : {}),
+  ...(e.pins ? { pins: e.pins } : {}),
+  ...(e.hub ? { hub: e.hub } : {}),
+  ...(e.mirror ? { mirror: e.mirror } : {}),
+  ...(e.bricklink ? { bricklink: e.bricklink } : {}),
+  ...(e.inferred ? { inferred: true } : {}),
+  ...(e.hint ? { hint: e.hint } : {}),
+  massFactor: e.mass,
+  ldraw: { file: e.ldraw.file, yaw: e.ldraw.yaw, origin: e.ldraw.origin },
+  source: "catalog",
+  mesh: true,
+}));
+
+/** Every part: the hand-made core first, then the catalog. */
+export const PARTS: PartDef[] = [...CORE_PARTS, ...CATALOG_PARTS];
+
 export const PART_MAP: ReadonlyMap<string, PartDef> = new Map(PARTS.map((p) => [p.id, p]));
 export const PART_IDS = PARTS.map((p) => p.id) as [string, ...string[]];
 
@@ -291,11 +364,11 @@ export function getPart(id: string): PartDef | undefined {
   return PART_MAP.get(id);
 }
 
-/** Local underside cells that accept a stud (resolves the "all cells" default). */
-export function localBottom(p: PartDef): [number, number][] {
-  if (p.bottom) return p.bottom;
-  const out: [number, number][] = [];
-  for (let cz = 0; cz < p.d; cz++) for (let cx = 0; cx < p.w; cx++) out.push([cx, cz]);
+/** Local anti-studs [cx, cz, level] (resolves the "every cell at the bottom" default). */
+export function localBottom(p: PartDef): [number, number, number][] {
+  if (p.bottom) return p.bottom.map(([x, z, l]) => [x, z, l ?? 0]);
+  const out: [number, number, number][] = [];
+  for (let cz = 0; cz < p.d; cz++) for (let cx = 0; cx < p.w; cx++) out.push([cx, cz, 0]);
   return out;
 }
 
@@ -304,10 +377,18 @@ export function localSolids(p: PartDef): Solid[] {
   return p.solids ?? [[0, 0, p.w, p.d, 0, p.h]];
 }
 
-/** Local top-stud cells of a part (resolves the "all cells" default). */
-export function localStuds(p: PartDef): [number, number][] {
-  if (p.studs) return p.studs;
-  const out: [number, number][] = [];
-  for (let cz = 0; cz < p.d; cz++) for (let cx = 0; cx < p.w; cx++) out.push([cx, cz]);
+/** Local studs [cx, cz, level] (resolves the "every top cell" default; level = plates above the bottom). */
+export function localStuds(p: PartDef): [number, number, number][] {
+  if (p.studs) return p.studs.map(([x, z, l]) => [x, z, l ?? p.h]);
+  const out: [number, number, number][] = [];
+  for (let cz = 0; cz < p.d; cz++) for (let cx = 0; cx < p.w; cx++) out.push([cx, cz, p.h]);
   return out;
 }
+
+/** Direction after turning a part by `rot` (local +x → world +z at rot 90). */
+export function rotateDir(dir: Dir, rot: 0 | 90 | 180 | 270): Dir {
+  const order: Dir[] = ["+x", "+z", "-x", "-z"];
+  return order[(order.indexOf(dir) + rot / 90) % 4];
+}
+
+export const oppositeDir = (d: Dir): Dir => rotateDir(d, 180);

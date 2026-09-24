@@ -33,9 +33,9 @@ describe("geometry", () => {
   });
   it("slope studs follow rotation (rot 0 back row is z=0, rot 90 moves it to max x)", () => {
     const s = getPart("slope45_2x2")!;
-    expect(worldStuds({ part: s.id, color: "red", x: 0, y: 0, z: 0, rot: 0 }, s)).toEqual([[0, 0], [1, 0]]);
-    expect(worldStuds({ part: s.id, color: "red", x: 0, y: 0, z: 0, rot: 90 }, s)).toEqual([[1, 0], [1, 1]]);
-    expect(worldStuds({ part: s.id, color: "red", x: 0, y: 0, z: 0, rot: 180 }, s).sort()).toEqual([[0, 1], [1, 1]]);
-    expect(worldStuds({ part: s.id, color: "red", x: 0, y: 0, z: 0, rot: 270 }, s).sort()).toEqual([[0, 0], [0, 1]]);
+    expect(worldStuds({ part: s.id, color: "red", x: 0, y: 0, z: 0, rot: 0 }, s)).toEqual([[0, 0, 3], [1, 0, 3]]);
+    expect(worldStuds({ part: s.id, color: "red", x: 0, y: 0, z: 0, rot: 90 }, s)).toEqual([[1, 0, 3], [1, 1, 3]]);
+    expect(worldStuds({ part: s.id, color: "red", x: 0, y: 0, z: 0, rot: 180 }, s).sort()).toEqual([[0, 1, 3], [1, 1, 3]]);
+    expect(worldStuds({ part: s.id, color: "red", x: 0, y: 0, z: 0, rot: 270 }, s).sort()).toEqual([[0, 0, 3], [0, 1, 3]]);
   });
 });

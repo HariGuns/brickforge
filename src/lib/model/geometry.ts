@@ -1,4 +1,4 @@
-import { getPart, localBottom, localSolids, localStuds, type PartDef } from "../parts/library";
+import { getPart, localBottom, localSolids, localStuds, rotateDir, type Dir, type PartDef, type PinDef } from "../parts/library";
 import type { Placement, Rot } from "./schema";
 
 /**
@@ -51,21 +51,56 @@ export function footprintCells(fp: Footprint): [number, number][] {
   return out;
 }
 
-/** World cells [x, z] that carry a stud on top of the part. */
-export function worldStuds(pl: Placement, def: PartDef): [number, number][] {
-  return localStuds(def).map(([cx, cz]) => {
+/** Studs as world [x, z, y]: the cell, and the height (plates) of the surface the stud stands on. */
+export function worldStuds(pl: Placement, def: PartDef): [number, number, number][] {
+  return localStuds(def).map(([cx, cz, level]) => {
     const [ox, oz] = rotateCell(cx, cz, def, pl.rot);
-    return [pl.x + ox, pl.z + oz];
+    return [pl.x + ox, pl.z + oz, pl.y + level];
   });
 }
 
-/** World cells [x, z] of the part's underside that accept a stud from below. */
-export function worldBottom(pl: Placement, def: PartDef): [number, number][] {
-  return localBottom(def).map(([cx, cz]) => {
+/** Anti-studs as world [x, z, y]: the cell, and the height (plates) of the face that takes a stud from below. */
+export function worldBottom(pl: Placement, def: PartDef): [number, number, number][] {
+  return localBottom(def).map(([cx, cz, level]) => {
     const [ox, oz] = rotateCell(cx, cz, def, pl.rot);
-    return [pl.x + ox, pl.z + oz];
+    return [pl.x + ox, pl.z + oz, pl.y + level];
   });
 }
+
+/** Map a local point (studs, not a cell) into the rotated footprint, like rotateCell does for cells. */
+export function rotatePoint(px: number, pz: number, p: PartDef, rot: Rot): [number, number] {
+  switch (rot) {
+    case 0:
+      return [px, pz];
+    case 90:
+      return [p.d - pz, px];
+    case 180:
+      return [p.w - px, p.d - pz];
+    case 270:
+      return [pz, p.w - px];
+  }
+}
+
+export interface WorldPin {
+  kind: PinDef["kind"];
+  /** World point: x/z in studs, y in plates. */
+  at: [number, number, number];
+  dir: Dir;
+}
+
+function toWorld(pl: Placement, def: PartDef, p: PinDef): WorldPin {
+  const [ox, oz] = rotatePoint(p.at[0], p.at[2], def, pl.rot);
+  return { kind: p.kind, at: [pl.x + ox, pl.y + p.at[1], pl.z + oz], dir: rotateDir(p.dir, pl.rot) };
+}
+
+/** A wheel holder's pins, in world space. */
+export const worldPins = (pl: Placement, def: PartDef): WorldPin[] => (def.pins ?? []).map((p) => toWorld(pl, def, p));
+
+/** A wheel's hub, in world space (null for parts that aren't wheels). */
+export const worldHub = (pl: Placement, def: PartDef): WorldPin | null => (def.hub ? toWorld(pl, def, def.hub) : null);
+
+/** Key for matching a pin with a hub: same kind and point; the hub opens against the pin's direction. */
+export const pinKey = (kind: string, at: [number, number, number], dir: Dir) => `${kind}|${at.map((n) => (Math.round(n * 1000) / 1000).toFixed(3)).join(",")}|${dir}`;
 
 /** World unit cells [x, y, z] the part fills (its solids; the whole box for most parts). */
 export function worldSolidCells(pl: Placement, def: PartDef): [number, number, number][] {
