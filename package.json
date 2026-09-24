@@ -20,7 +20,8 @@
     "install-launcher": "scripts/install-launcher.sh",
     "appimage": "scripts/build-appimage.sh",
     "build-catalog": "tsx scripts/build-catalog.ts",
-    "catalog-usage": "tsx scripts/catalog-usage.ts"
+    "catalog-usage": "tsx scripts/catalog-usage.ts",
+    "token-report": "tsx scripts/token-report.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
