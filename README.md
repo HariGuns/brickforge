@@ -196,6 +196,7 @@ Where it shows up:
 `npm run token-report` shows where the tokens go, per stage, per model and effort, and per token kind (answer vs thinking, cache reads and writes), from every run in `debug/`. The baseline before the cost work is in `docs/token-report-before.md`: thinking was 74% of the cost, the JSON answers 18%, and input 8%.
 
 - **Model and effort per stage** (`CONFIG.stages`): analysis, plan, design, sub-build, assembly, edit, comparison, and `repair` for every repair round. Any stage can switch model or effort; each round logs which it used, and its cost uses that model's prices (`CONFIG.pricing`). Defaults: Opus 5.5 at effort high, except analysis and repairs at medium.
+- **Compact parts format** (`CONFIG.outputFormat`, `src/lib/diff/codec.ts`): Claude writes each part as one string, `"brick_2x4 red 3 0 5 90"`, and each copy as `"pine_tree 4 1 0 270"` (`" m"` for a mirror image). The same format is used in the listings it's shown. This is 47% of the JSON objects' size on a real 247-part model. Malformed lines come back as errors with their path; JSON objects are still accepted.
 - **Diffs:** repairs, chat edits and photo comparisons return only the changes (remove / set / add by index, copies and new sub-builds for designs), applied by code (`src/lib/diff`).
 
 ## Part catalog

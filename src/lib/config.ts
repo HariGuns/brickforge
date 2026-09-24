@@ -59,6 +59,11 @@ export const CONFIG = {
   structure: { gramsPerUnit: 0.0967, slopeFactor: 0.75, maxStackPlatesOnOneStud: 12, maxLoadOnOneStudG: 5, maxMomentPerStud: 6 },
   /** Repair rounds after the initial generation. */
   maxRepairRounds: 4,
+  /**
+   * How parts and copies are written in Claude's answers and in listings:
+   * "compact" strings ("brick_2x4 red 3 0 5 90") or "json" objects.
+   */
+  outputFormat: "compact" as "compact" | "json",
   /** Default model and effort; each stage can override them (see `stages`). */
   model: "claude-opus-5-5",
   effort: "high" as Effort,

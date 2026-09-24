@@ -5,6 +5,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { generateModel, parseModel, type GenerateEvent } from "./generate";
 import { CONFIG } from "../config";
 import { P, SAMPLE_HOUSE } from "../fixtures/samples";
+import { compactCodec } from "../diff/codec";
 
 /** Fake client whose stream() returns queued JSON answers and records requests. */
 function fakeClient(answers: string[]) {
@@ -65,7 +66,7 @@ describe("generate/repair loop (fake Claude)", () => {
     expect(second[1].role).toBe("assistant");
     expect((second[1].content as { type: string }[]).map((b) => b.type)).toEqual(["thinking", "text"]);
     expect(second[2].content).toMatch(/FLOATING/);
-    expect(second[2].content).toContain(`Your last answer, with indices:\n#0 ${JSON.stringify(broken.parts[0])}`);
+    expect(second[2].content).toContain(`Your last answer, with indices:\n#0 ${compactCodec.formatPlacement(broken.parts[0])}`);
     expect(requests[0].model).toBe(CONFIG.model);
     // The repair asks for changes, not the whole model; the result is the house without the stray brick.
     const schemaProps = (q: Anthropic.MessageCreateParams) => Object.keys(((q.output_config?.format?.schema ?? {}) as { properties?: object }).properties ?? {});
@@ -109,7 +110,7 @@ describe("edit mode (fake Claude)", () => {
     dirs.push(r.debugDir);
     const first = requests[0].messages[0].content as string;
     expect(first).toContain("Change request: add a chimney");
-    expect(first).toContain(`#0 ${JSON.stringify(SAMPLE_HOUSE.parts[0])}`);
+    expect(first).toContain(`#0 ${compactCodec.formatPlacement(SAMPLE_HOUSE.parts[0])}`);
     expect(first).toContain(`Parts (${SAMPLE_HOUSE.parts.length})`);
     expect(r.valid).toBe(true);
     expect(r.model?.parts).toEqual(edited.parts);

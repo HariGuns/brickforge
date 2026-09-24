@@ -1,4 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { decodeAnswer } from "../diff/codec";
 import { applyAssemblyDiff, applyDesignDiff, applyModelDiff, assemblyDiffJsonSchema, DESIGN_DIFF_INSTRUCTIONS, designDiffJsonSchema, DIFF_INSTRUCTIONS, modelDiffJsonSchema } from "../diff/diff";
 import { codec } from "../diff/format";
 import { designListing, modelListing } from "../prompts/edit";
@@ -11,8 +12,6 @@ import { catalogUsage, formatCatalogUsage } from "../parts/usage";
 import { searchPartsTool } from "./tools";
 import { z } from "zod";
 import { CONFIG } from "../config";
-import { PART_IDS } from "../parts/library";
-import { COLOR_IDS } from "../parts/colors";
 import { BrickModelSchema, PlacementSchema, type BrickModel } from "../model/schema";
 import { brickModelJsonSchema } from "../model/jsonSchema";
 import { InstanceSchema, SUB_ID, type BrickDesign } from "../design/schema";
@@ -65,7 +64,9 @@ function parseJson<T>(text: string, schema: z.ZodType<T>): { value: T | null; is
   } catch (e) {
     return { value: null, issues: [invalidOutput(`Output was not valid JSON (${(e as Error).message}).`)] };
   }
-  const r = schema.safeParse(json);
+  const d = decodeAnswer(json, codec());
+  if (d.problems.length) return { value: null, issues: d.problems.slice(0, 20).map((m) => invalidOutput(m)) };
+  const r = schema.safeParse(d.json);
   return r.success ? { value: r.data, issues: [] } : { value: null, issues: r.error.issues.slice(0, 20).map((i) => invalidOutput(`${i.path.join(".")}: ${i.message}`)) };
 }
 
@@ -245,7 +246,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
       system,
       firstContent: withImage(aText),
       firstText: aText,
-      schema: assemblyJsonSchema(PART_IDS, COLOR_IDS, subBuilds.map((s) => s.id)),
+      schema: assemblyJsonSchema(),
       tools: [searchPartsTool],
       parse: (t) => parseJson(t, AssemblySchema),
       diff: {

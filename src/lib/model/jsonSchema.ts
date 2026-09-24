@@ -1,4 +1,4 @@
-import { COLOR_IDS } from "../parts/colors";
+import { codec } from "../diff/format";
 
 /**
  * JSON schema for Claude's structured output (output_config.format). Written by
@@ -14,23 +14,10 @@ export function brickModelJsonSchema() {
       description: { type: "string" },
       parts: {
         type: "array",
-        items: {
-          type: "object",
-          properties: {
-            // Not an enum: the catalog is too large; unknown ids are reported by the validator.
-            part: { type: "string" },
-            color: { type: "string", enum: COLOR_IDS },
-            x: { type: "integer" },
-            y: { type: "integer" },
-            z: { type: "integer" },
-            rot: { type: "integer", enum: [0, 90, 180, 270] },
-          },
-          required: ["part", "color", "x", "y", "z", "rot"],
-          additionalProperties: false,
-        },
+        items: codec().placementSchema,
       },
     },
     required: ["name", "description", "parts"],
     additionalProperties: false,
-  } as const;
+  };
 }

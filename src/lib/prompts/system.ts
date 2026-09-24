@@ -3,6 +3,7 @@
  * generated from the library so they stay in sync.
  */
 import { CONFIG } from "../config";
+import { formatHelp } from "../diff/format";
 import { COLORS } from "../parts/colors";
 import { PARTS } from "../parts/library";
 import { partRow, PART_TABLE_HEADER } from "../parts/describe";
@@ -19,8 +20,8 @@ function wheelExample(): string {
   const holder = { part: "4600", color: "black", x: 10, y: 2, z: 5, rot: 0 as const };
   const m = mountsFor(holder, "4624c01");
   if (m.length < 2) return "";
-  const at = (i: number) => `{"part":"4624c01","x":${m[i].at.x},"y":${m[i].at.y},"z":${m[i].at.z},"rot":${m[i].at.rot}}`;
-  return `Example: a plate 2×2 with wheel pins (4600) at x=10, y=2, z=5, rot 0 has pins on its +x and −x sides. Small wheels go at ${at(0)} (right) and ${at(1)} (left); they reach down to y=0, so the car stands on its wheels.`;
+  const at = (i: number) => `x=${m[i].at.x}, y=${m[i].at.y}, z=${m[i].at.z}, rot=${m[i].at.rot}`;
+  return `Example: a plate 2×2 with wheel pins (4600) at x=10, y=2, z=5, rot 0 has pins on its +x and −x sides. Small wheels (4624c01) go at ${at(0)} (right) and ${at(1)} (left); they reach down to y=0, so the car stands on its wheels.`;
 }
 
 export function colorList(): string {
@@ -91,5 +92,5 @@ Colors: ${colorList()}
 Before answering, check your own placement layer by layer against the rules above: overlaps, the stud under every part, and bonding across seams.
 
 # Output
-Return JSON with: name (short), description (one or two sentences describing the model and its main features), parts (every placement, listed bottom layer first).`;
+Return JSON with: name (short), description (one or two sentences describing the model and its main features), parts (every placement, listed bottom layer first). ${formatHelp()}`;
 }

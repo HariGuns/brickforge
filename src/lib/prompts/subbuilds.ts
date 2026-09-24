@@ -4,6 +4,7 @@
  * Tune freely.
  */
 import { CONFIG } from "../config";
+import { codec, formatHelp } from "../diff/format";
 import type { Detail } from "../detail";
 import type { SurfaceMaps } from "../design/surface";
 
@@ -102,7 +103,7 @@ Rules for this sub-build:
 - Its bottom will stand on studs of the main build, so give it a studded-to-underside base where it touches down (plain bricks or plates at y = 0, not tiles on the bottom face).
 - Aim for about ${sub.parts} parts. Make it detailed and recognisable; it's a real piece of the final model.
 
-Return JSON with name "${sub.name}", a one-sentence description, and parts (listed bottom layer first).`;
+Return JSON with name "${sub.name}", a one-sentence description, and parts (listed bottom layer first). ${formatHelp()}`;
 }
 
 function surfaceText(m: SurfaceMaps): string {
@@ -128,7 +129,7 @@ ${built.map((b) => `- ${b.id} "${b.name}" (${b.parts} parts, planned ${b.copies}
 
 Return the main build:
 - parts: the main build's own parts — the base the copies stand on and glue parts that tie copies together or finish the model. Same rules as always.
-- uses: the copies, each { sub, x, y, z, rot, mirror }. (x, z) is where the min corner of the copy's (rotated) footprint goes; y is the height of the copy's bottom. A copy's cells rotate like a part's: at rot 90 a w × d footprint becomes d × w and its local cell (cx, cz) lands at (d-1-cz, cx) inside it; at rot 180 at (w-1-cx, d-1-cz); at rot 270 at (cz, w-1-cx).
+- uses: the copies, each with sub, x, y, z, rot and mirror. (x, z) is where the min corner of the copy's (rotated) footprint goes; y is the height of the copy's bottom. A copy's cells rotate like a part's: at rot 90 a w × d footprint becomes d × w and its local cell (cx, cz) lands at (d-1-cz, cx) inside it; at rot 180 at (w-1-cx, d-1-cz); at rot 270 at (cz, w-1-cx).
 - mirror: true makes the copy the mirror image of the sub-build (left/right): it's flipped along the sub-build's own x axis (local cell (cx, cz) → (w-1-cx, cz)) before rot is applied, and handed parts are swapped automatically (wedge right ↔ left, wheels turn to face the other way). Use it for the opposite side of a symmetric subject; use mirror: false for plain copies. A few parts have no mirror image; the checker names them.
 
 Rules the compiler checks:
@@ -137,45 +138,18 @@ Rules the compiler checks:
 - Everything together must be one connected structure, buildable bottom-up. Things only connect through studs.
 - Build area: x 0..${g.x - 1}, z 0..${g.z - 1}; at most ${CONFIG.design.maxParts} parts after expanding copies.
 
-Place roughly the planned number of copies. Return JSON with name, description, parts and uses.`;
+Place roughly the planned number of copies. Return JSON with name, description, parts and uses. ${formatHelp(codec(), true)}`;
 }
 
-export function assemblyJsonSchema(partIds: readonly string[], colorIds: readonly string[], subIds: string[]): Record<string, unknown> {
-  const placement = {
-    type: "object",
-    properties: {
-      part: { type: "string" },
-      color: { type: "string", enum: colorIds },
-      x: { type: "integer" },
-      y: { type: "integer" },
-      z: { type: "integer" },
-      rot: { type: "integer", enum: [0, 90, 180, 270] },
-    },
-    required: ["part", "color", "x", "y", "z", "rot"],
-    additionalProperties: false,
-  };
+export function assemblyJsonSchema(): Record<string, unknown> {
+  const c = codec();
   return {
     type: "object",
     properties: {
       name: { type: "string" },
       description: { type: "string" },
-      parts: { type: "array", items: placement },
-      uses: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            sub: { type: "string", enum: subIds },
-            x: { type: "integer" },
-            y: { type: "integer" },
-            z: { type: "integer" },
-            rot: { type: "integer", enum: [0, 90, 180, 270] },
-            mirror: { type: "boolean" },
-          },
-          required: ["sub", "x", "y", "z", "rot", "mirror"],
-          additionalProperties: false,
-        },
-      },
+      parts: { type: "array", items: c.placementSchema },
+      uses: { type: "array", items: c.instanceSchema },
     },
     required: ["name", "description", "parts", "uses"],
     additionalProperties: false,

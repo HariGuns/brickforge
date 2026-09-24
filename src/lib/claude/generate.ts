@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { decodeAnswer } from "../diff/codec";
 import { catalogUsage, formatCatalogUsage } from "../parts/usage";
 import { searchPartsTool } from "./tools";
 import { apiKey, settingsEnabled } from "../settings/store";
@@ -95,7 +96,9 @@ export function parseModel(text: string): { model: BrickModel | null; issues: Is
 
 /** A model from already-parsed JSON (e.g. the model inside a comparison answer). */
 export function parseModelJson(json: unknown): { model: BrickModel | null; issues: Issue[] } {
-  const r = BrickModelSchema.safeParse(json);
+  const d = decodeAnswer(json, codec());
+  if (d.problems.length) return { model: null, issues: d.problems.slice(0, 20).map((m) => invalidOutput(m)) };
+  const r = BrickModelSchema.safeParse(d.json);
   if (!r.success) {
     const issues = r.error.issues.slice(0, 20).map((i) => invalidOutput(`${i.path.join(".")}: ${i.message}`));
     return { model: null, issues };
