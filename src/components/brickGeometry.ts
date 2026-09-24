@@ -33,7 +33,7 @@ function extrudeProfile(def: PartDef, pts: [number, number][]): G {
   g.rotateY(Math.PI / 2);
   g.translate(GAP, 0, 0);
   g.deleteAttribute("uv");
-  const flat = g.toNonIndexed();
+  const flat = g.index ? g.toNonIndexed() : g;
   flat.computeVertexNormals();
   return flat;
 }
@@ -128,7 +128,7 @@ export function partGeometry(partId: string): THREE.BufferGeometry | null {
   const pieces: THREE.BufferGeometry[] = [bodyGeometry(def).clone()];
   const top = def.h * PLATE_H - GAP;
   for (const [cx, cz] of localStuds(def)) {
-    const s = new THREE.CylinderGeometry(STUD_R, STUD_R, STUD_H, 16).toNonIndexed();
+    const s = new THREE.CylinderGeometry(STUD_R, STUD_R, STUD_H, 12).toNonIndexed();
     s.translate(cx + 0.5 - def.w / 2, top + STUD_H / 2, cz + 0.5 - def.d / 2);
     pieces.push(s);
   }

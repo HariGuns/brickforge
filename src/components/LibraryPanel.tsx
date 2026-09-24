@@ -20,6 +20,7 @@ function Card({ e, selected, onPick }: { e: LibraryEntry; selected: boolean; onP
         {e.description ? <span className="lib-desc">{e.description}</span> : e.source && <span className="lib-desc">{e.source}</span>}
         <span className="lib-meta">
           {e.parts} pieces
+          {e.subBuilds ? ` · ${e.subBuilds} sub-builds` : ""}
           {e.valid !== null && (
             <>
               {" · "}

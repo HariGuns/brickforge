@@ -37,6 +37,8 @@ export function TopBar(props: {
   model: BrickModel | null;
   stats: ModelStats | null;
   steps: number;
+  /** Unique sub-builds, when the model has a sub-build design. */
+  subBuilds?: number;
   problems: number;
   theme: "light" | "dark";
   onToggleTheme: () => void;
@@ -66,8 +68,9 @@ export function TopBar(props: {
     ? [
         { n: fmt(stats.pieces), l: "pieces" },
         { n: fmt(props.steps), l: "steps" },
+        ...(props.subBuilds !== undefined ? [{ n: fmt(props.subBuilds), l: props.subBuilds === 1 ? "sub-build" : "sub-builds" }] : []),
         { n: `${stats.width}×${stats.depth}`, l: "studs" },
-        { n: fmt(stats.partTypes), l: "part types" },
+        ...(props.subBuilds === undefined ? [{ n: fmt(stats.partTypes), l: "part types" }] : []),
       ]
     : [];
 

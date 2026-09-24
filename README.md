@@ -46,7 +46,7 @@ The UI follows `design/brickforge-v2.html`.
   - **Undo/redo:** the top-bar buttons, or ⌘/Ctrl+Z and ⌘/Ctrl+Shift+Z, step through your changes. A new edit clears the redo steps but never deletes a version.
   - **Save** (⌘/Ctrl+S): writes the build with all its versions to `builds/<id>.json` (gitignored). Saved builds appear at the top of the Library.
   - **Unsaved work:** switching builds or leaving the page asks first. Logic: `src/lib/builds/doc.ts`; storage: `src/lib/builds/store.ts`.
-- **Not built yet:** Showcase, sub-builds and shared builds are disabled placeholders.
+- **Not built yet:** Showcase and shared builds are disabled placeholders.
 
 ## Sub-builds
 
@@ -80,9 +80,17 @@ Comparison at size Large (claude-opus-5-5, effort high):
 | Steam train, engine + three matching carriages | single | yes | 1 | 215 | – | $0.54 |
 | | sub-builds | yes | 6 (1 assembly repair) | 647 | 4 / 15 | $1.13 |
 | Village square, three houses, trees, well | single | yes | 1 | 247 | – | $0.67 |
-| | sub-builds | yes | 14 (2 sub-build + 1 assembly repair) | 1,014 | 8 / 23 | $2.57 |
+| | sub-builds | yes | 14 (3 sub-build + 1 assembly repair) | 1,014 | 8 / 23 | $2.57 |
 
 The village sub-build run was interrupted at assembly when the API credit ran out. It was finished with `--resume`, which reused the plan and all 8 valid sub-builds ($2.11 already spent) and ran only the assembly ($0.46).
+
+**In the app:**
+- **Top bar:** the real sub-build count.
+- **Design tab:** the sub-build tree with copy counts (click a node to highlight all its copies in 3D) and a stats panel: pieces, steps, pages, compile time, errors, warnings, and size in cm.
+- **Manual:** the sub-builds come first (deepest first), then the main build. Each page carries a "Sub-build · Pine tree ×4" tab, and main-build callouts show copies ("4× Corner Tower"). The Go to menu is grouped by sub-build, and the PDF follows the same order.
+- **Download `.mpd`:** one submodel per sub-build.
+- **Chat edits on a model with sub-builds:** Claude gets the design (each sub-build once) and returns the updated design, so changing a sub-build changes every copy. The reply names the changed sub-builds. For example, "make all three carriages dark blue" on the train changed only the Passenger Carriage (90 parts across 3 copies, $0.35).
+- **Speed:** the viewer uses instanced meshes and merged outlines. The 2,394-part castle draws in 187 draw calls instead of ~7,000.
 
 `.mpd` export for designs has one submodel per unique sub-build, with copies as references; the importer expands them back. Compiling ~4,600 parts in 425 nested copies takes about 60 ms (`npm run bench`).
 

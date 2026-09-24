@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { CONFIG } from "../config";
 import { BrickModelSchema, type BrickModel } from "../model/schema";
+import { BrickDesignSchema, type BrickDesign } from "../design/schema";
 import { importLdr } from "../ldraw/import";
 
 export const EXPORTS_DIR = "exports";
@@ -19,6 +20,8 @@ export interface LibraryEntry {
   /** ISO timestamp (debug: from the folder name; export: file mtime). */
   date: string;
   source: string | null;
+  /** Unique sub-builds, for runs made with the sub-build generator. */
+  subBuilds: number | null;
 }
 
 function readJson(file: string): unknown {
@@ -27,6 +30,11 @@ function readJson(file: string): unknown {
   } catch {
     return null;
   }
+}
+
+function debugDesign(dir: string): BrickDesign | null {
+  const d = BrickDesignSchema.safeParse(readJson(path.join(dir, "final-design.json")));
+  return d.success ? d.data : null;
 }
 
 function debugModel(dir: string): BrickModel | null {
@@ -60,7 +68,7 @@ export function listLibrary(): LibraryEntry[] {
       if (!fs.statSync(dir).isDirectory()) continue;
       const model = debugModel(dir);
       if (!model) continue;
-      const summary = readJson(path.join(dir, "summary.json")) as { valid?: boolean; rounds?: unknown[]; total?: { cost?: number } } | null;
+      const summary = readJson(path.join(dir, "summary.json")) as { valid?: boolean; rounds?: { round?: number }[]; total?: { cost?: number } } | null;
       const input = readJson(path.join(dir, "input.json")) as { mode?: string; text?: string | null; hasImage?: boolean } | null;
       seen.add(`${model.name}|${model.parts.length}`);
       out.push({
@@ -70,9 +78,11 @@ export function listLibrary(): LibraryEntry[] {
         description: model.description,
         parts: model.parts.length,
         valid: summary?.valid ?? null,
-        rounds: summary?.rounds?.length ?? null,
+        // Rounds after the first in each stage are repairs (sub-build runs have one loop per stage).
+        rounds: summary?.rounds ? 1 + summary.rounds.filter((r) => (r.round ?? 0) > 0).length : null,
         cost: summary?.total?.cost ?? null,
         date: debugDate(id),
+        subBuilds: debugDesign(dir)?.subBuilds.length ?? null,
         source: `${input?.mode === "edit" ? "Edit · " : ""}${input?.hasImage ? `Photo${input.text ? ` · ${input.text}` : ""}` : (input?.text ?? "")}` || null,
       });
     }
@@ -97,6 +107,7 @@ export function listLibrary(): LibraryEntry[] {
         cost: null,
         date: fs.statSync(file).mtime.toISOString(),
         source: `exports/${id}`,
+        subBuilds: null,
       });
     }
   }
@@ -105,13 +116,14 @@ export function listLibrary(): LibraryEntry[] {
 }
 
 /** Load one entry's model. `id` must name an existing entry (no path traversal). */
-export function loadLibraryModel(kind: string, id: string): { model: BrickModel; skipped: number } | null {
+export function loadLibraryModel(kind: string, id: string): { model: BrickModel; skipped: number; design?: BrickDesign } | null {
   if (path.basename(id) !== id || id.startsWith(".")) return null;
   if (kind === "debug") {
     const dir = path.join(path.resolve(CONFIG.debugDir), id);
     if (!fs.existsSync(dir)) return null;
     const model = debugModel(dir);
-    return model ? { model, skipped: 0 } : null;
+    const design = debugDesign(dir);
+    return model ? { model, skipped: 0, ...(design ? { design } : {}) } : null;
   }
   if (kind === "export" && /\.ldr$/i.test(id)) {
     const file = path.join(path.resolve(EXPORTS_DIR), id);

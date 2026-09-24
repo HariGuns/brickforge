@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -55,27 +55,79 @@ const highlightEdgeMat = new THREE.LineBasicMaterial({ color: "#ffb000" });
 const errorEdgeMat = new THREE.LineBasicMaterial({ color: "#ff2d2d" });
 const warnEdgeMat = new THREE.LineBasicMaterial({ color: "#f2a900" });
 
+/** One instanced mesh for every copy of a part type in one colour and highlight state. */
+function InstancedGroup({ geo, mat, matrices }: { geo: THREE.BufferGeometry; mat: THREE.Material; matrices: THREE.Matrix4[] }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    matrices.forEach((m, i) => mesh.setMatrixAt(i, m));
+    mesh.count = matrices.length;
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, [matrices]);
+  return <instancedMesh ref={ref} args={[geo, mat, matrices.length]} castShadow receiveShadow frustumCulled={false} />;
+}
+
+/**
+ * Instanced rendering: parts are grouped by (part, colour, highlighted) into
+ * instanced meshes, and all outlines are merged into one line set per outline
+ * style, so thousands of parts take a few dozen draw calls instead of two each.
+ */
 function Parts({ model, visible, highlight, errorParts, warnParts }: ViewerProps) {
+  const scene = useMemo(() => {
+    const groups = new Map<string, { geo: THREE.BufferGeometry; mat: THREE.Material; matrices: THREE.Matrix4[] }>();
+    const edgeVerts: Record<"normal" | "highlight" | "error" | "warn", number[]> = { normal: [], highlight: [], error: [], warn: [] };
+    const v = new THREE.Vector3();
+    model?.parts.forEach((pl, i) => {
+      if (visible && !visible.has(i)) return;
+      const def = getPart(pl.part);
+      const geo = partGeometry(pl.part);
+      const edges = partEdges(pl.part);
+      if (!def || !geo || !edges) return;
+      const fp = footprint(pl, def);
+      const m = new THREE.Matrix4().compose(
+        new THREE.Vector3(fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2),
+        new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (-pl.rot * Math.PI) / 180),
+        new THREE.Vector3(1, 1, 1),
+      );
+      const hi = highlight?.has(i) ?? false;
+      const key = `${pl.part}|${pl.color}|${hi}`;
+      let g = groups.get(key);
+      if (!g) groups.set(key, (g = { geo, mat: material(pl.color, hi ? "highlight" : "normal"), matrices: [] }));
+      g.matrices.push(m);
+
+      const err = errorParts?.has(i) ?? false;
+      const style = err ? "error" : hi ? "highlight" : !err && warnParts?.has(i) ? "warn" : "normal";
+      const pos = edges.getAttribute("position") as THREE.BufferAttribute;
+      const out = edgeVerts[style];
+      for (let k = 0; k < pos.count; k++) {
+        v.fromBufferAttribute(pos, k).applyMatrix4(m);
+        out.push(v.x, v.y, v.z);
+      }
+    });
+    const lines = (Object.keys(edgeVerts) as (keyof typeof edgeVerts)[])
+      .filter((k) => edgeVerts[k].length)
+      .map((k) => {
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(edgeVerts[k], 3));
+        return { key: k, geo: g, mat: k === "error" ? errorEdgeMat : k === "highlight" ? highlightEdgeMat : k === "warn" ? warnEdgeMat : edgeMat };
+      });
+    return { groups: [...groups.entries()], lines };
+  }, [model, visible, highlight, errorParts, warnParts]);
+
+  // Merged outline geometries are rebuilt on every change; free the old ones.
+  useEffect(() => () => scene.lines.forEach((l) => l.geo.dispose()), [scene]);
+
   if (!model) return null;
   return (
     <group>
-      {model.parts.map((pl, i) => {
-        if (visible && !visible.has(i)) return null;
-        const def = getPart(pl.part);
-        const geo = partGeometry(pl.part);
-        const edges = partEdges(pl.part);
-        if (!def || !geo || !edges) return null;
-        const fp = footprint(pl, def);
-        const hi = highlight?.has(i) ?? false;
-        const err = errorParts?.has(i) ?? false;
-        const warn = !err && (warnParts?.has(i) ?? false);
-        return (
-          <group key={i} position={[fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2]} rotation={[0, (-pl.rot * Math.PI) / 180, 0]}>
-            <mesh geometry={geo} material={material(pl.color, hi ? "highlight" : "normal")} castShadow receiveShadow />
-            <lineSegments geometry={edges} material={err ? errorEdgeMat : hi ? highlightEdgeMat : warn ? warnEdgeMat : edgeMat} />
-          </group>
-        );
-      })}
+      {scene.groups.map(([key, g]) => (
+        <InstancedGroup key={`${key}|${g.matrices.length}`} geo={g.geo} mat={g.mat} matrices={g.matrices} />
+      ))}
+      {scene.lines.map((l) => (
+        <lineSegments key={l.key} geometry={l.geo} material={l.mat} frustumCulled={false} />
+      ))}
     </group>
   );
 }
@@ -127,7 +179,15 @@ export default function Viewer(props: ViewerProps) {
   const gridSize = Math.max(16, Math.ceil(Math.max(size.x, size.z) / 8) * 8 + 16);
 
   return (
-    <Canvas shadows="percentage" camera={{ fov: 40, position: [20, 16, 24] }} gl={{ antialias: true, preserveDrawingBuffer: true }}>
+    <Canvas
+      shadows="percentage"
+      camera={{ fov: 40, position: [20, 16, 24] }}
+      gl={{ antialias: true, preserveDrawingBuffer: true }}
+      // Dev only: lets tests read draw-call / triangle counts (renderer.info).
+      onCreated={({ gl }) => {
+        if (process.env.NODE_ENV !== "production") (window as unknown as { __bfGl?: THREE.WebGLRenderer }).__bfGl = gl;
+      }}
+    >
       <color attach="background" args={[scene.bg]} />
       <hemisphereLight args={["#ffffff", "#8a8f99", 0.9]} />
       <directionalLight

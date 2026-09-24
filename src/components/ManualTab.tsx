@@ -4,7 +4,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { BrickModel } from "@/lib/model/schema";
 import type { BuildStep } from "@/lib/steps/steps";
 import { manualPages, type CalloutItem, type ManualPage } from "@/lib/manual/pages";
-import { peekStep, renderPartIcon, renderStep, STEP_SIZE, THUMB_SIZE, type PartIcon } from "./manual/stepRenderer";
+import type { CopyItem, StepSection } from "@/lib/design/steps";
+import { peekStep, renderModelIcon, renderPartIcon, renderStep, STEP_SIZE, THUMB_SIZE, type PartIcon } from "./manual/stepRenderer";
 import { exportFileNames } from "@/lib/ldraw/export";
 import * as I from "./icons";
 
@@ -51,13 +52,57 @@ function CalloutPart({ item }: { item: CalloutItem }) {
   );
 }
 
-function Page({ model, steps, page, total }: { model: BrickModel; steps: BuildStep[]; page: ManualPage; total: number }) {
-  const url = useStepImage(model, steps, page.n, STEP_SIZE, "high");
+/** A sub-build copy in the callout: a small render of the whole sub-build and "×count". */
+function CopyCallout({ item, model }: { item: CopyItem; model: BrickModel | undefined }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!model) return;
+    let live = true;
+    renderModelIcon(model).then((u) => live && setUrl(u), () => {});
+    return () => {
+      live = false;
+    };
+  }, [model]);
+  return (
+    <div className="man-callout-item man-copy" title={`${item.count}× ${item.name} (sub-build)`}>
+      <div className="man-icon-slot man-copy-slot">{url && <img src={url} alt={item.name} />}</div>
+      <span className="man-qty">
+        <b>{item.count}×</b>
+        <span>{item.name}</span>
+      </span>
+    </div>
+  );
+}
+
+function Page({ sections, modelName, page, total }: { sections: StepSection[]; modelName: string; page: ManualPage; total: number }) {
+  const sec = sections[page.section];
+  const url = useStepImage(sec.model, sec.steps, page.local, STEP_SIZE, "high");
+  const subModel = (id: string) => sections.find((x) => x.sub === id)?.model;
   return (
     <div className="man-page" data-screen-label="Manual page">
-      <div className="man-panel">
+      {page.label && (
+        <span className="man-tab">
+          <I.Bricks size={14} />
+          {sec.sub ? (
+            <>
+              <b>Sub-build</b>
+              <span className="sep">·</span>
+              <span>
+                {sec.name}
+                {sec.copies > 1 ? ` ×${sec.copies}` : ""}
+              </span>
+            </>
+          ) : (
+            <b>Main build</b>
+          )}
+        </span>
+      )}
+      <div className={`man-panel ${page.label ? "tabbed" : ""}`}>
         <span className="man-step">{page.n}</span>
         <div className="man-callout" aria-label={`Parts for step ${page.n}`}>
+          {page.copies.map((c) => (
+            <CopyCallout key={c.sub} item={c} model={subModel(c.sub)} />
+          ))}
           {page.callout.map((c) => (
             <CalloutPart key={`${c.part}|${c.color}`} item={c} />
           ))}
@@ -69,8 +114,9 @@ function Page({ model, steps, page, total }: { model: BrickModel; steps: BuildSt
       </div>
       <div className="man-footer">
         <span>
-          {model.name}
-          <span className="sep">·</span>Layer {page.layer} of {page.layers}
+          {modelName}
+          <span className="sep">·</span>
+          {sec.sub ? `${sec.name} · step ${page.local} of ${page.localTotal}` : `${page.label ? "Main build · " : ""}Layer ${page.layer} of ${page.layers}`}
         </span>
         <span>
           <b>{page.n}</b> / {total}
@@ -81,8 +127,8 @@ function Page({ model, steps, page, total }: { model: BrickModel; steps: BuildSt
   );
 }
 
-function Thumb({ model, steps, n, current, ready, onPick }: { model: BrickModel; steps: BuildStep[]; n: number; current: boolean; ready: boolean; onPick: () => void }) {
-  const url = useStepImage(model, steps, n, THUMB_SIZE, "low", ready);
+function Thumb({ model, steps, local, n, current, ready, onPick }: { model: BrickModel; steps: BuildStep[]; local: number; n: number; current: boolean; ready: boolean; onPick: () => void }) {
+  const url = useStepImage(model, steps, local, THUMB_SIZE, "low", ready);
   return (
     <button className={`man-thumb ${current ? "on" : ""}`} onClick={onPick} aria-label={`Page ${n}`} aria-current={current ? "page" : undefined}>
       <span className="man-thumb-page">{url && <img src={url} alt="" />}</span>
@@ -91,9 +137,9 @@ function Thumb({ model, steps, n, current, ready, onPick }: { model: BrickModel;
   );
 }
 
-export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: number; onStep: (n: number) => void }) {
-  const { model, steps, onStep } = props;
-  const pages = useMemo(() => manualPages(model, steps), [model, steps]);
+export function ManualTab(props: { sections: StepSection[]; modelName: string; step: number; onStep: (n: number) => void }) {
+  const { sections, modelName, onStep } = props;
+  const pages = useMemo(() => manualPages(sections), [sections]);
   const total = pages.length;
   const n = Math.min(Math.max(1, props.step), total);
   const page = pages[n - 1];
@@ -123,16 +169,17 @@ export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: 
   // After the current page renders: prefetch its neighbours, then let the thumbnail strip fill in.
   useEffect(() => {
     let live = true;
-    renderStep(model, steps, n).then(() => {
+    const render = (p: ManualPage | undefined) => (p ? renderStep(sections[p.section].model, sections[p.section].steps, p.local) : Promise.resolve(""));
+    render(pages[n - 1]).then(() => {
       if (!live) return;
-      if (n < total) renderStep(model, steps, n + 1).catch(() => {});
-      if (n > 1) renderStep(model, steps, n - 1).catch(() => {});
+      render(pages[n]).catch(() => {});
+      render(pages[n - 2]).catch(() => {});
       setReady(true);
     }, () => {});
     return () => {
       live = false;
     };
-  }, [model, steps, n, total]);
+  }, [sections, pages, n]);
 
   // Keep the current thumbnail centred in the strip.
   useEffect(() => {
@@ -156,11 +203,11 @@ export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: 
     setPdf({ busy: "Preparing…", error: null });
     try {
       const { buildManualPdf } = await import("./manual/manualPdf");
-      const blob = await buildManualPdf(model, steps, (done, all) => setPdf({ busy: done < all ? `Page ${done + 1} of ${all}…` : "Saving…", error: null }));
+      const blob = await buildManualPdf(sections, modelName, (done, all) => setPdf({ busy: done < all ? `Page ${done + 1} of ${all}…` : "Saving…", error: null }));
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = exportFileNames(model).ldr.replace(/\.ldr$/, "_manual.pdf");
+      a.download = exportFileNames({ name: modelName, description: "", parts: [] }).ldr.replace(/\.ldr$/, "_manual.pdf");
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
       setPdf({ busy: null, error: null });
@@ -189,11 +236,23 @@ export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: 
         <label className="man-goto">
           Go to
           <select value={n} onChange={(e) => onStep(Number(e.target.value))}>
-            {pages.map((p) => (
-              <option key={p.n} value={p.n}>
-                Step {p.n} · {p.pieces} piece{p.pieces === 1 ? "" : "s"}
-              </option>
-            ))}
+            {sections.length > 1
+              ? sections.map((sec, si) => (
+                  <optgroup key={si} label={sec.sub ? `${sec.name}${sec.copies > 1 ? ` ×${sec.copies}` : ""}` : "Main build"}>
+                    {pages
+                      .filter((p) => p.section === si)
+                      .map((p) => (
+                        <option key={p.n} value={p.n}>
+                          {p.n}. {sec.sub ? sec.name : "Main build"} · step {p.local}
+                        </option>
+                      ))}
+                  </optgroup>
+                ))
+              : pages.map((p) => (
+                  <option key={p.n} value={p.n}>
+                    Step {p.n} · {p.pieces} piece{p.pieces === 1 ? "" : "s"}
+                  </option>
+                ))}
           </select>
         </label>
         <div className="man-right">
@@ -222,13 +281,13 @@ export function ManualTab(props: { model: BrickModel; steps: BuildStep[]; step: 
       )}
       <div className="man-viewport" ref={viewportRef}>
         <div className="man-page-wrap" style={{ width: Math.round(fitW * zoom) }}>
-          <Page model={model} steps={steps} page={page} total={total} />
+          <Page sections={sections} modelName={modelName} page={page} total={total} />
         </div>
       </div>
 
       <div className="man-thumbs" ref={stripRef} aria-label="Pages">
         {pages.map((p) => (
-          <Thumb key={p.n} model={model} steps={steps} n={p.n} current={p.n === n} ready={ready} onPick={() => onStep(p.n)} />
+          <Thumb key={p.n} model={sections[p.section].model} steps={sections[p.section].steps} local={p.local} n={p.n} current={p.n === n} ready={ready} onPick={() => onStep(p.n)} />
         ))}
       </div>
     </div>

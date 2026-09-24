@@ -5,7 +5,9 @@ import { PART_IDS } from "../parts/library";
 import { COLOR_IDS } from "../parts/colors";
 import { BrickModelSchema, PlacementSchema, type BrickModel } from "../model/schema";
 import { brickModelJsonSchema } from "../model/jsonSchema";
-import { InstanceSchema, SUB_ID, type BrickDesign } from "../design/schema";
+import { BrickDesignSchema, InstanceSchema, SUB_ID, type BrickDesign } from "../design/schema";
+import { designJsonSchema } from "../design/jsonSchema";
+import { designEditPrompt } from "../prompts/edit";
 import { compileDesign } from "../design/compile";
 import { surfaceMaps } from "../design/surface";
 import { systemPrompt } from "../prompts/system";
@@ -266,6 +268,70 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   if (result.model) debug.write("final-model.json", result.model);
   if (resumed) console.log(`[generate] resumed: reused plan=${resumed.reused.plan}, sub-builds [${resumed.reused.subBuilds.join(", ")}], assembly=${resumed.reused.assembly}; earlier $${resumed.costBefore.toFixed(4)}, now $${resumed.costNow.toFixed(4)}`);
   console.log(`[generate] sub-builds done: valid=${result.valid}, ${result.model?.parts.length ?? 0} parts, ${compiled?.stats.copies ?? 0} copies, ${rounds.length} round(s) · total ${formatUsage(usage)} · debug: ${debug.dir}`);
+  onEvent({ type: "done", result });
+  return result;
+}
+
+// ---- design edits ------------------------------------------------------------------------
+
+/**
+ * Chat edit of a model that has a sub-build design: Claude gets the design
+ * (each sub-build once) and returns the whole updated design, which is compiled
+ * and repaired like an assembly. Changing a sub-build changes every copy.
+ */
+export async function editDesign(input: GenerateInput & { baseDesign: BrickDesign }, onEvent: (e: GenerateEvent) => void = () => {}, opts: GenerateOptions = {}): Promise<GenerateResult> {
+  if (!input.text?.trim() && !input.image) throw new Error("Describe the change you want.");
+  const anthropic = opts.client ?? getClient();
+  const debug = new DebugRun(`edit-${input.text?.trim() || "photo"}`);
+  onEvent({ type: "start", debugDir: debug.dir });
+  const system = systemPrompt();
+  debug.write("input.json", { mode: "edit", pipeline: "design-edit", text: input.text ?? null, hasImage: !!input.image, config: CONFIG });
+  debug.write("base-design.json", input.baseDesign);
+  debug.write("system-prompt.md", system);
+  const text = designEditPrompt(input.baseDesign, input.text ?? "", !!input.image);
+  const content: Anthropic.MessageParam["content"] = input.image
+    ? [
+        { type: "image", source: { type: "base64", media_type: input.image.mediaType, data: input.image.data } },
+        { type: "text", text },
+      ]
+    : text;
+
+  onEvent({ type: "stage", scope: "edit", label: "Editing the design", status: "start" });
+  const loop = await runLoop<BrickDesign>(
+    {
+      scope: "edit",
+      debugPrefix: "edit.",
+      system,
+      firstContent: content,
+      firstText: text,
+      schema: designJsonSchema(),
+      parse: (t) => parseJson(t, BrickDesignSchema),
+      check: (d, last) => {
+        const c = compileDesign(d, { structure: last ? "warn" : "error" });
+        return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
+      },
+    },
+    { anthropic, debug, onEvent, signal: opts.signal },
+  );
+  const design = loop.best?.value ?? null;
+  onEvent({ type: "stage", scope: "edit", label: "Editing the design", status: "done", valid: loop.best?.check.valid ?? false, parts: loop.best?.check.partCount, cost: loop.usage.cost });
+  const compiled = design ? compileDesign(design, { structure: loop.best!.check.valid ? "warn" : "error" }) : null;
+  const result: GenerateResult = {
+    model: compiled?.model ?? null,
+    valid: !!compiled && compiled.errors.length === 0,
+    validation: compiled?.validation ? { errors: compiled.errors, warnings: compiled.warnings, components: compiled.validation.components, connections: compiled.validation.connections } : null,
+    steps: compiled ? buildSteps(compiled.model) : [],
+    rounds: loop.rounds,
+    usage: loop.usage,
+    debugDir: debug.dir,
+    design: design ?? undefined,
+    compile: compiled ? { stats: compiled.stats, tree: compiled.tree, subBuilds: compiled.subBuilds } : undefined,
+    pipeline: "subbuilds",
+  };
+  debug.write("summary.json", { pipeline: "design-edit", valid: result.valid, rounds: loop.rounds, total: loop.usage, partCount: result.model?.parts.length ?? 0, compile: compiled?.stats });
+  if (design) debug.write("final-design.json", design);
+  if (result.model) debug.write("final-model.json", result.model);
+  console.log(`[generate] design edit done: valid=${result.valid}, ${result.model?.parts.length ?? 0} parts · ${formatUsage(loop.usage)} · debug: ${debug.dir}`);
   onEvent({ type: "done", result });
   return result;
 }

@@ -82,8 +82,8 @@ function moveTo(ws: Workspace, history: History, now: string): Workspace {
 }
 
 /** Add a new version (from a chat edit) and make it current. */
-export function commitVersion(ws: Workspace, model: BrickModel, label: string, source: Version["source"], now = new Date().toISOString()): Workspace {
-  const v: Version = { id: newId(), model, label, createdAt: now, source };
+export function commitVersion(ws: Workspace, model: BrickModel, label: string, source: Version["source"], now = new Date().toISOString(), design?: BrickDesign): Workspace {
+  const v: Version = { id: newId(), model, label, createdAt: now, source, ...(design ? { design } : {}) };
   const stack = [...ws.history.stack.slice(0, ws.history.index + 1), v.id];
   return moveTo({ ...ws, doc: { ...ws.doc, versions: [...ws.doc.versions, v] } }, { stack, index: stack.length - 1 }, now);
 }

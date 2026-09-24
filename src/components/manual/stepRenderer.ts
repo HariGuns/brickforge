@@ -264,3 +264,28 @@ export function renderPartIcon(partId: string, colorId: string): Promise<PartIco
   }
   return p;
 }
+
+// ---- whole-model icons (sub-build copies in callouts) ---------------------------
+export const MODEL_ICON_SIZE = { w: 240, h: 180 } as const;
+
+/** The whole model in its own colours (nothing faded or outlined), for a sub-build's callout icon. */
+export function renderModelIcon(model: BrickModel): Promise<string> {
+  const ms = modelScene(model);
+  const key = "icon";
+  let p = ms.cache.get(key);
+  if (!p) {
+    p = enqueue(async () => {
+      model.parts.forEach((pl, i) => {
+        ms.groups[i].visible = true;
+        ms.meshes[i].material = material(pl.color, false);
+        ms.edges[i].material = OLD_EDGE;
+      });
+      const url = await snapshot(ms.scene, isoCamera(ms.box, MODEL_ICON_SIZE.w / MODEL_ICON_SIZE.h, 1.02), MODEL_ICON_SIZE);
+      ms.done.set(key, url);
+      return url;
+    });
+    ms.cache.set(key, p);
+    p.catch(() => ms.cache.delete(key));
+  }
+  return p;
+}

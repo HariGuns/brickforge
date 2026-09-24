@@ -47,6 +47,9 @@ export function ModelTab(props: {
   errors: Issue[];
   warnings: Issue[];
   theme: "light" | "dark";
+  /** Parts to highlight from outside (e.g. a sub-build's copies picked in the Design tab). */
+  focusParts?: Set<number>;
+  onClearFocus?: () => void;
 }) {
   const { model, steps } = props;
   const [view, setView] = useState<CameraView>("3/4");
@@ -89,7 +92,8 @@ export function ModelTab(props: {
   const issues = [...props.errors, ...props.warnings];
   const errorParts = useMemo(() => new Set(props.errors.flatMap((e) => e.parts)), [props.errors]);
   const warnParts = useMemo(() => new Set(props.warnings.flatMap((e) => e.parts)), [props.warnings]);
-  const highlight = focus !== null ? new Set(issues[focus]?.parts ?? []) : playing && progress > 0 ? new Set(steps[progress - 1]?.parts ?? []) : undefined;
+  const highlight =
+    focus !== null ? new Set(issues[focus]?.parts ?? []) : playing && progress > 0 ? new Set(steps[progress - 1]?.parts ?? []) : props.focusParts;
 
   function play() {
     if (!steps.length) return;
@@ -157,6 +161,14 @@ export function ModelTab(props: {
             Spin
           </button>
         </div>
+        {props.focusParts && (
+          <div className="focus-chip">
+            {props.focusParts.size} parts highlighted
+            <button className="chip-x" aria-label="Clear highlight" onClick={props.onClearFocus}>
+              <I.Close size={12} />
+            </button>
+          </div>
+        )}
         <div className="overlay-tr">
           <button className="float-btn accent-ink" disabled title="Coming soon: presentation mode">
             <I.Sparkle size={14} />

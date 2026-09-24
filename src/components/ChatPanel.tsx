@@ -83,7 +83,7 @@ function stageRows(t: Turn): Row[] {
   const running = t.status === "running";
   for (const s of t.stages ?? []) {
     const reps = Math.max(0, roundsOf(s.scope).length - 1);
-    const label = s.scope === "plan" ? "Planning sub-builds" : s.scope === "assembly" ? "Assembling" : `Sub-build · ${s.label}${s.copies && s.copies > 1 ? ` ×${s.copies}` : ""}`;
+    const label = s.scope.startsWith("sub:") ? `Sub-build · ${s.label}${s.copies && s.copies > 1 ? ` ×${s.copies}` : ""}` : s.scope === "plan" ? "Planning sub-builds" : s.scope === "assembly" ? "Assembling" : s.label;
     if (s.status === "start") rows.push({ label, state: running ? "active" : "fail", note: running ? live(s.scope) : "" });
     else {
       const what = s.scope === "plan" ? `${s.parts ?? 0} sub-builds` : `${s.parts ?? 0} parts`;

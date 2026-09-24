@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generateModel, type GenerateEvent, type ImageMediaType } from "@/lib/claude/generate";
-import { generateDesign } from "@/lib/claude/subbuilds";
+import { editDesign, generateDesign } from "@/lib/claude/subbuilds";
+import { BrickDesignSchema as DesignSchema, type BrickDesign } from "@/lib/design/schema";
 import type { BuildSize } from "@/lib/prompts/design";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
@@ -24,7 +25,7 @@ function friendly(err: unknown): string {
  * "single" | "subbuilds" | "auto" (default CONFIG.generator).
  */
 export async function POST(req: Request) {
-  let body: { text?: string; image?: { mediaType: string; data: string }; size?: string; base?: unknown; pipeline?: string };
+  let body: { text?: string; image?: { mediaType: string; data: string }; size?: string; base?: unknown; baseDesign?: unknown; pipeline?: string };
   try {
     body = await req.json();
   } catch {
@@ -43,8 +44,17 @@ export async function POST(req: Request) {
   if (body.base !== undefined) {
     const parsed = BrickModelSchema.safeParse(body.base);
     if (!parsed.success) return Response.json({ error: "The model to edit isn't valid JSON for this app" }, { status: 400 });
-    if (parsed.data.parts.length > CONFIG.maxParts) return Response.json({ error: `The model to edit has more than ${CONFIG.maxParts} parts` }, { status: 400 });
+    // Flat edits go through the single-pass editor (its limit); designs are edited per sub-build.
+    const limit = body.baseDesign !== undefined ? CONFIG.design.maxParts : CONFIG.maxParts;
+    if (parsed.data.parts.length > limit) return Response.json({ error: `The model to edit has more than ${limit} parts` }, { status: 400 });
     base = parsed.data;
+  }
+  // A model with sub-builds is edited as a design (changing a sub-build changes every copy).
+  let baseDesign: BrickDesign | undefined;
+  if (body.baseDesign !== undefined) {
+    const parsed = DesignSchema.safeParse(body.baseDesign);
+    if (!parsed.success) return Response.json({ error: "The design to edit isn't valid" }, { status: 400 });
+    baseDesign = parsed.data;
   }
   if (body.pipeline !== undefined && !PIPELINES.includes(body.pipeline as Pipeline)) return Response.json({ error: `Unknown pipeline "${body.pipeline}"` }, { status: 400 });
   const pipeline = resolvePipeline(body.pipeline as Pipeline | undefined, size, !!base);
@@ -66,8 +76,8 @@ export async function POST(req: Request) {
         }
       };
       try {
-        const run = pipeline === "subbuilds" ? generateDesign : generateModel;
-        await run({ text, image, size, base }, send, { signal: abort.signal });
+        if (baseDesign) await editDesign({ text, image, baseDesign }, send, { signal: abort.signal });
+        else await (pipeline === "subbuilds" ? generateDesign : generateModel)({ text, image, size, base }, send, { signal: abort.signal });
       } catch (err) {
         if (!abort.signal.aborted) {
           console.error("[generate] failed:", err);

@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GenerateEvent } from "@/lib/claude/generate";
 import type { LibraryEntry } from "@/lib/library/scan";
-import { validate } from "@/lib/validate/validator";
-import { buildSteps } from "@/lib/steps/steps";
 import { modelStats } from "@/lib/model/stats";
 import { describeDiff, diffModels } from "@/lib/model/diff";
+import { describeDesignDiff, diffDesigns } from "@/lib/design/diff";
 import {
   canRedo,
   canUndo,
@@ -24,8 +23,10 @@ import {
   type Workspace,
 } from "@/lib/builds/doc";
 import type { BuildSummary } from "@/lib/builds/store";
-import type { BrickDesign } from "@/lib/design/schema";
-import { exportFileNames, exportLdr, exportMpd } from "@/lib/ldraw/export";
+import { designFromModel, type BrickDesign } from "@/lib/design/schema";
+import { exportDesignMpd, exportFileNames, exportLdr, exportMpd } from "@/lib/ldraw/export";
+import { compileDesign } from "@/lib/design/compile";
+import { designSteps } from "@/lib/design/steps";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
 import { streamGenerate } from "@/lib/client/sse";
@@ -83,16 +84,25 @@ export default function Page() {
   }
 
   const version = ws ? currentVersion(ws) : null;
-  const model = version?.model ?? null;
   const modelKey = ws?.doc.id ?? "none";
   const hasUnsaved = (w: Workspace | null) => !!w && isDirty(w) && (w.doc.versions.length > 1 || w.savedRev !== null);
   const dirtyWork = hasUnsaved(ws);
   wsRef.current = ws;
   const saveState: SaveState = !ws ? "none" : saving ? "saving" : isDirty(ws) ? "dirty" : "saved";
 
-  const validation = useMemo(() => (model ? validate(model) : null), [model]);
-  const steps = useMemo(() => (model ? buildSteps(model) : []), [model]);
+  // Every model is compiled as a design (a flat model is a design without sub-builds), which
+  // gives validation, stats, and manual sections (sub-builds first, then the main build).
+  const storedModel = version?.model ?? null;
+  const design = useMemo(() => version?.design ?? (storedModel ? designFromModel(storedModel) : null), [version, storedModel]);
+  const compiled = useMemo(() => (design ? compileDesign(design) : null), [design]);
+  const dsteps = useMemo(() => (design && compiled ? designSteps(design, compiled) : null), [design, compiled]);
+  const model = compiled?.model ?? storedModel;
+  const validation = compiled ? { errors: compiled.errors, warnings: compiled.warnings } : null;
+  const steps = dsteps?.mainSteps ?? [];
+  const sections = dsteps?.sections ?? [];
+  const totalSteps = sections.reduce((n, s) => n + s.steps.length, 0);
   const stats = useMemo(() => (model ? modelStats(model) : null), [model]);
+  const [focusParts, setFocusParts] = useState<Set<number> | undefined>();
 
   /** Replace the open build. Asks first if that would drop unsaved edits. */
   function open(next: Workspace): boolean {
@@ -182,7 +192,7 @@ export default function Page() {
       const res = await fetch(`/api/library/model?kind=${e.kind}&id=${encodeURIComponent(e.id)}`);
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
-      if (!openModel(body.model, `Opened from ${e.kind === "debug" ? "a generation run" : `exports/${e.id}`}`, { kind: "open", debugDir: e.kind === "debug" ? e.id : undefined })) return;
+      if (!openModel(body.model, `Opened from ${e.kind === "debug" ? "a generation run" : `exports/${e.id}`}`, { kind: "open", debugDir: e.kind === "debug" ? e.id : undefined }, body.design ?? undefined)) return;
       setSelected(key);
       if (body.skipped) setNotice(`${body.skipped} line(s) in ${e.id} used parts outside the library and were skipped.`);
     } catch (err) {
@@ -230,9 +240,9 @@ export default function Page() {
     const ac = new AbortController();
     abortRef.current = ac;
     try {
-      const body = { text: d.text, size: d.size, pipeline: d.pipeline, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined, base };
-      const baseHadDesign = !!(base && version?.design);
-      for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev, base, docId, d.text.trim(), baseHadDesign);
+      const baseDesign = base ? version?.design : undefined;
+      const body = { text: d.text, size: d.size, pipeline: d.pipeline, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined, base, baseDesign };
+      for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev, base, docId, d.text.trim(), baseDesign);
     } catch (e) {
       if (ac.signal.aborted) updateTurn(id, (t) => ({ ...t, status: "cancelled" }));
       else updateTurn(id, (t) => ({ ...t, status: "error", error: (e as Error).message }));
@@ -242,7 +252,7 @@ export default function Page() {
     }
   }
 
-  function onEvent(id: number, ev: GenerateEvent, base?: BrickModel, docId?: string, prompt = "", baseHadDesign = false) {
+  function onEvent(id: number, ev: GenerateEvent, base?: BrickModel, docId?: string, prompt = "", baseDesign?: BrickDesign) {
     switch (ev.type) {
       case "stage":
         updateTurn(id, (t) => {
@@ -281,7 +291,11 @@ export default function Page() {
             problems: r.validation?.errors.length ?? 0,
             cost: r.usage.cost,
             debugDir: r.debugDir,
-            change: base ? `${describeDiff(diffModels(base, r.model!))}${baseHadDesign ? " (as a flat model: editing sub-builds directly comes later)" : ""}` : undefined,
+            change: base
+              ? baseDesign && r.design
+                ? `${describeDesignDiff(diffDesigns(baseDesign, r.design))} (${describeDiff(diffModels(base, r.model!))})`
+                : describeDiff(diffModels(base, r.model!))
+              : undefined,
             parts: r.model!.parts.length,
             subBuilds: r.compile?.stats.uniqueSubBuilds,
             copies: r.compile?.stats.copies,
@@ -294,7 +308,7 @@ export default function Page() {
         if (base) {
           if (wsRef.current?.doc.id === docId) {
             // An edit becomes a new version of the open build (undoable).
-            apply((w) => (w.doc.id === docId ? commitVersion(w, r.model!, `Edit: ${quote(prompt || "match the photo")}`, source) : w));
+            apply((w) => (w.doc.id === docId ? commitVersion(w, r.model!, `Edit: ${quote(prompt || "match the photo")}`, source, undefined, r.design) : w));
           } else {
             setNotice("That edit finished after you opened a different build, so it wasn't applied. It's in the Library under Generated.");
           }
@@ -327,8 +341,9 @@ export default function Page() {
     if (!model) return;
     const names = exportFileNames(model);
     if (kind === "ldr") download(names.ldr, exportLdr(model, steps));
-    if (kind === "mpd") download(names.mpd, exportMpd(model, steps));
-    if (kind === "json") download(names.ldr.replace(/\.ldr$/, ".json"), compactJson(model), "application/json");
+    // Designs with sub-builds: one submodel per unique sub-build.
+    if (kind === "mpd") download(names.mpd, version?.design && compiled ? exportDesignMpd(version.design, compiled) : exportMpd(model, steps));
+    if (kind === "json") download(names.ldr.replace(/\.ldr$/, ".json"), version?.design ? JSON.stringify(version.design, null, 1) : compactJson(model), "application/json");
   }
 
   return (
@@ -337,7 +352,8 @@ export default function Page() {
         <TopBar
           model={model}
           stats={stats}
-          steps={steps.length}
+          steps={totalSteps}
+          subBuilds={version?.design ? (compiled?.stats.uniqueSubBuilds ?? 0) : undefined}
           problems={validation?.errors.length ?? 0}
           theme={theme}
           onToggleTheme={toggleTheme}
@@ -408,11 +424,24 @@ export default function Page() {
               </div>
             )}
             {(tab === "model" || !model) && (
-              <ModelTab model={model} modelKey={modelKey} steps={steps} errors={validation?.errors ?? []} warnings={validation?.warnings ?? []} theme={theme} />
+              <ModelTab model={model} modelKey={modelKey} steps={steps} errors={validation?.errors ?? []} warnings={validation?.warnings ?? []} theme={theme} focusParts={focusParts} onClearFocus={() => setFocusParts(undefined)} />
             )}
-            {tab === "manual" && model && <ManualTab model={model} steps={steps} step={manualStep} onStep={setManualStep} />}
+            {tab === "manual" && model && <ManualTab sections={sections} modelName={model.name} step={manualStep} onStep={setManualStep} />}
             {tab === "parts" && model && <PartsTab model={model} />}
-            {tab === "design" && model && stats && <DesignTab model={model} stats={stats} steps={steps.length} onDownloadJson={() => downloadModel("json")} />}
+            {tab === "design" && model && stats && compiled && (
+              <DesignTab
+                model={model}
+                design={version?.design ?? null}
+                compiled={compiled}
+                stats={stats}
+                steps={totalSteps}
+                onDownloadJson={() => downloadModel("json")}
+                onHighlight={(parts) => {
+                  setFocusParts(parts);
+                  if (parts) setTab("model");
+                }}
+              />
+            )}
           </main>
         </div>
       </div>

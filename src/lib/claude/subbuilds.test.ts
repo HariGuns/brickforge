@@ -135,3 +135,41 @@ describe("debug folders", () => {
     expect(a.dir).not.toBe(b.dir);
   });
 });
+
+describe("design edits (fake Claude)", () => {
+  it("changing a sub-build once changes every copy", async () => {
+    const { editDesign } = await import("./subbuilds");
+    const { diffDesigns, describeDesignDiff } = await import("../design/diff");
+    const { compileDesign } = await import("../design/compile");
+    // The edit adds a second tip plate to the pine tree.
+    const edited = {
+      ...SAMPLE_VILLAGE,
+      subBuilds: SAMPLE_VILLAGE.subBuilds.map((s) => (s.id === "pine_tree" ? { ...s, parts: [...s.parts, P("plate_1x1", "yellow", 0, 11, 0)] } : s)),
+    };
+    const requests: Anthropic.MessageCreateParams[] = [];
+    const client = {
+      messages: {
+        stream(params: Anthropic.MessageCreateParams) {
+          requests.push(structuredClone(params));
+          return {
+            on() {
+              return this;
+            },
+            async finalMessage() {
+              return { content: [{ type: "text", text: JSON.stringify(edited) }], stop_reason: "end_turn", stop_details: null, usage: { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } };
+            },
+          };
+        },
+      },
+    } as unknown as Pick<Anthropic, "messages">;
+    const r = await editDesign({ text: "put a star on every tree", baseDesign: SAMPLE_VILLAGE }, () => {}, { client });
+    dirs.push(r.debugDir);
+    const prompt = requests[0].messages[0].content as string;
+    expect(prompt).toMatch(/Sub-build pine_tree "Pine tree"/);
+    expect(prompt).toMatch(/Change request: put a star on every tree/);
+    expect(r.valid).toBe(true);
+    const before = compileDesign(SAMPLE_VILLAGE).stats.pieces;
+    expect(r.model!.parts.length).toBe(before + 4); // 4 pine tree copies
+    expect(describeDesignDiff(diffDesigns(SAMPLE_VILLAGE, r.design!))).toBe("changed Pine tree; main build unchanged");
+  });
+});

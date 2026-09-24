@@ -1,7 +1,6 @@
-import type { BrickModel } from "@/lib/model/schema";
-import type { BuildStep } from "@/lib/steps/steps";
 import { manualPages, type CalloutItem } from "@/lib/manual/pages";
-import { renderPartIcon, renderStep, STEP_SIZE } from "./stepRenderer";
+import type { StepSection } from "@/lib/design/steps";
+import { MODEL_ICON_SIZE, renderModelIcon, renderPartIcon, renderStep, STEP_SIZE } from "./stepRenderer";
 
 /**
  * Builds the instruction manual as a PDF: one A4-landscape page per build step,
@@ -63,20 +62,24 @@ async function iconPng(url: string): Promise<Uint8Array> {
   return new Uint8Array(await (await fetch(url)).arrayBuffer());
 }
 
-export async function buildManualPdf(model: BrickModel, steps: BuildStep[], onProgress?: (done: number, total: number) => void): Promise<Blob> {
+export async function buildManualPdf(sections: StepSection[], modelName: string, onProgress?: (done: number, total: number) => void): Promise<Blob> {
   const { jsPDF } = await import("jspdf");
-  const pages = manualPages(model, steps);
+  const pages = manualPages(sections);
   const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4", compress: true });
-  doc.setProperties({ title: `${model.name} – building instructions`, subject: model.description, creator: "BrickForge" });
+  doc.setProperties({ title: `${modelName} – building instructions`, creator: "BrickForge" });
 
   const iconCache = new Map<string, { data: Uint8Array; w: number; h: number }>();
+  const copyIcons = new Map<string, Uint8Array>();
   const pad = PAGE_W * 0.034;
   const footerH = 12;
-  const panel = { x: pad, y: pad, w: PAGE_W - 2 * pad, h: PAGE_H - pad - footerH };
+  const tabH = 7;
 
   for (const [i, page] of pages.entries()) {
     onProgress?.(i, pages.length);
     if (i > 0) doc.addPage("a4", "landscape");
+    const sec = sections[page.section];
+    const top = page.label ? pad + tabH : pad;
+    const panel = { x: pad, y: top, w: PAGE_W - 2 * pad, h: PAGE_H - top - footerH };
 
     // Page and panel
     doc.setFillColor(CREAM);
@@ -86,8 +89,21 @@ export async function buildManualPdf(model: BrickModel, steps: BuildStep[], onPr
     doc.setLineWidth(0.3);
     doc.roundedRect(panel.x, panel.y, panel.w, panel.h, 14 * U, 14 * U, "FD");
 
+    // Sub-build tab above the panel
+    if (page.label) {
+      const text = sec.sub ? `Sub-build  ·  ${sec.name}${sec.copies > 1 ? ` ×${sec.copies}` : ""}` : "Main build";
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13 * U * PT_PER_MM);
+      const tw = doc.getTextWidth(text) + 8;
+      doc.setFillColor("#f3dfb2");
+      doc.roundedRect(panel.x, pad, tw, tabH + 3, 10 * U, 10 * U, "F");
+      doc.rect(panel.x, pad + tabH, tw, 3, "F");
+      doc.setTextColor("#5e430f");
+      doc.text(text, panel.x + 4, pad + tabH / 2 + 1.5);
+    }
+
     // Render (drawn first so the callout and step number sit on top of it)
-    const url = await renderStep(model, steps, page.n);
+    const url = await renderStep(sec.model, sec.steps, page.local);
     const area = { x: panel.x + panel.w * 0.27, y: panel.y + panel.h * 0.04, w: panel.w * 0.69, h: panel.h * 0.9 };
     const aspect = STEP_SIZE.w / STEP_SIZE.h;
     const iw = Math.min(area.w, area.h * aspect), ih = iw / aspect;
@@ -100,7 +116,26 @@ export async function buildManualPdf(model: BrickModel, steps: BuildStep[], onPr
     doc.text(String(page.n), panel.x + 18 * U, panel.y + 10 * U, { baseline: "top" });
 
     // Parts callout: 2 columns of icon + "qty× size"
-    const items: { c: CalloutItem; icon: { data: Uint8Array; w: number; h: number }; iw: number; ih: number; qty: string; qtyW: number; colW: number }[] = [];
+    const items: { c: CalloutItem | { part: string; color: string; size: string; qty: number }; icon: { data: Uint8Array; w: number; h: number }; iw: number; ih: number; qty: string; qtyW: number; colW: number }[] = [];
+    // Sub-build copies first: a small render of the whole sub-build and "×count name".
+    for (const copy of page.copies) {
+      let data = copyIcons.get(copy.sub);
+      const subModel = sections.find((x) => x.sub === copy.sub)?.model;
+      if (!data && subModel) {
+        data = await iconPng(await renderModelIcon(subModel));
+        copyIcons.set(copy.sub, data);
+      }
+      if (!data) continue;
+      const ih2 = 60 * U;
+      const iw2 = ih2 * (MODEL_ICON_SIZE.w / MODEL_ICON_SIZE.h);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14 * U * PT_PER_MM);
+      const qty = `${copy.count}×`;
+      const qtyW = doc.getTextWidth(qty);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10 * U * PT_PER_MM);
+      items.push({ c: { part: `sub_${copy.sub}`, color: "", size: copy.name, qty: copy.count }, icon: { data, w: MODEL_ICON_SIZE.w, h: MODEL_ICON_SIZE.h }, iw: iw2, ih: ih2, qty, qtyW, colW: Math.max(iw2, qtyW + 5 * U + doc.getTextWidth(copy.name)) });
+    }
     for (const c of page.callout) {
       const key = `${c.part}|${c.color}`;
       let icon = iconCache.get(key);
@@ -120,7 +155,8 @@ export async function buildManualPdf(model: BrickModel, steps: BuildStep[], onPr
       const labelW = qtyW + 5 * U + doc.getTextWidth(c.size);
       items.push({ c, icon, iw: iw2, ih: ih2, qty, qtyW, colW: Math.max(iw2, labelW) });
     }
-    const cols = 2, gapX = 20 * U, gapY = 14 * U, padC = 14 * U, slotH = 48 * U, labelH = 5;
+    const cols = 2, gapX = 20 * U, gapY = 14 * U, padC = 14 * U, labelH = 5;
+    const slotH = Math.max(48 * U, ...items.map((it) => it.ih));
     const colW = [0, 1].map((k) => Math.max(0, ...items.filter((_, j) => j % cols === k).map((it) => it.colW)));
     const rows = Math.ceil(items.length / cols);
     const boxW = padC * 2 + colW[0] + (items.length > 1 ? gapX + colW[1] : 0);
@@ -148,7 +184,7 @@ export async function buildManualPdf(model: BrickModel, steps: BuildStep[], onPr
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12 * U * PT_PER_MM);
     doc.setTextColor(FOOT);
-    doc.text(`${model.name}  ·  Layer ${page.layer} of ${page.layers}`, panel.x + 1, fy);
+    doc.text(`${modelName}  ·  ${sec.sub ? `${sec.name} · step ${page.local} of ${page.localTotal}` : `${page.label ? "Main build · " : ""}Layer ${page.layer} of ${page.layers}`}`, panel.x + 1, fy);
     const total = ` / ${pages.length}`;
     const totalW = doc.getTextWidth(total);
     doc.text(total, panel.x + panel.w - 1 - totalW, fy);
