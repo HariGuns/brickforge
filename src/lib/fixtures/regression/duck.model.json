@@ -1,0 +1,294 @@
+{
+  "name": "Yellow Rubber Duck",
+  "description": "A classic yellow rubber duck with a rounded sloped body, upturned tail at the back, a round head with black eyes on both sides, and a protruding orange beak.",
+  "parts": [
+    {
+      "part": "brick_2x6",
+      "color": "yellow",
+      "x": 3,
+      "y": 0,
+      "z": 1,
+      "rot": 0
+    },
+    {
+      "part": "brick_2x6",
+      "color": "yellow",
+      "x": 3,
+      "y": 0,
+      "z": 3,
+      "rot": 0
+    },
+    {
+      "part": "brick_2x8",
+      "color": "yellow",
+      "x": 2,
+      "y": 3,
+      "z": 0,
+      "rot": 0
+    },
+    {
+      "part": "brick_2x8",
+      "color": "yellow",
+      "x": 2,
+      "y": 3,
+      "z": 2,
+      "rot": 0
+    },
+    {
+      "part": "brick_2x8",
+      "color": "yellow",
+      "x": 2,
+      "y": 3,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "plate_4x6",
+      "color": "yellow",
+      "x": 2,
+      "y": 6,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "plate_4x6",
+      "color": "yellow",
+      "x": 6,
+      "y": 6,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "slope45_2x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 7,
+      "z": 0,
+      "rot": 180
+    },
+    {
+      "part": "slope45_2x4",
+      "color": "yellow",
+      "x": 6,
+      "y": 7,
+      "z": 0,
+      "rot": 180
+    },
+    {
+      "part": "brick_2x8",
+      "color": "yellow",
+      "x": 2,
+      "y": 7,
+      "z": 2,
+      "rot": 0
+    },
+    {
+      "part": "slope45_2x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 7,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "slope45_2x4",
+      "color": "yellow",
+      "x": 6,
+      "y": 7,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "brick_2x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 10,
+      "z": 1,
+      "rot": 0
+    },
+    {
+      "part": "brick_2x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 10,
+      "z": 3,
+      "rot": 0
+    },
+    {
+      "part": "slope45_2x4",
+      "color": "yellow",
+      "x": 8,
+      "y": 10,
+      "z": 1,
+      "rot": 90
+    },
+    {
+      "part": "tile_2x2",
+      "color": "yellow",
+      "x": 6,
+      "y": 10,
+      "z": 2,
+      "rot": 0
+    },
+    {
+      "part": "tile_1x2",
+      "color": "yellow",
+      "x": 6,
+      "y": 10,
+      "z": 1,
+      "rot": 0
+    },
+    {
+      "part": "tile_1x2",
+      "color": "yellow",
+      "x": 6,
+      "y": 10,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "slope45_2x2",
+      "color": "yellow",
+      "x": 8,
+      "y": 13,
+      "z": 2,
+      "rot": 90
+    },
+    {
+      "part": "plate_2x4",
+      "color": "orange",
+      "x": 0,
+      "y": 13,
+      "z": 2,
+      "rot": 0
+    },
+    {
+      "part": "plate_1x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 13,
+      "z": 1,
+      "rot": 0
+    },
+    {
+      "part": "plate_1x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 13,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "plate_2x2",
+      "color": "yellow",
+      "x": 4,
+      "y": 13,
+      "z": 2,
+      "rot": 0
+    },
+    {
+      "part": "plate_2x2",
+      "color": "orange",
+      "x": 0,
+      "y": 14,
+      "z": 2,
+      "rot": 0
+    },
+    {
+      "part": "brick_2x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 14,
+      "z": 1,
+      "rot": 90
+    },
+    {
+      "part": "brick_2x4",
+      "color": "yellow",
+      "x": 4,
+      "y": 14,
+      "z": 1,
+      "rot": 90
+    },
+    {
+      "part": "brick_1x1",
+      "color": "yellow",
+      "x": 2,
+      "y": 17,
+      "z": 1,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x1",
+      "color": "black",
+      "x": 3,
+      "y": 17,
+      "z": 1,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x2",
+      "color": "yellow",
+      "x": 4,
+      "y": 17,
+      "z": 1,
+      "rot": 0
+    },
+    {
+      "part": "brick_2x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 17,
+      "z": 2,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x1",
+      "color": "yellow",
+      "x": 2,
+      "y": 17,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x1",
+      "color": "black",
+      "x": 3,
+      "y": 17,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x2",
+      "color": "yellow",
+      "x": 4,
+      "y": 17,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "plate_4x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 20,
+      "z": 1,
+      "rot": 0
+    },
+    {
+      "part": "slope45_2x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 21,
+      "z": 1,
+      "rot": 180
+    },
+    {
+      "part": "slope45_2x4",
+      "color": "yellow",
+      "x": 2,
+      "y": 21,
+      "z": 3,
+      "rot": 0
+    }
+  ]
+}

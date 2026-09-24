@@ -1,0 +1,782 @@
+{
+  "name": "Blue Pickup Truck",
+  "description": "A blue pickup truck with an open bed, red taillights, a cab with clear windows and windscreens, a flat hood with a gray grille and clear headlights, black fender flares and four medium wheels that stick out past the body.",
+  "parts": [
+    {
+      "part": "4600",
+      "color": "black",
+      "x": 1,
+      "y": 3,
+      "z": 5,
+      "rot": 0
+    },
+    {
+      "part": "4600",
+      "color": "black",
+      "x": 11,
+      "y": 3,
+      "z": 5,
+      "rot": 0
+    },
+    {
+      "part": "4600",
+      "color": "black",
+      "x": 1,
+      "y": 3,
+      "z": 20,
+      "rot": 0
+    },
+    {
+      "part": "4600",
+      "color": "black",
+      "x": 11,
+      "y": 3,
+      "z": 20,
+      "rot": 0
+    },
+    {
+      "part": "50944c01",
+      "color": "black",
+      "x": 0,
+      "y": 0,
+      "z": 4,
+      "rot": 180
+    },
+    {
+      "part": "50944c01",
+      "color": "black",
+      "x": 13,
+      "y": 0,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "50944c01",
+      "color": "black",
+      "x": 0,
+      "y": 0,
+      "z": 19,
+      "rot": 180
+    },
+    {
+      "part": "50944c01",
+      "color": "black",
+      "x": 13,
+      "y": 0,
+      "z": 19,
+      "rot": 0
+    },
+    {
+      "part": "3029",
+      "color": "black",
+      "x": 1,
+      "y": 4,
+      "z": 4,
+      "rot": 0
+    },
+    {
+      "part": "3029",
+      "color": "black",
+      "x": 1,
+      "y": 4,
+      "z": 20,
+      "rot": 0
+    },
+    {
+      "part": "3033",
+      "color": "black",
+      "x": 1,
+      "y": 5,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "3033",
+      "color": "black",
+      "x": 7,
+      "y": 5,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "3028",
+      "color": "black",
+      "x": 1,
+      "y": 5,
+      "z": 10,
+      "rot": 90
+    },
+    {
+      "part": "3028",
+      "color": "black",
+      "x": 7,
+      "y": 5,
+      "z": 10,
+      "rot": 90
+    },
+    {
+      "part": "3958",
+      "color": "black",
+      "x": 1,
+      "y": 5,
+      "z": 22,
+      "rot": 0
+    },
+    {
+      "part": "3958",
+      "color": "black",
+      "x": 7,
+      "y": 5,
+      "z": 22,
+      "rot": 0
+    },
+    {
+      "part": "2465",
+      "color": "blue",
+      "x": 1,
+      "y": 6,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "6112",
+      "color": "blue",
+      "x": 1,
+      "y": 6,
+      "z": 16,
+      "rot": 90
+    },
+    {
+      "part": "2465",
+      "color": "blue",
+      "x": 12,
+      "y": 6,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "6112",
+      "color": "blue",
+      "x": 12,
+      "y": 6,
+      "z": 16,
+      "rot": 90
+    },
+    {
+      "part": "6111",
+      "color": "blue",
+      "x": 2,
+      "y": 6,
+      "z": 0,
+      "rot": 0
+    },
+    {
+      "part": "6111",
+      "color": "blue",
+      "x": 2,
+      "y": 6,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "6111",
+      "color": "blue",
+      "x": 2,
+      "y": 6,
+      "z": 19,
+      "rot": 0
+    },
+    {
+      "part": "6111",
+      "color": "blue",
+      "x": 2,
+      "y": 6,
+      "z": 27,
+      "rot": 0
+    },
+    {
+      "part": "plate_1x3",
+      "color": "blue",
+      "x": 1,
+      "y": 9,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "plate_2x6",
+      "color": "black",
+      "x": 0,
+      "y": 9,
+      "z": 3,
+      "rot": 90
+    },
+    {
+      "part": "plate_1x8",
+      "color": "blue",
+      "x": 1,
+      "y": 9,
+      "z": 9,
+      "rot": 90
+    },
+    {
+      "part": "plate_1x1",
+      "color": "blue",
+      "x": 1,
+      "y": 9,
+      "z": 17,
+      "rot": 0
+    },
+    {
+      "part": "plate_2x6",
+      "color": "black",
+      "x": 0,
+      "y": 9,
+      "z": 18,
+      "rot": 90
+    },
+    {
+      "part": "plate_1x4",
+      "color": "blue",
+      "x": 1,
+      "y": 9,
+      "z": 24,
+      "rot": 90
+    },
+    {
+      "part": "plate_1x3",
+      "color": "blue",
+      "x": 12,
+      "y": 9,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "plate_2x6",
+      "color": "black",
+      "x": 12,
+      "y": 9,
+      "z": 3,
+      "rot": 90
+    },
+    {
+      "part": "plate_1x8",
+      "color": "blue",
+      "x": 12,
+      "y": 9,
+      "z": 9,
+      "rot": 90
+    },
+    {
+      "part": "plate_1x1",
+      "color": "blue",
+      "x": 12,
+      "y": 9,
+      "z": 17,
+      "rot": 0
+    },
+    {
+      "part": "plate_2x6",
+      "color": "black",
+      "x": 12,
+      "y": 9,
+      "z": 18,
+      "rot": 90
+    },
+    {
+      "part": "plate_1x4",
+      "color": "blue",
+      "x": 12,
+      "y": 9,
+      "z": 24,
+      "rot": 90
+    },
+    {
+      "part": "4477",
+      "color": "blue",
+      "x": 2,
+      "y": 9,
+      "z": 0,
+      "rot": 0
+    },
+    {
+      "part": "4477",
+      "color": "blue",
+      "x": 2,
+      "y": 9,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "4477",
+      "color": "blue",
+      "x": 2,
+      "y": 9,
+      "z": 19,
+      "rot": 0
+    },
+    {
+      "part": "4477",
+      "color": "light_gray",
+      "x": 2,
+      "y": 9,
+      "z": 27,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x1",
+      "color": "red",
+      "x": 1,
+      "y": 10,
+      "z": 0,
+      "rot": 0
+    },
+    {
+      "part": "6112",
+      "color": "blue",
+      "x": 1,
+      "y": 10,
+      "z": 1,
+      "rot": 90
+    },
+    {
+      "part": "brick_1x8",
+      "color": "blue",
+      "x": 1,
+      "y": 10,
+      "z": 13,
+      "rot": 90
+    },
+    {
+      "part": "brick_1x6",
+      "color": "blue",
+      "x": 1,
+      "y": 10,
+      "z": 21,
+      "rot": 90
+    },
+    {
+      "part": "brick_1x1",
+      "color": "blue",
+      "x": 1,
+      "y": 10,
+      "z": 27,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x1",
+      "color": "red",
+      "x": 12,
+      "y": 10,
+      "z": 0,
+      "rot": 0
+    },
+    {
+      "part": "6112",
+      "color": "blue",
+      "x": 12,
+      "y": 10,
+      "z": 1,
+      "rot": 90
+    },
+    {
+      "part": "brick_1x8",
+      "color": "blue",
+      "x": 12,
+      "y": 10,
+      "z": 13,
+      "rot": 90
+    },
+    {
+      "part": "brick_1x6",
+      "color": "blue",
+      "x": 12,
+      "y": 10,
+      "z": 21,
+      "rot": 90
+    },
+    {
+      "part": "brick_1x1",
+      "color": "blue",
+      "x": 12,
+      "y": 10,
+      "z": 27,
+      "rot": 0
+    },
+    {
+      "part": "6111",
+      "color": "blue",
+      "x": 2,
+      "y": 10,
+      "z": 0,
+      "rot": 0
+    },
+    {
+      "part": "6111",
+      "color": "blue",
+      "x": 2,
+      "y": 10,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "6111",
+      "color": "blue",
+      "x": 2,
+      "y": 10,
+      "z": 19,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x2",
+      "color": "trans_clear",
+      "x": 2,
+      "y": 10,
+      "z": 27,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x6",
+      "color": "light_gray",
+      "x": 4,
+      "y": 10,
+      "z": 27,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x2",
+      "color": "trans_clear",
+      "x": 10,
+      "y": 10,
+      "z": 27,
+      "rot": 0
+    },
+    {
+      "part": "4162",
+      "color": "blue",
+      "x": 1,
+      "y": 13,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "63864",
+      "color": "blue",
+      "x": 1,
+      "y": 13,
+      "z": 8,
+      "rot": 90
+    },
+    {
+      "part": "4162",
+      "color": "blue",
+      "x": 12,
+      "y": 13,
+      "z": 0,
+      "rot": 90
+    },
+    {
+      "part": "63864",
+      "color": "blue",
+      "x": 12,
+      "y": 13,
+      "z": 8,
+      "rot": 90
+    },
+    {
+      "part": "4162",
+      "color": "blue",
+      "x": 2,
+      "y": 13,
+      "z": 0,
+      "rot": 0
+    },
+    {
+      "part": "tile_1x2",
+      "color": "blue",
+      "x": 10,
+      "y": 13,
+      "z": 0,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x4",
+      "color": "blue",
+      "x": 1,
+      "y": 13,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "window_1x2x2",
+      "color": "blue",
+      "x": 5,
+      "y": 13,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "window_1x2x2",
+      "color": "blue",
+      "x": 7,
+      "y": 13,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x4",
+      "color": "blue",
+      "x": 9,
+      "y": 13,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "3245a",
+      "color": "blue",
+      "x": 1,
+      "y": 13,
+      "z": 12,
+      "rot": 90
+    },
+    {
+      "part": "window_1x2x2",
+      "color": "blue",
+      "x": 1,
+      "y": 13,
+      "z": 14,
+      "rot": 90
+    },
+    {
+      "part": "window_1x2x2",
+      "color": "blue",
+      "x": 1,
+      "y": 13,
+      "z": 16,
+      "rot": 90
+    },
+    {
+      "part": "3245a",
+      "color": "blue",
+      "x": 12,
+      "y": 13,
+      "z": 12,
+      "rot": 90
+    },
+    {
+      "part": "window_1x2x2",
+      "color": "blue",
+      "x": 12,
+      "y": 13,
+      "z": 14,
+      "rot": 90
+    },
+    {
+      "part": "window_1x2x2",
+      "color": "blue",
+      "x": 12,
+      "y": 13,
+      "z": 16,
+      "rot": 90
+    },
+    {
+      "part": "3823",
+      "color": "trans_clear",
+      "x": 1,
+      "y": 13,
+      "z": 18,
+      "rot": 0
+    },
+    {
+      "part": "3823",
+      "color": "trans_clear",
+      "x": 5,
+      "y": 13,
+      "z": 18,
+      "rot": 0
+    },
+    {
+      "part": "3823",
+      "color": "trans_clear",
+      "x": 9,
+      "y": 13,
+      "z": 18,
+      "rot": 0
+    },
+    {
+      "part": "3029",
+      "color": "blue",
+      "x": 1,
+      "y": 13,
+      "z": 20,
+      "rot": 0
+    },
+    {
+      "part": "3029",
+      "color": "blue",
+      "x": 1,
+      "y": 13,
+      "z": 24,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x4",
+      "color": "blue",
+      "x": 1,
+      "y": 16,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "brick_1x4",
+      "color": "blue",
+      "x": 9,
+      "y": 16,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 1,
+      "y": 14,
+      "z": 20,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 7,
+      "y": 14,
+      "z": 20,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 1,
+      "y": 14,
+      "z": 22,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 7,
+      "y": 14,
+      "z": 22,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 1,
+      "y": 14,
+      "z": 24,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 7,
+      "y": 14,
+      "z": 24,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 1,
+      "y": 14,
+      "z": 26,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 7,
+      "y": 14,
+      "z": 26,
+      "rot": 0
+    },
+    {
+      "part": "3029",
+      "color": "blue",
+      "x": 1,
+      "y": 19,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "3029",
+      "color": "blue",
+      "x": 1,
+      "y": 19,
+      "z": 15,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 1,
+      "y": 20,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 7,
+      "y": 20,
+      "z": 11,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 1,
+      "y": 20,
+      "z": 13,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 7,
+      "y": 20,
+      "z": 13,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 1,
+      "y": 20,
+      "z": 15,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 7,
+      "y": 20,
+      "z": 15,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 1,
+      "y": 20,
+      "z": 17,
+      "rot": 0
+    },
+    {
+      "part": "69729",
+      "color": "blue",
+      "x": 7,
+      "y": 20,
+      "z": 17,
+      "rot": 0
+    }
+  ]
+}
