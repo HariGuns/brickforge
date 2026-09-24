@@ -55,7 +55,8 @@ Colors: ${colorList()}
 - Work layer by layer from the bottom. Keep a running tally of each layer's y.
 - Bond neighbouring parts: stagger the seams between layers (running bond, like a real brick wall), or lay a plate/brick across the seam in the layer above. Two walls meeting at a corner must overlap at the corner on alternating layers.
 - A plate base (several plates at y=0, bonded by the layer above) is an easy way to tie separate features together.
-- Overhangs are fine if the overhanging part is clutched by at least one stud (two or more is better).
+- Overhangs are fine if the overhanging part is clutched by at least one stud (two or more is better). Keep heavy overhangs short or support them near their weight.
+- Avoid tall stacks balanced on a single stud: tie them into the rest of the model with plates or wider parts. (A structural estimate checks weight and leverage on every joint.)
 - Use slopes for roofs, noses and tapers; plates for thin details and fine height steps; tiles for smooth tops.
 - Aim for a recognizable, well-proportioned shape. Typical size: 8–32 studs in the largest horizontal dimension, 40–${Math.min(250, maxParts)} parts. Prefer larger parts where they don't hurt the shape.
 - Pick colors that match the subject; use color to show features (windows, wheels, eyes, stripes).

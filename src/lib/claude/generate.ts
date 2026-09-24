@@ -186,7 +186,9 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
       const parsed = parseModel(text);
       model = parsed.model;
       if (model) {
-        v = validate(model);
+        // Structural issues (weak joints, overhangs) block acceptance during repair
+        // rounds; after the last round they're reported as warnings instead.
+        v = validate(model, { structure: round < CONFIG.maxRepairRounds ? "error" : "warn" });
         issues = v.errors;
         warnings = v.warnings;
       } else {

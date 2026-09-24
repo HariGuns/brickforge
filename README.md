@@ -56,6 +56,13 @@ A **design** (`src/lib/design/schema.ts`) describes a model as a tree of sub-bui
 
 A flat model is a design with no sub-builds, so the single-pass path and older saved builds are unchanged. Versions store the compiled `model` and, optionally, the `design`.
 
+**Structural estimate** (`src/lib/validate/structure.ts`, thresholds in `CONFIG.structure`). This is not a physics simulation.
+- **Load on joints:** each part gets a mass from its size (a 2×4 brick ≈ 2.3 g). Weight flows down through the joints, split by stud count, giving a load on every joint.
+- **`WEAK_JOINT`:** a single stud is the only thing holding a stack more than 12 plates tall, or more than 5 g.
+- **`OVERSTRESSED`:** an overhang whose leverage per supporting stud is over the limit.
+- **Only real weak points:** a part that's also tied into the model another way (bonded walls, spans on other supports) is never flagged.
+- **In the repair loop:** both count as errors during repair rounds, and as warnings after the last round.
+
 `.mpd` export for designs has one submodel per unique sub-build, with copies as references; the importer expands them back. Compiling ~4,600 parts in 425 nested copies takes about 60 ms (`npm run bench`).
 
 ## Where to tune things

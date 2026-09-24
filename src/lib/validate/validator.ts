@@ -2,6 +2,10 @@ import { CONFIG } from "../config";
 import { COLOR_MAP } from "../parts/colors";
 import { describe, footprintCells, resolve, worldStuds, type Resolved } from "../model/geometry";
 import type { BrickModel } from "../model/schema";
+import { analyzeStructure, type StructureReport } from "./structure";
+
+/** Issue codes from the structural estimate (they're warnings unless a repair round asks for errors). */
+export const STRUCTURAL_CODES = ["WEAK_JOINT", "OVERSTRESSED"] as const;
 
 export type IssueCode =
   | "UNKNOWN_PART"
@@ -16,6 +20,9 @@ export type IssueCode =
   | "UNSUPPORTED"
   | "DISCONNECTED"
   | "WEAK_CONNECTION"
+  // structural estimate
+  | "WEAK_JOINT"
+  | "OVERSTRESSED"
   // design / sub-build compiler
   | "UNKNOWN_SUBBUILD"
   | "DUPLICATE_SUBBUILD"
@@ -49,11 +56,15 @@ export interface ValidationResult {
   connections: Connection[];
   /** Connected groups of part indices, largest first (only parts that resolved). */
   components: number[][];
+  /** Load estimate per joint and part (absent when structure checks are off or the model has hard errors). */
+  structure?: StructureReport;
 }
 
 export interface ValidateOptions {
   grid?: { x: number; z: number; y: number };
   maxParts?: number;
+  /** Structural checks: "warn" (default), "error" (for repair rounds) or "off". */
+  structure?: "off" | "warn" | "error";
 }
 
 const key3 = (x: number, y: number, z: number) => `${x},${y},${z}`;
@@ -247,5 +258,13 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
     }
   }
 
-  return { valid: errors.length === 0, errors, warnings, connections, components };
+  // --- structural estimate (only once the basic checks pass) --------------------------
+  let structure: StructureReport | undefined;
+  const mode = opts.structure ?? "warn";
+  if (mode !== "off" && errors.length === 0) {
+    structure = analyzeStructure(model, connections, mode === "error" ? "error" : "warning");
+    for (const issue of structure.issues) (issue.severity === "error" ? errors : warnings).push(issue);
+  }
+
+  return { valid: errors.length === 0, errors, warnings, connections, components, structure };
 }

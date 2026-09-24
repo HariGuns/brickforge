@@ -78,6 +78,8 @@ export interface CompileOptions {
   grid?: { x: number; z: number; y: number };
   maxParts?: number;
   maxDepth?: number;
+  /** Structural checks, passed to the validator (default "warn"). */
+  structure?: "off" | "warn" | "error";
 }
 
 interface Tagged {
@@ -248,7 +250,7 @@ export function compileDesign(design: BrickDesign, opts: CompileOptions = {}): C
   // --- validation ------------------------------------------------------------------------
   let validation: ValidationResult | null = null;
   if (!errors.some((e) => ["SUBBUILD_CYCLE", "DUPLICATE_SUBBUILD"].includes(e.code))) {
-    validation = validate(model, { grid: opts.grid ?? CONFIG.design.grid, maxParts: opts.maxParts ?? CONFIG.design.maxParts });
+    validation = validate(model, { grid: opts.grid ?? CONFIG.design.grid, maxParts: opts.maxParts ?? CONFIG.design.maxParts, structure: opts.structure });
     const joins = joinChecks(model, validation, instances, origin);
     const suppress = joins.suppress;
     const where = (e: Issue) => {

@@ -22,6 +22,11 @@ const LABEL: Partial<Record<Issue["code"], [string, string]>> = {
   UNKNOWN_COLOR: ["unknown colour", "unknown colours"],
   TOO_MANY_PARTS: ["part-count overflow", "part-count overflows"],
   WEAK_CONNECTION: ["weak single-stud connection", "weak single-stud connections"],
+  WEAK_JOINT: ["overloaded single-stud joint", "overloaded single-stud joints"],
+  OVERSTRESSED: ["overhang with too much leverage", "overhangs with too much leverage"],
+  DETACHED_SUBBUILD: ["detached sub-build copy", "detached sub-build copies"],
+  SUBBUILD_UNSUPPORTED: ["sub-build copy with nothing under it", "sub-build copies with nothing under them"],
+  INTERLOCKED: ["interlocking sub-build group", "interlocking sub-build groups"],
 };
 
 function summarize(list: Issue[]): string {

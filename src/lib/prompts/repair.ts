@@ -12,6 +12,11 @@ const HINTS: Partial<Record<IssueCode, string>> = {
   UNKNOWN_PART: "Use only part ids from the parts table.",
   UNKNOWN_COLOR: "Use only colors from the color list.",
   INVALID_OUTPUT: "Return valid JSON matching the schema.",
+  WEAK_JOINT: "The part holds too much on one stud. Put a wider part under it, or bond it to neighbours so more studs clutch it; split tall single-stud stacks with plates that tie into the rest.",
+  OVERSTRESSED: "The weight sits too far from the studs holding it. Add support closer to the weight (a pillar or a wider part underneath), shorten the overhang, or clutch it with more studs near the load.",
+  DETACHED_SUBBUILD: "Move the copy so its bottom sits on studs of the model, or add glue parts that tie it in.",
+  SUBBUILD_UNSUPPORTED: "A copy is placed as one piece, so its bottom must sit on studs below it (or the ground), not hang from something above.",
+  INTERLOCKED: "Two copies each sit on the other. Merge them into one sub-build or change heights so one is fully below the other.",
 };
 
 export function repairPrompt(errors: Issue[], warnings: Issue[], opts: { round: number; maxErrors?: number } = { round: 1 }): string {

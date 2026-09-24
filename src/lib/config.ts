@@ -10,6 +10,13 @@ export const CONFIG = {
    * plan → sub-builds → assembly, "auto" = sub-builds for Large, single otherwise.
    */
   generator: "single" as "single" | "subbuilds" | "auto",
+  /**
+   * Structural estimate (see validate/structure.ts). Mass: grams per 1 stud × 1 stud
+   * × 1 plate of part volume (a 2×4 brick ≈ 2.3 g); slopes are ~75% solid.
+   * Limits: a single-stud joint may carry at most this stack height / weight, and
+   * the leverage of an overhang is limited per supporting stud (gram·studs).
+   */
+  structure: { gramsPerUnit: 0.0967, slopeFactor: 0.75, maxStackPlatesOnOneStud: 12, maxLoadOnOneStudG: 5, maxMomentPerStud: 6 },
   /** Repair rounds after the initial generation. */
   maxRepairRounds: 4,
   model: "claude-opus-5-5",

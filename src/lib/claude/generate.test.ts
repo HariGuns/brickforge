@@ -108,6 +108,28 @@ describe("edit mode (fake Claude)", () => {
   });
 });
 
+describe("structural issues in the repair loop (fake Claude)", () => {
+  const overhang = JSON.stringify({ name: "Beam", description: "d", parts: [P("brick_1x1", "red", 0, 0, 0), P("brick_1x8", "blue", 0, 3, 0)] });
+  const balanced = JSON.stringify({ name: "Beam", description: "d", parts: [P("brick_1x1", "red", 4, 0, 0), P("brick_1x8", "blue", 0, 3, 0)] });
+
+  it("sends an overhang back for repair", async () => {
+    const { client, requests } = fakeClient([overhang, balanced]);
+    const r = await generateModel({ text: "a beam" }, () => {}, { client });
+    dirs.push(r.debugDir);
+    expect(r.rounds.map((x) => x.errorCodes)).toEqual([{ OVERSTRESSED: 1 }, {}]);
+    expect(requests[1].messages.at(-1)!.content).toMatch(/OVERSTRESSED/);
+    expect(r.valid).toBe(true);
+  });
+
+  it("accepts it as a warning if it's still there after the last round", async () => {
+    const { client } = fakeClient(Array.from({ length: CONFIG.maxRepairRounds + 1 }, () => overhang));
+    const r = await generateModel({ text: "a beam" }, () => {}, { client });
+    dirs.push(r.debugDir);
+    expect(r.valid).toBe(true);
+    expect(r.validation?.warnings.map((w) => w.code)).toContain("OVERSTRESSED");
+  });
+});
+
 describe("parseModel", () => {
   it("reports schema problems as issues", () => {
     const r = parseModel(JSON.stringify({ name: "x", description: "x", parts: [{ part: "brick_2x2", color: "red", x: 0.5, y: 0, z: 0, rot: 45 }] }));
