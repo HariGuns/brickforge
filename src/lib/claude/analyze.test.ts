@@ -60,8 +60,8 @@ describe("photo builds start with the analysis", () => {
       messages: {
         stream(params: Anthropic.MessageCreateParams) {
           requests.push(structuredClone(params));
-          const isAnalysis = "keyFeatures" in (((params.output_config?.format?.schema ?? {}) as { properties?: object }).properties ?? {});
-          const text = JSON.stringify(isAnalysis ? huracan : car);
+          const props = ((params.output_config?.format?.schema ?? {}) as { properties?: object }).properties ?? {};
+          const text = JSON.stringify("keyFeatures" in props ? huracan : "matches" in props ? { matches: true, differences: [], model: { name: "", description: "", parts: [] } } : car);
           return {
             on() {
               return this;
@@ -77,7 +77,7 @@ describe("photo builds start with the analysis", () => {
     const r = await generateModel({ image: { mediaType: "image/jpeg", data: "AAAA" }, detail: "standard" }, (e) => events.push(e), { client });
     dirs.push(r.debugDir);
 
-    expect(requests).toHaveLength(2);
+    expect(requests).toHaveLength(3); // analysis, design, one comparison (matches)
     expect(requests[0].output_config?.effort).toBe(CONFIG.analysisEffort);
     expect(requests[0].tools).toBeUndefined();
     const designText = (requests[1].messages[0].content as Anthropic.ContentBlockParam[]).find((b) => b.type === "text") as Anthropic.TextBlockParam;
@@ -85,7 +85,7 @@ describe("photo builds start with the analysis", () => {
     expect(events.find((e) => e.type === "analysis")).toMatchObject({ type: "analysis", target: { width: 14, length: 33 } });
     expect(r.analysis?.analysis.subject).toBe("Lamborghini Huracán");
     // Total = analysis + design; the analysis is also logged on its own.
-    expect(r.usage.cost).toBeCloseTo(r.analysis!.cost + r.rounds.filter((x) => x.scope === "main").reduce((s, x) => s + x.usage.cost, 0), 6);
+    expect(r.usage.cost).toBeCloseTo(r.analysis!.cost + r.rounds.filter((x) => x.scope === "main" || x.scope.startsWith("refine")).reduce((s, x) => s + x.usage.cost, 0), 6);
     const summary = JSON.parse(fs.readFileSync(`${r.debugDir}/summary.json`, "utf8"));
     expect(summary.analysis.subject).toBe("Lamborghini Huracán");
     expect(summary.analysis.usage.cost).toBeGreaterThan(0);

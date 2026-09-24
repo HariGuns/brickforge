@@ -33,6 +33,8 @@ export interface Turn {
   stages?: StageState[];
   /** Part searches Claude made (search_parts), latest last. */
   searches?: string[];
+  /** Photo builds: comparison rounds against the photo. */
+  refines?: { round: number; rounds: number; status: "start" | "done"; matches?: boolean; differences?: string[]; accepted?: boolean; cost?: number }[];
   /** Photo builds: what the analysis found and the size it set. */
   analysis?: { subject: string; ratio: string; size: string; cost: number };
   result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string; parts?: number; subBuilds?: number; copies?: number; compileMs?: number };
@@ -97,6 +99,7 @@ function stageRows(t: Turn): Row[] {
       rows.push({ label, state: s.valid ? "done" : "fail", note: `${what}${reps ? ` · ${reps} repair${reps === 1 ? "" : "s"}` : ""}${s.valid ? "" : " · has problems"}` });
     }
   }
+  rows.push(...refineRows(t));
   if (t.status === "error" || t.status === "cancelled") rows.push({ label: t.status === "cancelled" ? "Cancelled" : "Failed", state: "fail", note: "" });
   else
     rows.push({
@@ -105,6 +108,17 @@ function stageRows(t: Turn): Row[] {
       note: t.result ? `${t.result.valid ? "buildable" : `${t.result.problems} left`} · ${t.result.subBuilds ?? 0} sub-builds, ${t.result.copies ?? 0} copies` : "",
     });
   return rows;
+}
+
+/** "Comparing with the photo (1 of 2)": what differed, and whether the correction was taken. */
+function refineRows(t: Turn): Row[] {
+  return (t.refines ?? []).map((r) => {
+    const label = `Comparing with the photo (${r.round} of ${r.rounds})`;
+    if (r.status === "start") return { label, state: t.status === "running" ? "active" : "fail", note: t.status === "running" ? "rendering and comparing" : "" };
+    const diffs = r.differences?.length ? `${r.differences.length} difference${r.differences.length === 1 ? "" : "s"}: ${r.differences.slice(0, 2).join("; ")}${r.differences.length > 2 ? "; …" : ""}` : "";
+    const what = r.matches ? `matches${diffs ? ` · ${diffs}` : ""}` : r.accepted ? `refined · ${diffs}` : `correction didn't pass the checks, kept the previous model`;
+    return { label, state: r.matches || r.accepted ? "done" : "fail", note: `${what} · ${usd(r.cost ?? 0)}` };
+  });
 }
 
 /** "Reading the photo": the subject, its proportions and the size it set. */
@@ -154,6 +168,7 @@ function trackerRows(t: Turn): Row[] {
     });
   }
 
+  rows.push(...refineRows(t));
   if (t.status === "error" || t.status === "cancelled") {
     rows.push({ label: t.status === "cancelled" ? "Cancelled" : "Failed", state: "fail", note: "" });
   } else {

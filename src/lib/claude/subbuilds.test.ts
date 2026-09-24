@@ -56,6 +56,7 @@ function fakeClient(opts: { failAssembly?: boolean; assemblyOk?: boolean } = {})
         const first = typeof c0 === "string" ? c0 : c0.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n");
         let text: string;
         if ("keyFeatures" in props) text = JSON.stringify(photoAnalysis);
+        else if ("matches" in props) text = JSON.stringify({ matches: true, differences: [], design: { name: "", description: "", subBuilds: [], main: { parts: [], uses: [] } } });
         else if ("layout" in props) text = JSON.stringify(plan);
         else if ("uses" in props) {
           if (opts.failAssembly) throw new Error("Your credit balance is too low to access the Anthropic API.");
@@ -140,7 +141,9 @@ describe("sub-build generator (fake Claude)", () => {
 
     const second = fakeClient({ assemblyOk: true });
     const r = await resumeDesign(dir, () => {}, { client: second.client });
-    expect(second.requests.map((q) => ("uses" in schemaProps(q) ? "assembly" : "keyFeatures" in schemaProps(q) ? "analysis" : "other"))).toEqual(["assembly"]);
+    // Only the assembly is redone (the analysis is reused), then the finished design is compared with the photo.
+    expect(second.requests.map((q) => ("uses" in schemaProps(q) ? "assembly" : "keyFeatures" in schemaProps(q) ? "analysis" : "matches" in schemaProps(q) ? "compare" : "other"))).toEqual(["assembly", "compare"]);
+    expect(r.refine?.[0].matches).toBe(true);
     expect(r.analysis?.analysis.subject).toBe("A small village");
     expect(r.rounds.filter((x) => x.reused).map((x) => x.scope)).toContain("analysis");
   });

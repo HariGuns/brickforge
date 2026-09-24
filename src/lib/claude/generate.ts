@@ -10,6 +10,8 @@ import { photoDesignPrompt, textDesignPrompt } from "../prompts/design";
 import { analysisBlock, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
 import type { Detail } from "../detail";
 import { analyzePhoto, type AnalysisEvent } from "./analyze";
+import { refineWithPhoto, type RefineEvent, type RefineLog } from "./refine";
+import { refineJsonSchema, refinePrompt } from "../prompts/refine";
 import { sumUsage } from "./usage";
 import { editPrompt } from "../prompts/edit";
 import { validate, type Issue, type ValidationResult } from "../validate/validator";
@@ -47,6 +49,8 @@ export interface GenerateResult {
   pipeline?: "single" | "subbuilds";
   /** Photo builds: what the analysis found, the size it set, and what it cost (also counted in `usage`). */
   analysis?: { analysis: PhotoAnalysis; target: SizeTarget; cost: number };
+  /** Photo builds: the comparison rounds against the photo (their cost is also counted in `usage`). */
+  refine?: RefineLog[];
 }
 
 /** A stage of the sub-build path starting or finishing ("plan", "sub:<id>", "assembly"). */
@@ -61,7 +65,7 @@ export interface StageEvent {
   cost?: number;
 }
 
-export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | AnalysisEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };
+export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | AnalysisEvent | RefineEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };
 
 let client: { key: string; api: Anthropic } | null = null;
 /** A client for the current key (Settings, or ANTHROPIC_API_KEY in .env.local); rebuilt when the key changes. */
@@ -84,6 +88,11 @@ export function parseModel(text: string): { model: BrickModel | null; issues: Is
   } catch (e) {
     return { model: null, issues: [invalidOutput(`Output was not valid JSON (${(e as Error).message}).`)] };
   }
+  return parseModelJson(json);
+}
+
+/** A model from already-parsed JSON (e.g. the model inside a comparison answer). */
+export function parseModelJson(json: unknown): { model: BrickModel | null; issues: Issue[] } {
   const r = BrickModelSchema.safeParse(json);
   if (!r.success) {
     const issues = r.error.issues.slice(0, 20).map((i) => invalidOutput(`${i.path.join(".")}: ${i.message}`));
@@ -156,18 +165,58 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
     { anthropic, debug, onEvent, signal },
   );
 
-  const bestModel = loop.best?.value ?? null;
-  const v = bestModel ? validate(bestModel, { structure: loop.best!.check.valid ? "warn" : "error" }) : null;
+  let bestModel = loop.best?.value ?? null;
+  let best = loop.best?.check ?? null;
+  const rounds = [...(photo?.rounds ?? []), ...loop.rounds];
+
+  // Photo builds: compare renders with the photo and refine (valid models only).
+  let refine: { usage: RoundUsage; log: RefineLog[] } | null = null;
+  if (photo && input.image && bestModel && best?.valid && CONFIG.refine.rounds > 0) {
+    const r = await refineWithPhoto<BrickModel>(
+      {
+        photo: input.image,
+        analysis: photo.analysis,
+        target: photo.target,
+        initial: bestModel,
+        toModel: (m) => m,
+        prompt: (m, round, n) => refinePrompt(photo.analysis, photo.target, m, round, n),
+        schema: refineJsonSchema("model", brickModelJsonSchema() as unknown as Record<string, unknown>),
+        key: "model",
+        parseInner: (json) => {
+          const p = parseModelJson(json);
+          return { value: p.model, issues: p.issues };
+        },
+        check: (m, last) => {
+          const v = validate(m, { structure: last ? "warn" : "error" });
+          return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: m.parts.length };
+        },
+        system,
+        tools: [searchPartsTool],
+      },
+      { anthropic, debug, onEvent, signal },
+      onEvent,
+    );
+    rounds.push(...r.rounds);
+    refine = { usage: r.usage, log: r.log };
+    if (r.value !== bestModel) {
+      bestModel = r.value;
+      const v = validate(bestModel, { structure: "warn" });
+      best = { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: bestModel.parts.length };
+    }
+  }
+
+  const v = bestModel ? validate(bestModel, { structure: best?.valid ? "warn" : "error" }) : null;
   const result: GenerateResult = {
     model: bestModel,
-    valid: loop.best?.check.valid ?? false,
-    validation: v ? { errors: loop.best!.check.errors, warnings: loop.best!.check.warnings, components: v.components, connections: v.connections } : null,
+    valid: best?.valid ?? false,
+    validation: v ? { errors: best!.errors, warnings: best!.warnings, components: v.components, connections: v.connections } : null,
     steps: bestModel ? buildSteps(bestModel) : [],
-    rounds: loop.rounds,
-    usage: photo ? sumUsage([photo.usage, loop.usage]) : loop.usage,
+    rounds,
+    usage: sumUsage(rounds.map((r) => r.usage)),
     debugDir: debug.dir,
     pipeline: "single",
     ...(photo ? { analysis: { analysis: photo.analysis, target: photo.target, cost: photo.usage.cost } } : {}),
+    ...(refine ? { refine: refine.log } : {}),
   };
   const catalog = catalogUsage(result.model);
   console.log(`[generate] ${formatCatalogUsage(catalog)}`);
@@ -176,12 +225,13 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
     valid: result.valid,
     rounds: loop.rounds,
     ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, usage: photo.usage } } : {}),
+    ...(refine ? { refine: { rounds: refine.log, usage: refine.usage } } : {}),
     total: result.usage,
     partCount: result.model?.parts.length ?? 0,
     catalog,
   });
   if (result.model) debug.write("final-model.json", result.model);
-  console.log(`[generate] done: valid=${result.valid}, ${loop.rounds.length} round(s) · total ${formatUsage(result.usage)}${photo ? ` (analysis ${formatUsage(photo.usage)})` : ""} · debug: ${debug.dir}`);
+  console.log(`[generate] done: valid=${result.valid}, ${loop.rounds.length} design round(s) · total ${formatUsage(result.usage)}${photo ? ` (analysis ${formatUsage(photo.usage)})` : ""}${refine ? ` (comparison ${formatUsage(refine.usage)})` : ""} · debug: ${debug.dir}`);
   onEvent({ type: "done", result });
   return result;
 }

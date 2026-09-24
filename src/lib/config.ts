@@ -28,6 +28,12 @@ export const CONFIG = {
     very_high: { width: 22, parts: 1500 },
     vehicleMinWidth: 14,
   },
+  /**
+   * Photo builds: compare renders with the photo and refine, up to `rounds`
+   * times (0 = off); each refined model gets up to `repairRounds` repairs.
+   * Renders are width × height px.
+   */
+  refine: { rounds: 2, repairRounds: 2, width: 768, height: 512 },
   /** Effort for the photo analysis call (a short structured description). */
   analysisEffort: "medium" as const,
   /** Sub-build generator limits: unique sub-builds, total copies, envelope size (studs), parts per copy, parallel calls. */

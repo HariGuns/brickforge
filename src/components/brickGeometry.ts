@@ -28,14 +28,20 @@ function colorIdForLdraw(code: number): string {
 const meshLoads = new Map<string, Promise<boolean>>();
 
 /** Load the meshes of any catalog parts among `partIds`. Resolves true if something new arrived (rebuild the scene). */
+/** How mesh files are read: fetch in the browser; the server-side renderer reads them from disk. */
+type MeshReader = (id: string) => Promise<ArrayBuffer>;
+let readMesh: MeshReader = (id) => fetch(`/parts/${encodeURIComponent(id)}.bin`).then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(`HTTP ${r.status}`))));
+export function setMeshReader(reader: MeshReader) {
+  readMesh = reader;
+}
+
 export async function loadPartMeshes(partIds: Iterable<string>): Promise<boolean> {
   const wanted = [...new Set(partIds)].filter((id) => getPart(id)?.mesh && !meshGeo.has(id));
   const results = await Promise.all(
     wanted.map((id) => {
       let p = meshLoads.get(id);
       if (!p) {
-        p = fetch(`/parts/${encodeURIComponent(id)}.bin`)
-          .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(`HTTP ${r.status}`))))
+        p = readMesh(id)
           .then((buf) => {
             const { positions, indices, groups } = parseMesh(buf);
             const g = new THREE.BufferGeometry();

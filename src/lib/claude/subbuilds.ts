@@ -1,4 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { refineWithPhoto, type RefineLog } from "./refine";
+import { refineDesignPrompt, refineJsonSchema } from "../prompts/refine";
 import { analysisBlock, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
 import { analyzePhoto } from "./analyze";
 import type { RoundUsage } from "./usage";
@@ -251,9 +253,42 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
 
   // --- result -------------------------------------------------------------------------------
   const rounds = [...(photo?.rounds ?? []), ...earlierRounds, ...planLoop.rounds, ...subLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
+  let design = a ? designOf(a) : null;
+
+  // Photo builds: compare renders with the photo and refine the design (valid designs only).
+  let refine: { usage: RoundUsage; log: RefineLog[] } | null = null;
+  if (photo && input.image && design && assembly.best?.check.valid && CONFIG.refine.rounds > 0) {
+    const r = await refineWithPhoto<BrickDesign>(
+      {
+        photo: input.image,
+        analysis: photo.analysis,
+        target: photo.target,
+        initial: design,
+        toModel: (d) => compileDesign(d, { structure: "off" }).model,
+        prompt: (d, round, n) => refineDesignPrompt(photo!.analysis, photo!.target, d, compileDesign(d, { structure: "off" }).stats.pieces, round, n),
+        schema: refineJsonSchema("design", designJsonSchema()),
+        key: "design",
+        parseInner: (json) => {
+          const p = BrickDesignSchema.safeParse(json);
+          return p.success ? { value: p.data, issues: [] } : { value: null, issues: p.error.issues.slice(0, 10).map((i) => ({ code: "INVALID_OUTPUT" as const, severity: "error" as const, parts: [], message: `${i.path.join(".")}: ${i.message}` })) };
+        },
+        check: (d, last) => {
+          const c = compileDesign(d, { structure: last ? "warn" : "error" });
+          return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
+        },
+        system,
+        tools: [searchPartsTool],
+      },
+      ctx,
+      onEvent,
+    );
+    rounds.push(...r.rounds);
+    refine = { usage: r.usage, log: r.log };
+    design = r.value;
+  }
+
   const usage = sumUsage(rounds.map((r) => r.usage));
   const spentNow = sumUsage(rounds.filter((r) => !r.reused).map((r) => r.usage));
-  const design = a ? designOf(a) : null;
   const compiled = design ? compileDesign(design, { structure: assembly.best!.check.valid ? "warn" : "error" }) : null;
   const result: GenerateResult = {
     model: compiled?.model ?? null,
@@ -269,12 +304,14 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     compile: compiled ? { stats: compiled.stats, tree: compiled.tree, subBuilds: compiled.subBuilds } : undefined,
     pipeline: "subbuilds",
     ...(photo ? { analysis: { analysis: photo.analysis, target: photo.target, cost: photo.usage.cost } } : {}),
+    ...(refine ? { refine: refine.log } : {}),
   };
   const stages = {
     ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, rounds: photo.rounds.length, cost: photo.usage.cost } } : {}),
     plan: { rounds: planLoop.rounds.length, cost: planLoop.usage.cost },
     subBuilds: subLoops.map(({ sub, loop }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: loop.best?.value.parts.length ?? 0, valid: loop.best?.check.valid ?? false, rounds: loop.rounds.length, cost: loop.usage.cost })),
     assembly: { rounds: assembly.rounds.length, cost: assembly.usage.cost, valid: assembly.best?.check.valid ?? false },
+    ...(refine ? { refine: { rounds: refine.log, cost: refine.usage.cost } } : {}),
   };
   const resumed = cp
     ? {

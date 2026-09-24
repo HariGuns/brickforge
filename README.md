@@ -177,6 +177,18 @@ Where the analysis shows up:
 - **Cost:** it's included in the total and also logged on its own, as `analysis` in `summary.json` and `analysis.json`.
 - **Resume:** a resumed sub-build run reuses it.
 
+**Comparison with the photo** (`src/lib/claude/refine.ts`, prompt in `src/lib/prompts/refine.ts`, settings in `CONFIG.refine`) runs after a photo build is valid:
+1. **Render.** A server-side software renderer (`src/lib/render/render.ts`: plain JavaScript, no GPU or LeoCAD) draws the model from the photo's camera angle (from the analysis) and from the side the photo shows. It uses the viewer's part shapes and the catalog meshes.
+2. **Compare.** Claude gets the photo, both renders and the current model (or, with sub-builds, the design). It either says the model matches, or lists up to 6 differences, proportions first, and returns a corrected model.
+3. **Check.** The correction must pass the validator, with up to 2 repairs. If it can't be made valid, the previous model stays.
+
+There are at most `rounds` (2) rounds, and the loop stops once Claude says the model matches.
+
+Where it shows up:
+- **Debug folder:** renders as `refine-N.view.png` and `refine-N.side.png`, and the differences in `refine-N.json`.
+- **Chat:** a "Comparing with the photo" row per round.
+- **Cost:** logged separately (`refine` in `summary.json`) and included in the total.
+
 **Manual:** wheel holders hanging under a chassis go in the same step as the part they hang from, and wheels go on last.
 
 ## Part catalog

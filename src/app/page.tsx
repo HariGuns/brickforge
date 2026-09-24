@@ -295,6 +295,12 @@ export default function Page() {
         updateTurn(id, (t) => ({ ...t, analysis }));
         break;
       }
+      case "refine":
+        updateTurn(id, (t) => {
+          const list = (t.refines ?? []).filter((x) => x.round !== ev.round);
+          return { ...t, refines: [...list, { round: ev.round, rounds: ev.rounds, status: ev.status, matches: ev.matches, differences: ev.differences, accepted: ev.accepted, cost: ev.cost }].sort((a, b) => a.round - b.round) };
+        });
+        break;
       case "tool":
         updateTurn(id, (t) => ({ ...t, searches: [...(t.searches ?? []), ev.summary] }));
         break;
