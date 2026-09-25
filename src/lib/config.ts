@@ -96,6 +96,7 @@ export const CONFIG = {
     plan: {},
     design: {},
     // Medium matched high on the Huracán sub-builds (same plan) for 33% less.
+    // Assembly, refine and design were tested at medium too (README, "Effort A/B"): they lost quality on vehicles.
     subBuild: { effort: "medium" },
     assembly: {},
     edit: {},

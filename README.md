@@ -252,6 +252,21 @@ The models are larger now because the Detail targets are bigger, and cost per pa
 
 Across these runs, the JSON answer fell from 18% to 5% of the cost, and answer tokens per part from about 22 to about 10. But thinking in the first design call still dominates, and cache re-writes on repairs cost back what diffs saved (fixed since, see caching above). The biggest single lever measured is effort: on the same Huracán plan, sub-builds at **medium** cost **$1.04 instead of $1.55 (−33%)** with equal quality. That's now the default for sub-builds. Details are in `docs/token-report-after.md` against `docs/token-report-before.md`.
 
+### Effort A/B on the other stages (2026-09-25, $1.58)
+
+Each stage was run at **medium** against its earlier **high** run. Assembly and comparison were controlled: the high run's folder was copied and resumed, so plan and sub-builds were identical. Design used new runs of the same prompts. None held quality, so all three stay at high.
+
+| Stage | Test | High | Medium | Verdict |
+|---|---|---|---|---|
+| Assembly | Village (same sub-builds) | $0.16, 46 s, valid | $0.13, 26 s, valid, same model | equal |
+| Assembly | Huracán, sideways (same sub-builds) | $1.00, 411 s, 377 parts | $0.41, 191 s, 292 parts, 1 repair | **worse**: left out all 4 planned fender arches |
+| Comparison | Huracán (same design) | $0.93, 2 rounds of real fixes | $0.14, "matches" at once | **worse**: missed the tucked wheels, 20 vs 16 studs wide, boxy deck |
+| Design | House | $0.32, 89 parts | $0.18, 72 parts | simpler: no chimney or path |
+| Design | Pickup | $0.47, 97 parts | $0.27, 65 parts | **worse**: slab cab with bare studs, no slopes or windscreen |
+| Design | Train (High detail) | $0.56, 231 parts | $0.45, 230 parts | equal |
+
+Medium keeps up on simple, regular builds (village, train) and falls behind where shape matters (vehicles), or where it has to find problems (comparison). The runs are the `ab-*` and `2026-09-25_10-10-56-*` folders in `debug/`.
+
 ## Part catalog
 
 Claude can use **978 parts**:
