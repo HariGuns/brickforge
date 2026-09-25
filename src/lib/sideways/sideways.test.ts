@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { CONFIG } from "../config";
 import { compileDesign } from "../design/compile";
 import type { BrickDesign } from "../design/schema";
@@ -7,8 +7,6 @@ import { getPart } from "../parts/library";
 import { worldBoxes, worldConnectors } from "./frame";
 import { buildSteps, checkStepOrder } from "../steps/steps";
 
-beforeAll(() => void (CONFIG.sideways.enabled = true));
-afterAll(() => void (CONFIG.sideways.enabled = false));
 
 // A 4×4 base with a brick that has a stud on its +z side (87087), and a 2×2 plate "panel"
 // mounted on that stud: its top faces +z, its bottom cell [0, 1] clips onto the stud.

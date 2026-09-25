@@ -3,6 +3,7 @@
  * listings we show it. One codec per format; the rest of the app always works
  * with Placement / Instance objects.
  */
+import { CONFIG } from "../config";
 import { COLOR_IDS } from "../parts/colors";
 import { PlacementSchema, type Placement } from "../model/schema";
 import { InstanceSchema, type Instance } from "../design/schema";
@@ -35,18 +36,29 @@ export const jsonCodec: Codec = {
     required: ["part", "color", "x", "y", "z", "rot"],
     additionalProperties: false,
   },
-  instanceSchema: {
-    type: "object",
-    properties: { sub: { type: "string" }, x: { type: "integer" }, y: { type: "integer" }, z: { type: "integer" }, rot: { type: "integer", enum: [0, 90, 180, 270] }, mirror: { type: "boolean" } },
-    required: ["sub", "x", "y", "z", "rot", "mirror"],
-    additionalProperties: false,
+  get instanceSchema() {
+    const base = { sub: { type: "string" }, x: { type: "integer" }, y: { type: "integer" }, z: { type: "integer" }, rot: { type: "integer", enum: [0, 90, 180, 270] }, mirror: { type: "boolean" } };
+    if (!CONFIG.sideways.enabled) return { type: "object", properties: base, required: Object.keys(base), additionalProperties: false };
+    // Sideways copies: mount on a side stud (null for a copy placed at x/y/z).
+    const mount = {
+      anyOf: [
+        {
+          type: "object",
+          properties: { part: { type: "integer" }, stud: { type: "integer" }, at: { type: "array", items: { type: "integer" } }, spin: { type: "integer", enum: [0, 90, 180, 270] } },
+          required: ["part", "stud", "at", "spin"],
+          additionalProperties: false,
+        },
+        { type: "null" },
+      ],
+    };
+    return { type: "object", properties: { ...base, mount }, required: [...Object.keys(base), "mount"], additionalProperties: false };
   },
   parsePlacement: (v) => {
     const r = PlacementSchema.safeParse(v);
     return r.success ? r.data : zodError(r.error);
   },
   parseInstance: (v) => {
-    const r = InstanceSchema.safeParse(v);
+    const r = InstanceSchema.safeParse(v && typeof v === "object" && (v as { mount?: unknown }).mount === null ? (({ mount: _, ...rest }) => rest)(v as { mount?: unknown }) : v);
     return r.success ? r.data : zodError(r.error);
   },
   formatPlacement: (p) => JSON.stringify(p),
@@ -64,7 +76,10 @@ const int = (s: string | undefined) => (s !== undefined && /^-?\d+$/.test(s) ? N
 export const compactCodec: Codec = {
   name: "compact",
   placementSchema: { type: "string", description: 'One part: "<part id> <color> <x> <y> <z> <rot>", e.g. "brick_2x4 red 3 0 5 90".' },
-  instanceSchema: { type: "string", description: 'One copy: "<sub-build id> <x> <y> <z> <rot>", plus " m" for a mirror image, e.g. "pine_tree 4 1 0 270" or "side_panel 0 1 0 0 m".' },
+  instanceSchema: {
+    type: "string",
+    description: 'One copy: "<sub-build id> <x> <y> <z> <rot>", plus " m" for a mirror image, e.g. "pine_tree 4 1 0 270" or "roof 0 1 0 0 m". A sideways copy: "<sub-build id> on <part>:<side stud> at <cx>,<cz> spin <0|90|180|270>" (plus " m"), e.g. "side_panel on 12:0 at 3,1 spin 0".',
+  },
   // Objects are accepted too (the JSON format), so either form parses.
   parsePlacement: (v) => {
     if (v && typeof v === "object") return jsonCodec.parsePlacement(v);
@@ -79,6 +94,14 @@ export const compactCodec: Codec = {
   parseInstance: (v) => {
     if (v && typeof v === "object") return jsonCodec.parseInstance(v);
     if (typeof v !== "string") return `expected a string like "pine_tree 4 1 0 270", got ${JSON.stringify(v)}`;
+    // Sideways: "side_panel on 12:0 at 3,1 spin 0 [m]".
+    const side = v.trim().match(/^(\S+)\s+on\s+(\d+):(\d+)\s+at\s+(-?\d+)\s*,\s*(-?\d+)(?:\s+spin\s+(\d+))?(\s+m)?$/);
+    if (side) {
+      const spin = Number(side[6] ?? 0);
+      if (!ROT.has(spin)) return `"${v}": spin must be 0, 90, 180 or 270`;
+      return { sub: side[1], x: 0, y: 0, z: 0, rot: 0, ...(side[7] ? { mirror: true } : {}), mount: { part: Number(side[2]), stud: Number(side[3]), at: [Number(side[4]), Number(side[5])], spin: spin as Instance["rot"] } };
+    }
+    if (/\son\s/.test(v)) return `"${v}" isn't "<sub-build id> on <part>:<side stud> at <cx>,<cz> spin <rot>"`;
     const t = v.trim().split(/\s+/);
     const mirror = t.at(-1) === "m";
     if (mirror) t.pop();
@@ -89,7 +112,7 @@ export const compactCodec: Codec = {
     return { sub, x, y, z, rot: rot as Instance["rot"], ...(mirror ? { mirror: true } : {}) };
   },
   formatPlacement: (p) => `${p.part} ${p.color} ${p.x} ${p.y} ${p.z} ${p.rot}`,
-  formatInstance: (u) => `${u.sub} ${u.x} ${u.y} ${u.z} ${u.rot}${u.mirror ? " m" : ""}`,
+  formatInstance: (u) => (u.mount ? `${u.sub} on ${u.mount.part}:${u.mount.stud} at ${u.mount.at[0]},${u.mount.at[1]} spin ${u.mount.spin ?? 0}${u.mirror ? " m" : ""}` : `${u.sub} ${u.x} ${u.y} ${u.z} ${u.rot}${u.mirror ? " m" : ""}`),
 };
 
 /**

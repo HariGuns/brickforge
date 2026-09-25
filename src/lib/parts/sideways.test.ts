@@ -2,15 +2,22 @@ import { describe, expect, it } from "vitest";
 import { getPart, PARTS, SNOT_PARTS } from "./library";
 import { searchParts } from "./search";
 import { worldSideStuds } from "../model/geometry";
+import { CONFIG } from "../config";
 
 const snot = (id: string) => SNOT_PARTS.find((p) => p.id === id)!;
 
 describe("side-stud parts (sideways building, phase 1)", () => {
-  it("are kept out of the app until sideways building is enabled", () => {
+  it("are in the app only while sideways building is enabled", () => {
     expect(SNOT_PARTS.length).toBeGreaterThanOrEqual(35);
-    expect(PARTS.some((p) => p.snot)).toBe(false);
-    expect(getPart("87087")).toBeUndefined();
-    expect(searchParts("brick with studs on side").some((p) => p.snot)).toBe(false);
+    expect(PARTS.some((p) => p.snot)).toBe(true);
+    expect(getPart("87087")?.snot).toBe(true);
+    expect(searchParts("brick with studs on side").some((p) => p.snot)).toBe(true);
+    CONFIG.sideways.enabled = false;
+    try {
+      expect(getPart("87087")).toBeUndefined();
+    } finally {
+      CONFIG.sideways.enabled = true;
+    }
   });
 
   it("record side studs at the face, on stud centres, at quarter-plate heights", () => {

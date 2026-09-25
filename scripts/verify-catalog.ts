@@ -239,7 +239,9 @@ for (const def of SNOT_PARTS) {
 console.log(`Side-stud parts: ${SNOT_PARTS.length - failures} of ${SNOT_PARTS.length} match LDraw.`);
 const sideFailures = failures;
 failures = 0;
-for (const def of CATALOG_PARTS) {
+// Upright parts only (side-stud parts are checked above; their flanges extend past their box by design).
+const UPRIGHT = CATALOG_PARTS.filter((p) => !p.snot);
+for (const def of UPRIGHT) {
   const first = lib.readLines(def.ldraw.file)?.[0] ?? "";
   const problems = /~Moved to/i.test(first) ? [`${def.ldraw.file} is a redirect`] : [];
   if (def.hub) problems.push(...checkWheel(def));
@@ -251,5 +253,5 @@ for (const def of CATALOG_PARTS) {
     for (const p of [...new Set(problems)].slice(0, 6)) console.log(`    ${p}`);
   }
 }
-console.log(`\nCatalog: ${CATALOG_PARTS.length - failures} of ${CATALOG_PARTS.length} parts match LDraw${failures ? `, ${failures} need fixing` : ""}. ${inferred.length} have anti-studs inferred from geometry (not in the shadow library).`);
+console.log(`\nCatalog: ${UPRIGHT.length - failures} of ${UPRIGHT.length} upright parts match LDraw${failures ? `, ${failures} need fixing` : ""}. ${inferred.length} have anti-studs inferred from geometry (not in the shadow library).`);
 process.exit(failures || sideFailures ? 1 : 0);

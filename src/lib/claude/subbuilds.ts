@@ -51,6 +51,7 @@ const PlanSchema = z.object({
       h: z.number().int(),
       parts: z.number().int(),
       copies: z.number().int(),
+      sideways: z.boolean().optional(),
     }),
   ),
 });
@@ -87,6 +88,7 @@ export function checkPlan(plan: Plan): Issue[] {
     if (b.h < 1 || b.h > 90) bad(`${b.id}: height ${b.h} plates must be between 1 and 90.`);
     if (b.parts < 3 || b.parts > s.maxSubParts) bad(`${b.id}: part budget ${b.parts} must be between 3 and ${s.maxSubParts}.`);
     if (b.copies < 1) bad(`${b.id}: plan at least one copy.`);
+    if (b.sideways && b.h > 6) bad(`${b.id}: a sideways panel is at most 6 plates thick (you planned ${b.h}); its face is w × d.`);
   }
   const copies = plan.subBuilds.reduce((n, b) => n + b.copies, 0);
   if (copies > s.maxCopies) bad(`Plan at most ${s.maxCopies} copies in total (you planned ${copies}).`);
@@ -244,7 +246,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   const aText = assemblyPrompt(
     request,
     plan,
-    built.map(({ sub, model }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: model.parts.length, maps: surfaceMaps(model) })),
+    built.map(({ sub, model }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: model.parts.length, maps: surfaceMaps(model), sideways: CONFIG.sideways.enabled && sub.sideways })),
   );
   const designOf = (a: Assembly): BrickDesign => ({ name: a.name, description: a.description, subBuilds, main: { parts: a.parts, uses: a.uses } });
   const savedAssembly = cp?.assembly.valid ? AssemblySchema.safeParse(cp.assembly.valid) : null;

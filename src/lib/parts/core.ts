@@ -25,4 +25,6 @@ export const CORE_MENU_CATALOG: string[] = [
   "3006", "6111", "6112", "2465", "2357", "2356", "14716", "6191", "37352", "3245a",
   // Panels.
   "4865a", "87552",
+  // Side studs, for sideways copies (only while sideways building is enabled).
+  "87087", "11211", "30414", "47905", "52107", "32952", "99781", "99780",
 ];

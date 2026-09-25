@@ -19,6 +19,11 @@ export interface PlannedSubBuild {
   /** Part budget for one copy. */
   parts: number;
   copies: number;
+  /**
+   * A sideways panel (sideways building): built flat like a picture, then turned
+   * onto its side and clipped onto side studs. w × d is its face, h its thickness.
+   */
+  sideways?: boolean;
 }
 
 export interface Plan {
@@ -45,12 +50,14 @@ ${analysis ? `\n${analysis}\n` : `Target size: ${detailTargetText(detail)}.`}
 Split the model into sub-builds: self-contained pieces that are each built on their own as one connected piece, then placed on the main build. Good sub-builds are repeated features (trees, houses, windows bays, towers, wheels sets, fence runs) or big distinct sections (a hull, a tower, a gatehouse). Repeating a sub-build as several copies is the main way to get a large, detailed model cheaply, so use copies wherever the subject repeats. Left/right pairs count as repeats: a copy can be a mirror image (mirror: true in the assembly), so a vehicle's right side panel, wheel arch or wing can be designed once and mirrored for the left side.
 
 The main build holds the base (plates the copies stand on) and glue parts that tie copies together; it is designed last, once every sub-build exists.
-
+${CONFIG.sideways.enabled ? `
+Sideways panels (optional): a sub-build can be a panel that's turned onto its side and clipped onto side studs of the main build (bricks with studs on the side, brackets), with its studs facing outwards. Use it for large flat vertical faces that should look smooth or detailed from the side: a car's flanks, doors, a building's facade, a ship's hull sides. Mark it sideways: true; its envelope is then its face, w studs wide × d studs tall, and h is its thickness in plates (1–3 is typical). Mirror a panel for the opposite side. Everything else stays upright (sideways: false).
+` : ""}
 For each unique sub-build give:
 - id (lowercase, letters/digits/_), name (human label), purpose (one sentence: what it is and how it looks)
 - envelope: w × d studs footprint and h plates tall that ONE copy must fit inside (w, d ≤ ${s.maxEnvelope}; brick = 3 plates)
 - parts: a part budget for one copy (≤ ${s.maxSubParts})
-- copies: how many copies the main build will place
+- copies: how many copies the main build will place${CONFIG.sideways.enabled ? "\n- sideways: true for a sideways panel, false otherwise" : ""}
 
 Limits: at most ${s.maxUnique} unique sub-builds and ${s.maxCopies} copies in total; parts × copies over all sub-builds ≤ ${CONFIG.design.maxParts - 400}.
 
@@ -77,8 +84,9 @@ export function planJsonSchema(): Record<string, unknown> {
             h: { type: "integer" },
             parts: { type: "integer" },
             copies: { type: "integer" },
+            ...(CONFIG.sideways.enabled ? { sideways: { type: "boolean" } } : {}),
           },
-          required: ["id", "name", "purpose", "w", "d", "h", "parts", "copies"],
+          required: ["id", "name", "purpose", "w", "d", "h", "parts", "copies", ...(CONFIG.sideways.enabled ? ["sideways"] : [])],
           additionalProperties: false,
         },
       },
@@ -100,13 +108,21 @@ Design the sub-build "${sub.name}" (${sub.copies} cop${sub.copies === 1 ? "y" : 
 Rules for this sub-build:
 - Its own frame: it must fit inside x 0..${sub.w - 1}, z 0..${sub.d - 1}, y 0..${sub.h - 1} (plates). Start at x = 0, z = 0 and put its lowest parts at y = 0.
 - It must be ONE connected piece on its own (it's built separately, then placed as a unit), and buildable bottom-up.
-- Its bottom will stand on studs of the main build, so give it a studded-to-underside base where it touches down (plain bricks or plates at y = 0, not tiles on the bottom face).
-- Aim for about ${sub.parts} parts. Make it detailed and recognisable; it's a real piece of the final model.
+${sub.sideways ? `- It's a SIDEWAYS PANEL: build it flat, like a picture lying face up. It will be turned onto its side, so its top (y = ${sub.h - 1} and up) becomes the outer face everyone sees and its bottom (y = 0) clips onto side studs of the main build. Seen from outside, x runs left to right and z runs top to bottom (z = 0 is the top edge). Draw the details on the top face: tiles for smooth paint, slopes and plates for relief.
+- Its bottom at y = 0 must be plates or bricks (not tiles) wherever it clips on, and it holds together as one piece through its bottom layer (e.g. long plates spanning it).
+` : `- Its bottom will stand on studs of the main build, so give it a studded-to-underside base where it touches down (plain bricks or plates at y = 0, not tiles on the bottom face).
+`}- Aim for about ${sub.parts} parts. Make it detailed and recognisable; it's a real piece of the final model.
 
 Return JSON with name "${sub.name}", a one-sentence description, and parts (listed bottom layer first). ${formatHelp()}`;
 }
 
-function surfaceText(m: SurfaceMaps): string {
+function surfaceText(m: SurfaceMaps, sideways?: boolean): string {
+  if (sideways)
+    return [
+      `  SIDEWAYS PANEL: face ${m.w} studs wide × ${m.d} studs tall, ${m.h} plates thick (x left → right, z top → bottom, seen from outside)`,
+      `  back (o = an anti-stud that can clip onto a side stud):`,
+      ...m.bottom.map((r, z) => `    z${z}: ${r}`),
+    ].join("\n");
   return [
     `  size: ${m.w} × ${m.d} studs, ${m.h} plates tall`,
     `  top surface (rows z = 0..${m.d - 1}, columns x = 0..${m.w - 1}; number = top height in plates, * = a free stud there, . = empty):`,
@@ -116,7 +132,7 @@ function surfaceText(m: SurfaceMaps): string {
   ].join("\n");
 }
 
-export function assemblyPrompt(request: string, plan: Plan, built: { id: string; name: string; copies: number; parts: number; maps: SurfaceMaps }[]): string {
+export function assemblyPrompt(request: string, plan: Plan, built: { id: string; name: string; copies: number; parts: number; maps: SurfaceMaps; sideways?: boolean }[]): string {
   const g = CONFIG.design.grid;
   return `You are assembling a large model from finished sub-builds.
 
@@ -125,7 +141,7 @@ Model: ${plan.name} — ${plan.description}
 Planned layout: ${plan.layout}
 
 Finished sub-builds (they can't be changed now; you place copies of them):
-${built.map((b) => `- ${b.id} "${b.name}" (${b.parts} parts, planned ${b.copies} cop${b.copies === 1 ? "y" : "ies"})\n${surfaceText(b.maps)}`).join("\n")}
+${built.map((b) => `- ${b.id} "${b.name}" (${b.parts} parts, planned ${b.copies} cop${b.copies === 1 ? "y" : "ies"})\n${surfaceText(b.maps, b.sideways)}`).join("\n")}
 
 Return the main build:
 - parts: the main build's own parts — the base the copies stand on and glue parts that tie copies together or finish the model. Same rules as always.
@@ -138,7 +154,13 @@ Rules the compiler checks:
 - Everything together must be one connected structure, buildable bottom-up. Things only connect through studs.
 - Build area: x 0..${g.x - 1}, z 0..${g.z - 1}; at most ${CONFIG.design.maxParts} parts after expanding copies.
 
-Place roughly the planned number of copies. Return JSON with name, description, parts and uses. ${formatHelp(codec(), true)}`;
+${built.some((b) => b.sideways) ? `
+Sideways panels are mounted, not placed at x/y/z: give the copy a mount instead — "on <part>:<side stud> at <cx>,<cz> spin <rot>" (JSON: mount {part, stud, at: [cx, cz], spin}).
+- part is the index of one of the main build's own parts that has side studs (bricks with studs on the side, brackets; search for "side studs" or "bracket"). stud is the index of its side stud, as listed in the part's row ("side studs: 0: +z face at …"). Side studs turn with the part: at rot 90 a +z stud faces -x, +x faces +z; at rot 180 +z faces -z; at rot 270 +z faces +x.
+- The panel's back goes flat against that face, its outer face pointing the way the stud points, and the panel's back cell (cx, cz) (an o in its map) clips onto that stud. With spin 0 the panel is upright as drawn: z = 0 at the top, x running left to right as seen from outside. Every other o that lines up with another side stud clips on too, so put carriers at several heights and along the side to hold big panels.
+- Leave room: nothing else may be where the panel goes (it sticks out from the face by its thickness), and it must not dip below the ground.
+- The same panel on the opposite side of the model: mount a copy with mirror so its front and back stay the right way round.
+` : ""}Place roughly the planned number of copies. Return JSON with name, description, parts and uses. ${formatHelp(codec(), true)}`;
 }
 
 export function assemblyJsonSchema(): Record<string, unknown> {

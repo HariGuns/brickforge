@@ -378,7 +378,8 @@ const SNOT_MAP: ReadonlyMap<string, PartDef> = new Map(SNOT_PARTS.map((p) => [p.
 
 /** A part by id; side-stud parts only while sideways building is enabled (checked at call time). */
 export function getPart(id: string): PartDef | undefined {
-  return PART_MAP.get(id) ?? (CONFIG.sideways.enabled ? SNOT_MAP.get(id) : undefined);
+  const def = PART_MAP.get(id) ?? SNOT_MAP.get(id);
+  return def?.snot && !CONFIG.sideways.enabled ? undefined : def;
 }
 
 /** Local anti-studs [cx, cz, level] (resolves the "every cell at the bottom" default). */

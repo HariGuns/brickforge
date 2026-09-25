@@ -41,6 +41,11 @@ const SYNONYMS: Record<string, string[]> = {
   curved: ["curved", "curve"],
   wedge: ["wedge", "wing"],
   grille: ["grille", "grill"],
+  snot: ["side", "bracket"],
+  side: ["side", "sides"],
+  sideways: ["side", "bracket"],
+  bracket: ["bracket"],
+  headlight: ["side"],
 };
 
 /**

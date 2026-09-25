@@ -17,6 +17,8 @@ const HINTS: Partial<Record<IssueCode, string>> = {
   DETACHED_SUBBUILD: "Move the copy so its bottom sits on studs of the model, or add glue parts that tie it in.",
   SUBBUILD_UNSUPPORTED: "A copy is placed as one piece, so its bottom must sit on studs below it (or the ground), not hang from something above.",
   INTERLOCKED: "Two copies each sit on the other. Merge them into one sub-build or change heights so one is fully below the other.",
+  MOUNT_INVALID: "A sideways copy's mount must name one of the same build's own parts that has side studs (by index), one of its side studs (0-based, as in its part row), and an o cell of the panel's back. Fix the copy with setCopies.",
+  SIDEWAYS_DETACHED: "A sideways part touches no stud: its back must clip onto a side stud (or its studs take a part). Move its mount to a side stud, or add a side-stud brick or bracket where it sits.",
 };
 
 export function repairPrompt(errors: Issue[], warnings: Issue[], opts: { round: number; maxErrors?: number; diff?: { listing: string; instructions: string } } = { round: 1 }): string {

@@ -17,6 +17,8 @@ export function pinText(def: PartDef): string {
     const kind = def.pins[0].kind === "wpin" ? "wheel pins" : "Technic pins";
     out.push(`${kind} on ${def.pins.map((p) => dirWord[p.dir]).join(", ")} (take wheels with a matching hub)`);
   }
+  if (def.sideStuds?.length)
+    out.push(`side studs (for sideways copies): ${def.sideStuds.map((s, i) => `${i}: ${s.dir} face at (${s.at[0]},${s.at[1]}@,${s.at[2]})`.replace("@,", " plates up,")).join("; ")}${def.fine ? "; has a flange outside its footprint" : ""}`);
   if (def.hub) out.push(`wheel: mounts only on a ${def.hub.kind === "wpin" ? "wheel pin" : "Technic pin"}; hub faces ${def.hub.dir} at rot 0`);
   return out.join("; ");
 }

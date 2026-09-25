@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { importLdr } from "./import";
+import { CONFIG } from "../config";
 import { exportLdr, exportMpd } from "./export";
 import { buildSteps } from "../steps/steps";
 import { PARTS } from "../parts/library";
@@ -28,10 +29,21 @@ describe("LDraw import", () => {
   });
 
   it("skips parts it can't map, with a reason", () => {
-    const text = ["0 Odd", "1 4 0 -24 0 1 0 0 0 1 0 0 0 1 99999.dat", "1 4 0 -24 0 1 0 0 0 0 -1 0 1 0 3001.dat", "1 4 5 -24 0 1 0 0 0 1 0 0 0 1 3001.dat"].join("\n");
+    const text = ["0 Odd", "1 4 0 -24 0 1 0 0 0 1 0 0 0 1 99999.dat", "1 4 0 -24 0 1 0 0 0 1 0 0 0 -1 3001.dat", "1 4 5 -24 0 1 0 0 0 1 0 0 0 1 3001.dat"].join("\n");
     const { skipped, model } = importLdr(text);
     expect(model.parts).toHaveLength(0);
     expect(skipped.map((s) => s.reason)).toEqual(["unknown part 99999.dat", "part is tilted or mirrored", "part is off the stud grid"]);
+  });
+
+  it("skips tilted parts while sideways building is off", () => {
+    const text = "1 4 0 -24 0 1 0 0 0 0 -1 0 1 0 3001.dat";
+    expect(importLdr(text).model.parts[0].frame).toBeDefined();
+    CONFIG.sideways.enabled = false;
+    try {
+      expect(importLdr(text).skipped.map((s) => s.reason)).toEqual(["part is tilted or mirrored"]);
+    } finally {
+      CONFIG.sideways.enabled = true;
+    }
   });
 });
 
