@@ -8,12 +8,22 @@
  *   npm run gen -- --resume debug/<run folder>          (finish an interrupted sub-build run)
  *   npm run gen -- --tree / --no-tree "a town square"   (deeper sub-build trees; default on for Very high)
  *   npm run gen -- --budget 15 "a town square"          (budget cap in USD: stops and reports before a call would go over it)
+ *   npm run gen -- --simulate "a town square"           (simulated Claude, no API calls: always the scripted town square,
+ *                                                        tree mode; data goes to sim/ instead of the repo's debug/, exports/, components/)
  * Writes exports/<name>.ldr/.mpd and a debug folder under ./debug.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { config } from "dotenv";
 config({ path: ".env.local" });
+
+// --simulate: set before anything reads CONFIG, so simulated runs, exports and components stay in sim/.
+const simulate = process.argv.includes("--simulate");
+if (simulate) {
+  process.argv.splice(process.argv.indexOf("--simulate"), 1);
+  process.env.BRICKFORGE_DATA_DIR ??= path.resolve("sim");
+  console.log(`simulated Claude (no API calls); data in ${process.env.BRICKFORGE_DATA_DIR}`);
+}
 
 const { generateModel } = await import("../src/lib/claude/generate");
 const { generateDesign, resumeDesign } = await import("../src/lib/claude/subbuilds");
@@ -51,7 +61,7 @@ const resumeDir = ri >= 0 ? args.splice(ri, 2)[1] : undefined;
 const pi = args.indexOf("--pipeline");
 const pipelineArg = pi >= 0 ? (args.splice(pi, 2)[1] as "single" | "subbuilds" | "auto") : undefined;
 // --tree / --no-tree: deeper sub-build trees (default: CONFIG.tree.details).
-let tree: boolean | undefined;
+let tree: boolean | undefined = simulate ? true : undefined;
 for (const [flag, on] of [["--tree", true], ["--no-tree", false]] as const) {
   const k = args.indexOf(flag);
   if (k >= 0) (args.splice(k, 1), (tree = on));
@@ -84,11 +94,13 @@ const onEvent = (e: import("../src/lib/claude/generate").GenerateEvent) => {
     if (e.errors.length > 8) console.log(`    … ${e.summary.errorCount - 8} more`);
   }
 };
+const { simulatedClient } = await import("../src/lib/claude/simulated");
+const client = simulate ? simulatedClient({ delayMs: 20 }) : undefined;
 const result = resumeDir
-  ? await resumeDesign(resumeDir, onEvent, { budget })
+  ? await resumeDesign(resumeDir, onEvent, { budget, client })
   : pipeline === "subbuilds"
-    ? await generateDesign({ text, image, detail, tree }, onEvent, { budget })
-    : await generateModel({ text, image, detail, base }, onEvent, { budget });
+    ? await generateDesign({ text, image, detail, tree }, onEvent, { budget, client })
+    : await generateModel({ text, image, detail, base }, onEvent, { budget, client });
 
 console.log(`\nValid: ${result.valid} · parts: ${result.model?.parts.length ?? 0} · steps: ${result.steps.length}${result.compile ? ` · sub-builds: ${result.compile.stats.uniqueSubBuilds} unique, ${result.compile.stats.copies} copies · compile ${result.compile.stats.compileMs} ms` : ""}`);
 for (const r of result.rounds) console.log(`  ${r.scope} round ${r.round}: ${r.errorCount} errors · ${r.seconds.toFixed(0)}s · ${formatUsage(r.usage)}${r.reused ? " (earlier run)" : ""}`);
@@ -96,11 +108,12 @@ console.log(`  total: ${formatUsage(result.usage)}`);
 if (result.costBreakdown) console.log(`  cost: ${formatBreakdown(result.costBreakdown)}`);
 if (result.library) console.log(`  library: ${result.library.reused} components reused (${result.library.copies} copies, ~$${result.library.saved.toFixed(2)} saved), ${result.library.added} new components saved`);
 if (result.model) {
-  fs.mkdirSync("exports", { recursive: true });
+  const out = CONFIG.exportsDir;
+  fs.mkdirSync(out, { recursive: true });
   const n = exportFileNames(result.model);
-  fs.writeFileSync(`exports/${n.ldr}`, exportLdr(result.model, result.steps));
+  fs.writeFileSync(path.join(out, n.ldr), exportLdr(result.model, result.steps));
   // Sub-build designs get one submodel per unique sub-build in the .mpd.
-  fs.writeFileSync(`exports/${n.mpd}`, result.design ? exportDesignMpd(result.design, compileDesign(result.design)) : exportMpd(result.model, result.steps));
-  console.log(`  wrote exports/${n.ldr} and exports/${n.mpd}`);
+  fs.writeFileSync(path.join(out, n.mpd), result.design ? exportDesignMpd(result.design, compileDesign(result.design)) : exportMpd(result.model, result.steps));
+  console.log(`  wrote ${path.join(out, n.ldr)} and ${path.join(out, n.mpd)}`);
 }
 console.log(`  debug: ${result.debugDir}`);

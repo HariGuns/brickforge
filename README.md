@@ -8,6 +8,9 @@ Local web app that turns a text description or a photo into a buildable model ma
 |---|---|
 | [The app](#the-app) | BrickForge v2 design, paged instruction manual and PDF, chat editing, undo/redo, versions and Save, Showcase mode |
 | [Sub-builds](#sub-builds) | Designs as a tree of sub-builds: plan → sub-builds → assembly, structural estimate, resume, mirrored copies, `.mpd` with submodels |
+| [Sub-build trees](#sub-build-trees) | Sub-builds planned as their own child sub-builds, 3 levels deep; each level assembled and checked |
+| [Component library](#component-library) | Every valid sub-build saved as a reusable component; planners reuse (and recolour) them instead of designing again |
+| [Budget cap](#budget-cap) | A per-model cap that stops before going over and reports; cost by level and new vs reused components |
 | [Detail and photo analysis](#detail-and-photo-analysis) | Detail levels, photo analysis to an exact target size, server-side renders compared with the photo |
 | [Cost](#cost) | Per-stage model and effort, compact parts format, diffs, prompt caching, token report |
 | [Part catalog](#part-catalog) | 885 upright parts from LDraw + LDCad shadow data, `search_parts`, wheels on pins |
@@ -62,12 +65,16 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start the app |
-| `npm test` | All tests (194): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, BrickLink IDs, and the regression snapshots |
+| `npm test` | All tests (209): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
 | `npm run gen -- --detail high "a rubber duck"` | Detail: `standard` (default), `high` or `very_high`, the same choice as the Detail buttons in the chat |
 | `npm run gen -- --pipeline subbuilds --detail high "a castle"` | Generator path: `single`, `subbuilds` or `auto` (the default: sub-builds for High and Very high) |
+| `npm run gen -- --tree "a town square"` | Deeper sub-build trees (`--no-tree` to turn them off); on by default for Very high |
+| `npm run gen -- --budget 15 "a town square"` | Budget cap in USD for the model: stops before a call would go over it and prints how to resume |
+| `npm run gen -- --simulate "a town square"` | The simulated Claude (no API calls): builds the scripted town square in tree mode; its data goes to `sim/` |
+| `npm run seed-components` | Seed the component library from the valid sub-builds of every run and saved build (`--dry-run`, `--from <data folder>`) |
 | `npm run gen -- --resume debug/<run folder>` | Finish an interrupted sub-build run: reuses its valid plan, sub-builds and assembly, redoes the rest, and writes into the same folder. Earlier and new cost are reported separately |
 | `npm run bench [side]` | Compile benchmark for a large nested design (`side` 5 ≈ 4,600 parts) |
 | `npm run verify-ldraw` | Check the core parts and the whole catalog against the official LDraw library and LDCad's snap data (needs `ldraw-lib/`, see below) |
@@ -161,6 +168,51 @@ The village sub-build run was interrupted at assembly when the API credit ran ou
 - **Nested copies:** inside a mirrored copy, they flip too.
 - **Manual and export:** mirrored copies get their own manual section ("Side (mirrored)") and their own `.mpd` submodel, with the parts really swapped.
 
+## Sub-build trees
+
+With **Very high** detail (or `--tree`), a planned sub-build can be **split**: instead of being designed in one go, it gets its own child plan of smaller sub-builds (walls, facades, roof sections, windows, lamps, railings), which may be split again, down to `CONFIG.tree.maxDepth` (3) levels below the main build. Claude decides what to split; anything small enough is designed directly. Code in `src/lib/claude/tree.ts` and `subbuilds.ts`, prompts in `src/lib/prompts/tree.ts`.
+
+1. **Plan, level by level.** The top plan marks sub-builds `split: true`. Each split sub-build's child plan (stage `subPlan`) lists children that fit inside its envelope and budget. Plans of one level run in parallel; a child can share a sub-build already planned elsewhere (`from: "shared"`), and the same leaf planned by two parents is merged. Limits for the whole tree: 60 unique sub-builds, 400 copies (`CONFIG.tree`).
+2. **Design the leaves** in parallel, as before (medium effort).
+3. **Assemble each split sub-build from its children, deepest first.** The compiler checks it inside its envelope, with join checks at its level, and it's repaired until it's valid. Split sub-builds with a part budget up to `CONFIG.tree.smallAssembly` (150) use the `subAssembly` stage (medium); larger ones use `assembly` (high).
+4. **Main assembly** as before.
+
+The part target for Very high in tree mode is 3,000 (`CONFIG.tree.parts`). Every stage writes its rounds to the debug folder (`plan-<id>.*`, `sub-<id>.*`, `asm-<id>.*`, `tree.json`), and `--resume` reuses every stage that passed. The chat shows child plans and sub-assemblies indented by level.
+
+**Simulated Claude** (`src/lib/claude/simulated.ts`): answers every stage of a scripted town square (49 unique sub-builds, 255 copies, 3 levels) with made-up token usage, so trees, the library and the budget cap are tested without API calls. `npm run gen -- --simulate` runs it from the CLI.
+
+## Component library
+
+Every valid sub-build is saved as a **component** in `components/` (one JSON file each, gitignored; `src/lib/components/library.ts`):
+- **What's saved:** name, description, tags (its name, purpose, the sub-builds it sits in, the model and request), size, part count, colours, whether it's a sideways panel, its sub-build tree, and what designing it cost.
+- **Connection points:** its top surface and studs by height, its underside, and its number of side studs.
+- **Duplicates:** a content hash (ids don't matter) keeps each component once.
+
+**Reuse:** before each plan (the top plan and every child plan), the library is searched for components that match by name and tags and fit the envelope. The best 20 are listed in the prompt. The planner reuses one with `from: "library:<id>"`, optionally recoloured (`recolor: ["red>blue"]`), and it isn't designed again. Components with sub-builds inside come with their whole tree, and identical sub-builds already in the design are shared.
+
+**Visibility:**
+- **Chat:** "From library · Lamp post ×6 · saves ~$0.27" rows.
+- **Logs:** one `[generate] library:` line per reuse.
+- **`summary.json`:** `library` records what was offered, reused and saved.
+
+**Seeding:** `npm run seed-components` adds the valid sub-builds of every run in `debug/` and every saved build (`--from ~/.config/BrickForge` adds another data folder too). The default library also seeds itself the first time it's used, which covers runs copied into the desktop app. Seeded from this repo and the desktop app's runs: 70 components (one Huracán wheel set isn't valid on its own).
+
+Simulated result: the town square, run twice with the same library. Run 1 made 66 calls (about $4.59 simulated) and saved 49 components. Run 2 reused all 6 top-level components (17 copies) with 2 calls (plan and main assembly, about $0.39 simulated), and produced the same 406 parts.
+
+## Budget cap
+
+`--budget 15` (CLI), the **Cap** menu in the chat, or `budget` in the API sets a cap in USD for the whole model (`src/lib/claude/budget.ts`):
+- **Before each call:** every API call reserves an estimate first: the larger of a per-stage default and 1.25× the costliest call of that stage so far. A call that would take spent + reserved over the cap doesn't start. Calls that are already running finish.
+- **When it's reached:** a sub-build run stops and saves its valid sub-builds to the library. It writes `stopped.json` (spent, what didn't start, the cost breakdown) and prints the command to resume with a higher cap. Earlier spending counts toward the new cap.
+- **Limits:** a call can cost more than its estimate, so a run can end slightly over; it's reported as it is.
+
+**Cost breakdown** for sub-build runs (`summary.json` `costBreakdown`, the CLI and the log):
+- by level: 0 is the main build (analysis, top plan, main assembly, comparison), 1 is the sub-builds it places, and so on;
+- by kind: planning, design, assembly, repair, analysis, comparison;
+- new components against reused ones, with what the reused ones had cost.
+
+`npm run token-report` adds a by-level table for tree runs.
+
 ## Detail and photo analysis
 
 **Detail** (Standard / High / Very high; it replaced Small / Medium / Large) sets the target width of the subject in studs and the part budget (`CONFIG.detail`):
@@ -169,7 +221,7 @@ The village sub-build run was interrupted at assembly when the API credit ran ou
 |---|---|---|---|
 | Standard | 10 studs | 300 | single pass |
 | High | 16 studs | 700 | sub-builds |
-| Very high | 22 studs | 1,500 | sub-builds |
+| Very high | 22 studs | 1,500 (3,000 in tree mode) | sub-builds, as a [tree](#sub-build-trees) |
 
 Photos of vehicles are never narrower than 14 studs. The single pass keeps its 300-part limit, so High and Very high need sub-builds to use their full budget.
 
