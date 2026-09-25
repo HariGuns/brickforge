@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { OrbitControls as OrbitControlsImpl } from "three/addons/controls/OrbitControls.js";
 import { COLOR_MAP } from "@/lib/parts/colors";
 import { getPart } from "@/lib/parts/library";
 import { footprint } from "@/lib/model/geometry";
@@ -170,6 +169,28 @@ function bounds(model: BrickModel | null): THREE.Box3 {
   return box;
 }
 
+/** three's own orbit controls (drei was only used for this): damping, optional auto-rotate, updated every frame. */
+function Controls({ spin, controls }: { spin: boolean; controls: React.RefObject<OrbitControlsImpl | null> }) {
+  const { camera, gl, set, get } = useThree();
+  const c = useMemo(() => new OrbitControlsImpl(camera, gl.domElement), [camera, gl]);
+  useEffect(() => {
+    c.enableDamping = true;
+    c.autoRotateSpeed = 1.2;
+    controls.current = c;
+    const old = get().controls;
+    set({ controls: c });
+    return () => {
+      set({ controls: old });
+      c.dispose();
+    };
+  }, [c, controls, get, set]);
+  useEffect(() => {
+    c.autoRotate = spin;
+  }, [c, spin]);
+  useFrame(() => c.update(), -1);
+  return null;
+}
+
 function CameraFit({ model, fitKey, view, controls }: { model: BrickModel | null; fitKey?: string; view: CameraView; controls: React.RefObject<OrbitControlsImpl | null> }) {
   const { camera, size } = useThree();
   useEffect(() => {
@@ -236,7 +257,7 @@ export default function Viewer(props: ViewerProps) {
         <shadowMaterial opacity={scene.shadow} />
       </mesh>
       <Parts {...props} />
-      <OrbitControls ref={controls} makeDefault enableDamping autoRotate={!!props.spin} autoRotateSpeed={1.2} />
+      <Controls spin={!!props.spin} controls={controls} />
       <CameraFit model={props.model} fitKey={props.fitKey} view={props.view ?? "3/4"} controls={controls} />
     </Canvas>
   );

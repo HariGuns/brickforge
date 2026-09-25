@@ -8,9 +8,6 @@ import { needsSidewaysPass, sidewaysPass } from "../sideways/validate";
 import type { BrickModel } from "../model/schema";
 import { analyzeStructure, type StructureReport } from "./structure";
 
-/** Issue codes from the structural estimate (they're warnings unless a repair round asks for errors). */
-export const STRUCTURAL_CODES = ["WEAK_JOINT", "OVERSTRESSED"] as const;
-
 export type IssueCode =
   | "UNKNOWN_PART"
   | "UNKNOWN_COLOR"

@@ -294,16 +294,11 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     if (check?.valid) break;
     if (round === maxRounds) break;
 
-    messages.push({ role: "assistant", content: msg.content });
-    // The round is finished: its thinking doesn't need to be re-sent (billed as input every round).
-    if (!CONFIG.keepThinkingInRepairs) {
-      for (let k = 0; k < messages.length; k++) {
-        const m = messages[k];
-        if (m.role !== "assistant" || typeof m.content === "string") continue;
-        const kept = m.content.filter((b) => b.type !== "thinking" && b.type !== "redacted_thinking");
-        messages[k] = { role: "assistant", content: kept.length ? kept : [{ type: "text", text: "(no text)" }] };
-      }
-    }
+    // The round's final answer is sent without its thinking (billed as input every round).
+    // Earlier messages, including this round's tool turns, stay byte-identical: they're
+    // already in the cached prefix, and changing them would re-write the conversation.
+    const kept = CONFIG.keepThinkingInRepairs ? msg.content : msg.content.filter((b) => b.type !== "thinking" && b.type !== "redacted_thinking");
+    messages.push({ role: "assistant", content: kept.length ? kept : [{ type: "text", text: "(no text)" }] });
     const diff = spec.diff && lastValue !== null ? { listing: spec.diff.listing(lastValue), instructions: spec.diff.instructions } : undefined;
     messages.push({ role: "user", content: (spec.repairText ?? ((e, w, r) => repairPrompt(e, w, { round: r, diff })))(issues, warnings, round + 1) });
   }

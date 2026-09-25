@@ -16,8 +16,6 @@ export function toDetail(v: unknown): Detail | undefined {
   return undefined;
 }
 
-export const detailLabel = (d: Detail | undefined) => DETAILS.find((x) => x.id === (d ?? "standard"))!.label;
-
 /** Target width (studs) and part budget for a detail level; vehicles are at least CONFIG.detail.vehicleMinWidth wide. */
 export function detailTarget(detail: Detail | undefined, opts: { vehicle?: boolean } = {}): { width: number; parts: number } {
   const t = CONFIG.detail[detail ?? "standard"];

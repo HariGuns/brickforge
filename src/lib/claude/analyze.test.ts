@@ -81,6 +81,10 @@ describe("photo builds start with the analysis", () => {
     expect(requests[0].output_config?.effort).toBe(stageSetting("analysis").effort);
     // Its own schema, so nothing reads its cache back: no cache write.
     expect(requests[0].cache_control).toBeUndefined();
+    // Its own short system prompt, not the design prompt with the part menu.
+    const sys = (q: Anthropic.MessageCreateParams) => (q.system as Anthropic.TextBlockParam[])[0].text;
+    expect(sys(requests[0]).length).toBeLessThan(1000);
+    expect(sys(requests[1])).toContain("Core menu");
     expect(requests[1].cache_control).toEqual({ type: "ephemeral" });
     const designText = (requests[1].messages[0].content as Anthropic.ContentBlockParam[]).find((b) => b.type === "text") as Anthropic.TextBlockParam;
     expect(designText.text).toContain("33 studs long (z, front to back) × 14 studs wide");

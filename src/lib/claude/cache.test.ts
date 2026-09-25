@@ -4,6 +4,9 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { generateDesign } from "./subbuilds";
 import { SAMPLE_VILLAGE } from "../fixtures/designs";
 import { P } from "../fixtures/samples";
+import { runLoop } from "./loop";
+import { searchPartsTool } from "./tools";
+import type { DebugRun } from "./debug";
 
 const tree = SAMPLE_VILLAGE.subBuilds.find((s) => s.id === "pine_tree")!;
 const hut = SAMPLE_VILLAGE.subBuilds.find((s) => s.id === "hut")!;
@@ -93,5 +96,50 @@ describe("prompt caching", () => {
     const at = (e: string) => log.indexOf(e);
     expect(at("tree sent")).toBeGreaterThan(at("hut streaming"));
     expect(at("tree sent")).toBeLessThan(at("hut done")); // still in parallel
+  });
+});
+
+describe("prompt caching across repair rounds", () => {
+  it("a repair after a round with part searches re-sends that round's conversation unchanged (cached prefix), minus the final answer's thinking", async () => {
+    const requests: Anthropic.MessageCreateParams[] = [];
+    const usage = { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
+    const replies = [
+      { content: [{ type: "thinking", thinking: "which plate?", signature: "s1" }, { type: "tool_use", id: "toolu_1", name: "search_parts", input: { query: "plate 2x4" } }], stop_reason: "tool_use" },
+      { content: [{ type: "thinking", thinking: "answering", signature: "s2" }, { type: "text", text: '{"ok":false}' }], stop_reason: "end_turn" },
+      { content: [{ type: "thinking", thinking: "fixing", signature: "s3" }, { type: "text", text: '{"ok":true}' }], stop_reason: "end_turn" },
+    ];
+    const client = {
+      messages: {
+        stream(params: Anthropic.MessageCreateParams) {
+          requests.push(structuredClone(params));
+          const r = replies.shift()!;
+          return { on() { return this; }, finalMessage: async () => ({ ...r, stop_details: null, usage }) };
+        },
+      },
+    } as unknown as Pick<Anthropic, "messages">;
+    const debug = { write() {}, writeBinary() {} } as unknown as DebugRun;
+    const loop = await runLoop<{ ok: boolean }>(
+      {
+        scope: "main",
+        debugPrefix: "",
+        system: "sys",
+        firstContent: "build",
+        firstText: "build",
+        schema: { type: "object", properties: { ok: { type: "boolean" } } },
+        tools: [searchPartsTool],
+        parse: (t) => ({ value: JSON.parse(t), issues: [] }),
+        check: (v) => ({ errors: v.ok ? [] : [{ code: "FLOATING", severity: "error", parts: [0], message: "floats" }], warnings: [], valid: v.ok, partCount: 1 }),
+      },
+      { anthropic: client, debug, onEvent: () => {} },
+    );
+    expect(loop.best?.value.ok).toBe(true);
+    expect(requests).toHaveLength(3);
+    const [, lastOfRound0, repair] = requests;
+    // Everything round 0's last request sent is the start of the repair request, byte for byte.
+    expect(repair.messages.slice(0, lastOfRound0.messages.length)).toEqual(lastOfRound0.messages);
+    // The tool turn keeps its thinking; the final answer is sent without it.
+    expect((repair.messages[1].content as { type: string }[]).map((b) => b.type)).toEqual(["thinking", "tool_use"]);
+    expect((repair.messages[3].content as { type: string }[]).map((b) => b.type)).toEqual(["text"]);
+    expect(repair.messages[4].role).toBe("user");
   });
 });

@@ -12,8 +12,8 @@ export interface BuildSummary {
   updatedAt: string;
 }
 
-const root = (dir?: string) => path.resolve(dir ?? CONFIG.buildsDir);
-const file = (id: string, dir?: string) => path.join(root(dir), `${id}.json`);
+const root = (dir?: string) => path.resolve(/*turbopackIgnore: true*/ dir ?? CONFIG.buildsDir);
+const file = (id: string, dir?: string) => path.join(/*turbopackIgnore: true*/ root(dir), `${id}.json`);
 
 export function saveBuild(input: unknown, dir?: string): BuildDoc {
   const doc = BuildDocSchema.parse(input);

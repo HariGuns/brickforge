@@ -12,7 +12,12 @@ rm -rf .next-app dist
 BRICKFORGE_STANDALONE=1 NEXT_TELEMETRY_DISABLED=1 npx next build
 STANDALONE=.next-app/standalone
 cp -r .next-app/static "$STANDALONE/.next-app/static"
-[ -d public ] && cp -r public "$STANDALONE/public"
+# Merge public/ in: the tracer already copies public/parts (the server renderer reads it),
+# and `cp -r public "$STANDALONE/public"` would nest a second copy at public/public.
+[ -d public ] && mkdir -p "$STANDALONE/public" && cp -r public/. "$STANDALONE/public/"
+# sharp (~46 MB of native image libraries for three platforms) is only for next/image
+# optimisation, which the app doesn't use (images.unoptimized in next.config.ts).
+rm -rf "$STANDALONE/node_modules/sharp" "$STANDALONE/node_modules/@img"
 find "$STANDALONE" -maxdepth 1 -name '.env*' -delete
 
 # Refuse to package anything that contains a key from .env.local (Anthropic, Rebrickable, …).

@@ -53,6 +53,13 @@ export function analysisJsonSchema(): Record<string, unknown> {
   };
 }
 
+/**
+ * The analysis's own short system prompt. It doesn't get the design prompt (part
+ * menu, building rules): it designs nothing, and with its own schema and no cache
+ * that prompt was ~12k tokens billed as uncached input on every photo build.
+ */
+export const ANALYSIS_SYSTEM = "You look at photos for a program that designs buildable models made of interlocking toy bricks. Describe the photo's main subject accurately in the requested JSON format: what it is, its real size and proportions, its defining features, its colours and the camera angle.";
+
 export function analysisPrompt(extra?: string): string {
   return `Before anyone designs a brick model of the main subject in this photo, describe the subject so the model gets its proportions and character right. Don't design anything yet.
 

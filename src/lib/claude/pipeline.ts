@@ -3,8 +3,6 @@ import type { Detail } from "../detail";
 
 export type Pipeline = "single" | "subbuilds" | "auto";
 export const PIPELINES: Pipeline[] = ["single", "subbuilds", "auto"];
-/** Paths that can run (all of them since phase 3). */
-export const AVAILABLE_PIPELINES: Pipeline[] = ["single", "subbuilds", "auto"];
 
 /** Which generator runs: "auto" picks sub-builds for High and Very high detail, single pass for Standard. */
 export function resolvePipeline(requested: Pipeline | undefined, detail: Detail | undefined, isEdit = false): "single" | "subbuilds" {

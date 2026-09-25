@@ -9,13 +9,13 @@ export class DebugRun {
   constructor(label: string, existingDir?: string) {
     if (existingDir) {
       // Resuming: keep writing into the interrupted run's folder.
-      this.dir = path.resolve(existingDir);
+      this.dir = path.resolve(/*turbopackIgnore: true*/ existingDir);
       if (!fs.existsSync(this.dir)) throw new Error(`No debug folder at ${this.dir}`);
       return;
     }
     const stamp = new Date().toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
     const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "run";
-    const base = path.resolve(CONFIG.debugDir, `${stamp}-${slug}`);
+    const base = path.resolve(/*turbopackIgnore: true*/ CONFIG.debugDir, `${stamp}-${slug}`);
     fs.mkdirSync(path.dirname(base), { recursive: true });
     // Create atomically; two runs of the same prompt in the same second get -2, -3, …
     for (let n = 1; ; n++) {
@@ -38,7 +38,7 @@ export class DebugRun {
   write(name: string, data: unknown) {
     const body = typeof data === "string" ? data : JSON.stringify(data, null, 2);
     try {
-      fs.writeFileSync(path.join(this.dir, name), body);
+      fs.writeFileSync(path.join(/*turbopackIgnore: true*/ this.dir, name), body);
     } catch (err) {
       console.error(`[debug] failed to write ${name}:`, err);
     }
@@ -46,7 +46,7 @@ export class DebugRun {
 
   writeBinary(name: string, data: Buffer) {
     try {
-      fs.writeFileSync(path.join(this.dir, name), data);
+      fs.writeFileSync(path.join(/*turbopackIgnore: true*/ this.dir, name), data);
     } catch (err) {
       console.error(`[debug] failed to write ${name}:`, err);
     }

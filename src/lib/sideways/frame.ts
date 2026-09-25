@@ -45,11 +45,6 @@ export function uprightFrame(pl: Placement, def: Pick<PartDef, "w" | "d">): Fram
 export const frameOf = (pl: Placement, def: PartDef): Frame => pl.frame ?? uprightFrame(pl, def);
 
 export const DIR_VEC: Record<Dir, V3> = { "+x": [1, 0, 0], "-x": [-1, 0, 0], "+z": [0, 0, 1], "-z": [0, 0, -1] };
-export function vecDir(v: V3): Dir | "+y" | "-y" {
-  const [x, y, z] = v.map((n) => Math.round(n)) as V3;
-  return y > 0 ? "+y" : y < 0 ? "-y" : x > 0 ? "+x" : x < 0 ? "-x" : z > 0 ? "+z" : "-z";
-}
-
 /**
  * The frame of a copy mounted sideways: its top faces `n` (the side stud's
  * direction); seen from outside that face, its x runs left to right and its z

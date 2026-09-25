@@ -62,11 +62,11 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start the app |
-| `npm test` | All tests (193): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, BrickLink IDs, and the regression snapshots |
+| `npm test` | All tests (194): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, BrickLink IDs, and the regression snapshots |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
-| `npm run gen -- --detail high "a rubber duck"` | Detail: `standard` (default), `high` or `very_high`, the same choice as the Detail buttons in the chat. The old `--size small/medium/large` still works (small/medium → standard, large → high) |
+| `npm run gen -- --detail high "a rubber duck"` | Detail: `standard` (default), `high` or `very_high`, the same choice as the Detail buttons in the chat |
 | `npm run gen -- --pipeline subbuilds --detail high "a castle"` | Generator path: `single`, `subbuilds` or `auto` (the default: sub-builds for High and Very high) |
 | `npm run gen -- --resume debug/<run folder>` | Finish an interrupted sub-build run: reuses its valid plan, sub-builds and assembly, redoes the rest, and writes into the same folder. Earlier and new cost are reported separately |
 | `npm run bench [side]` | Compile benchmark for a large nested design (`side` 5 ≈ 4,600 parts) |

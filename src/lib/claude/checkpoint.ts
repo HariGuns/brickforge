@@ -43,11 +43,11 @@ function stage<T>(dir: string, prefix: string, parse: (raw: unknown) => T | null
   const re = new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}round-(\\d+)\\.validation\\.json$`);
   const nums = files.flatMap((f) => (re.test(f) ? [Number(f.match(re)![1])] : [])).sort((a, b) => a - b);
   for (const n of nums) {
-    const v = readJson(path.join(dir, `${prefix}round-${n}.validation.json`)) as { summary?: RoundSummary; errors?: unknown[] } | null;
+    const v = readJson(path.join(/*turbopackIgnore: true*/ dir, `${prefix}round-${n}.validation.json`)) as { summary?: RoundSummary; errors?: unknown[] } | null;
     if (!v?.summary) continue;
     rounds.push({ ...v.summary, reused: true });
     if (!v.errors?.length) {
-      const value = parse(readJson(path.join(dir, `${prefix}round-${n}.model.json`)));
+      const value = parse(readJson(path.join(/*turbopackIgnore: true*/ dir, `${prefix}round-${n}.model.json`)));
       if (value !== null) valid = value;
     }
   }
@@ -55,8 +55,8 @@ function stage<T>(dir: string, prefix: string, parse: (raw: unknown) => T | null
 }
 
 export function loadCheckpoint(dir: string): Checkpoint {
-  const abs = path.resolve(dir);
-  const input = readJson(path.join(abs, "input.json")) as { pipeline?: string; text?: string | null; detail?: string | null; size?: string | null; hasImage?: boolean } | null;
+  const abs = path.resolve(/*turbopackIgnore: true*/ dir);
+  const input = readJson(path.join(/*turbopackIgnore: true*/ abs, "input.json")) as { pipeline?: string; text?: string | null; detail?: string | null; size?: string | null; hasImage?: boolean } | null;
   if (!input) throw new Error(`${abs} has no input.json; it isn't a generation run.`);
   if (input.pipeline !== "subbuilds") throw new Error("Only sub-build runs can be resumed (single-pass runs are one call; just run them again).");
   let image: GenerateInput["image"];
@@ -64,7 +64,7 @@ export function loadCheckpoint(dir: string): Checkpoint {
     const f = fs.readdirSync(abs).find((x) => x.startsWith("input-image."));
     if (!f) throw new Error("The run used a photo, but input-image.* is missing.");
     const ext = f.split(".").pop()!;
-    image = { mediaType: `image/${ext === "jpg" ? "jpeg" : ext}` as ImageMediaType, data: fs.readFileSync(path.join(abs, f)).toString("base64") };
+    image = { mediaType: `image/${ext === "jpg" ? "jpeg" : ext}` as ImageMediaType, data: fs.readFileSync(path.join(/*turbopackIgnore: true*/ abs, f)).toString("base64") };
   }
   const plan = stage<Plan>(abs, "plan.", (raw) => (raw && typeof raw === "object" && "subBuilds" in raw ? (raw as Plan) : null));
   const subs = new Map<string, StageCheckpoint<BrickModel>>();
@@ -75,7 +75,7 @@ export function loadCheckpoint(dir: string): Checkpoint {
     }));
   }
   const assembly = stage<unknown>(abs, "assembly.", (raw) => raw ?? null);
-  const saved = readJson(path.join(abs, "analysis.json")) as { analysis?: unknown; target?: SizeTarget } | null;
+  const saved = readJson(path.join(/*turbopackIgnore: true*/ abs, "analysis.json")) as { analysis?: unknown; target?: SizeTarget } | null;
   const parsedAnalysis = PhotoAnalysisSchema.safeParse(saved?.analysis);
   const analysis = parsedAnalysis.success && saved?.target ? { analysis: parsedAnalysis.data, target: saved.target, rounds: stage<unknown>(abs, "analysis.", (raw) => raw ?? null).rounds } : undefined;
   // Older runs saved a Small/Medium/Large size; toDetail maps it.

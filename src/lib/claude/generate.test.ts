@@ -55,6 +55,8 @@ describe("generate/repair loop (fake Claude)", () => {
     const events: GenerateEvent[] = [];
     const r = await generateModel({ text: "tiny house" }, (e) => events.push(e), { client });
     dirs.push(r.debugDir);
+    // Test runs go to the throwaway data folder (vitest.global-setup.ts), never the real debug/.
+    expect(r.debugDir.startsWith(path.resolve(process.env.BRICKFORGE_DATA_DIR!))).toBe(true);
 
     expect(r.valid).toBe(true);
     expect(r.rounds.map((x) => x.errorCount)).toEqual([1, 0]);

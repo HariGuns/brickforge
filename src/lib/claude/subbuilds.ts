@@ -159,7 +159,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     if (cp?.analysis) {
       const rounds = cp.analysis.rounds.map((r) => ({ ...r, reused: true }));
       photo = { analysis: cp.analysis.analysis, target: cp.analysis.target, rounds, usage: sumUsage(rounds.map((r) => r.usage)) };
-    } else photo = await analyzePhoto({ text: input.text, image: input.image, detail: input.detail }, CONFIG.design.grid, ctx, system);
+    } else photo = await analyzePhoto({ text: input.text, image: input.image, detail: input.detail }, CONFIG.design.grid, ctx);
     onEvent({ type: "analysis", analysis: photo.analysis, target: photo.target, cost: photo.usage.cost });
     onEvent({ type: "stage", scope: "analysis", label: "Reading the photo", status: "done", valid: true, cost: photo.usage.cost });
   }

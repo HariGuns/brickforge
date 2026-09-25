@@ -1,6 +1,6 @@
 import { rotateCell, rotatePoint } from "../model/geometry";
 import type { Placement, Rot } from "../model/schema";
-import { getPart, localBottom, localSolids, localStuds, PARTS, rotateDir, type Dir, type PartDef } from "./library";
+import { getPart, localBottom, localSolids, localStuds, rotateDir, type Dir, type PartDef } from "./library";
 
 /**
  * Mirror images of parts, for mirrored sub-build copies (left/right).
@@ -71,6 +71,3 @@ export function mirrorPlacement(pl: Placement, minX: number, width: number): Pla
   const sx = pl.rot === 90 || pl.rot === 270 ? def.d : def.w;
   return { ...pl, part: m.id, rot: ((m.rot - pl.rot + 360) % 360) as Rot, x: minX + (width - (pl.x - minX) - sx) };
 }
-
-/** Parts with no mirror image (they can't go in a mirrored copy). */
-export const unmirrorable = () => PARTS.filter((p) => !mirrorOf(p.id)).map((p) => p.id);

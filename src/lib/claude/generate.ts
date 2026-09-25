@@ -132,7 +132,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
   if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
 
   // A photo build starts with the analysis: proportions, features, colours, camera angle → target size.
-  const photo = input.image && !input.base ? await analyzePhoto({ text: input.text, image: input.image, detail: input.detail }, CONFIG.grid, { anthropic, debug, onEvent, signal }, system) : null;
+  const photo = input.image && !input.base ? await analyzePhoto({ text: input.text, image: input.image, detail: input.detail }, CONFIG.grid, { anthropic, debug, onEvent, signal }) : null;
   if (photo) onEvent({ type: "analysis", analysis: photo.analysis, target: photo.target, cost: photo.usage.cost });
 
   const firstText = input.base

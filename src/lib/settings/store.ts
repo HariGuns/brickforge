@@ -18,7 +18,7 @@ export const KEY_PATTERN = /^sk-ant-[A-Za-z0-9_-]{20,}$/;
 
 const dir = () => process.env.BRICKFORGE_CONFIG_DIR;
 export const settingsEnabled = () => !!dir();
-const file = () => path.join(dir()!, "settings.json");
+const file = () => path.join(/*turbopackIgnore: true*/ dir()!, "settings.json");
 
 export function readSettings(): Settings {
   if (!settingsEnabled()) return {};

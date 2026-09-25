@@ -33,19 +33,19 @@ function readJson(file: string): unknown {
 }
 
 function debugDesign(dir: string): BrickDesign | null {
-  const d = BrickDesignSchema.safeParse(readJson(path.join(dir, "final-design.json")));
+  const d = BrickDesignSchema.safeParse(readJson(path.join(/*turbopackIgnore: true*/ dir, "final-design.json")));
   return d.success ? d.data : null;
 }
 
 function debugModel(dir: string): BrickModel | null {
   for (const f of ["final-model.json"]) {
-    const m = BrickModelSchema.safeParse(readJson(path.join(dir, f)));
+    const m = BrickModelSchema.safeParse(readJson(path.join(/*turbopackIgnore: true*/ dir, f)));
     if (m.success) return m.data;
   }
   // Runs without a final model: fall back to the last parsed round.
   const rounds = fs.readdirSync(dir).filter((f) => /^round-\d+\.model\.json$/.test(f)).sort((a, b) => parseInt(b.slice(6)) - parseInt(a.slice(6)));
   for (const f of rounds) {
-    const m = BrickModelSchema.safeParse(readJson(path.join(dir, f)));
+    const m = BrickModelSchema.safeParse(readJson(path.join(/*turbopackIgnore: true*/ dir, f)));
     if (m.success) return m.data;
   }
   return null;
@@ -64,12 +64,12 @@ export function listLibrary(): LibraryEntry[] {
   const debugRoot = path.resolve(CONFIG.debugDir);
   if (fs.existsSync(debugRoot)) {
     for (const id of fs.readdirSync(debugRoot)) {
-      const dir = path.join(debugRoot, id);
+      const dir = path.join(/*turbopackIgnore: true*/ debugRoot, id);
       if (!fs.statSync(dir).isDirectory()) continue;
       const model = debugModel(dir);
       if (!model) continue;
-      const summary = readJson(path.join(dir, "summary.json")) as { valid?: boolean; rounds?: { round?: number }[]; total?: { cost?: number } } | null;
-      const input = readJson(path.join(dir, "input.json")) as { mode?: string; text?: string | null; hasImage?: boolean } | null;
+      const summary = readJson(path.join(/*turbopackIgnore: true*/ dir, "summary.json")) as { valid?: boolean; rounds?: { round?: number }[]; total?: { cost?: number } } | null;
+      const input = readJson(path.join(/*turbopackIgnore: true*/ dir, "input.json")) as { mode?: string; text?: string | null; hasImage?: boolean } | null;
       seen.add(`${model.name}|${model.parts.length}`);
       out.push({
         kind: "debug",
@@ -92,7 +92,7 @@ export function listLibrary(): LibraryEntry[] {
   if (fs.existsSync(exportRoot)) {
     for (const id of fs.readdirSync(exportRoot)) {
       if (!/\.ldr$/i.test(id)) continue;
-      const file = path.join(exportRoot, id);
+      const file = path.join(/*turbopackIgnore: true*/ exportRoot, id);
       const { model } = importLdr(fs.readFileSync(file, "utf8"), id.replace(/\.ldr$/i, ""));
       // Generated models are already listed from their debug run.
       if (seen.has(`${model.name}|${model.parts.length}`)) continue;
@@ -119,14 +119,14 @@ export function listLibrary(): LibraryEntry[] {
 export function loadLibraryModel(kind: string, id: string): { model: BrickModel; skipped: number; design?: BrickDesign } | null {
   if (path.basename(id) !== id || id.startsWith(".")) return null;
   if (kind === "debug") {
-    const dir = path.join(path.resolve(CONFIG.debugDir), id);
+    const dir = path.join(/*turbopackIgnore: true*/ path.resolve(CONFIG.debugDir), id);
     if (!fs.existsSync(dir)) return null;
     const model = debugModel(dir);
     const design = debugDesign(dir);
     return model ? { model, skipped: 0, ...(design ? { design } : {}) } : null;
   }
   if (kind === "export" && /\.ldr$/i.test(id)) {
-    const file = path.join(path.resolve(EXPORTS_DIR), id);
+    const file = path.join(/*turbopackIgnore: true*/ path.resolve(EXPORTS_DIR), id);
     if (!fs.existsSync(file)) return null;
     const { model, skipped } = importLdr(fs.readFileSync(file, "utf8"), id.replace(/\.ldr$/i, ""));
     return { model, skipped: skipped.length };

@@ -24,12 +24,9 @@ let imagePath: string | undefined;
 const i = args.indexOf("--image");
 if (i >= 0) [imagePath] = args.splice(i, 2).slice(1);
 const { toDetail } = await import("../src/lib/detail");
-// --detail standard | high | very_high (the old --size small | medium | large still works).
-let detailArg: string | undefined;
-for (const flag of ["--detail", "--size"]) {
-  const k = args.indexOf(flag);
-  if (k >= 0) detailArg = args.splice(k, 2)[1];
-}
+// --detail standard | high | very_high.
+const detailAt = args.indexOf("--detail");
+const detailArg = detailAt >= 0 ? args.splice(detailAt, 2)[1] : undefined;
 const detail = toDetail(detailArg);
 if (detailArg && !detail) {
   console.error(`Unknown detail "${detailArg}". Use standard, high or very_high.`);
@@ -58,12 +55,8 @@ const ext = imagePath ? path.extname(imagePath).slice(1).toLowerCase() : "";
 const mediaType = ({ jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" } as const)[ext as "jpg"];
 const image = imagePath ? { mediaType, data: fs.readFileSync(imagePath).toString("base64") } : undefined;
 
-const { resolvePipeline, AVAILABLE_PIPELINES } = await import("../src/lib/claude/pipeline");
+const { resolvePipeline } = await import("../src/lib/claude/pipeline");
 const pipeline = resumeDir ? "subbuilds" : resolvePipeline(pipelineArg, detail, !!base);
-if (!AVAILABLE_PIPELINES.includes(pipeline)) {
-  console.error(`The ${pipeline} generator isn't built yet. Use --pipeline single.`);
-  process.exit(2);
-}
 console.log(`pipeline: ${pipeline}`);
 
 const onEvent = (e: import("../src/lib/claude/generate").GenerateEvent) => {

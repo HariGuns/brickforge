@@ -25,9 +25,9 @@ const list = (dir: string, keep: (e: fs.Dirent) => boolean) => {
 
 function sources(from: string) {
   return {
-    builds: list(path.join(from, "builds"), (e) => e.isFile() && e.name.endsWith(".json")),
-    runs: list(path.join(from, "debug"), (e) => e.isDirectory() && fs.existsSync(path.join(from, "debug", e.name, "final-model.json"))),
-    exports: list(path.join(from, "exports"), (e) => e.isFile() && /\.(ldr|mpd)$/i.test(e.name)),
+    builds: list(path.join(/*turbopackIgnore: true*/ from, "builds"), (e) => e.isFile() && e.name.endsWith(".json")),
+    runs: list(path.join(/*turbopackIgnore: true*/ from, "debug"), (e) => e.isDirectory() && fs.existsSync(path.join(/*turbopackIgnore: true*/ from, "debug", e.name, "final-model.json"))),
+    exports: list(path.join(/*turbopackIgnore: true*/ from, "exports"), (e) => e.isFile() && /\.(ldr|mpd)$/i.test(e.name)),
   };
 }
 
@@ -39,20 +39,20 @@ export function countImport(from: string): ImportCounts {
 /** The folder to offer on first run, if it has anything and isn't the app's own data folder. */
 export function importCandidate(): ({ path: string } & ImportCounts) | null {
   const from = process.env.BRICKFORGE_IMPORT_FROM;
-  if (!from || path.resolve(from) === path.resolve(CONFIG.debugDir, "..")) return null;
+  if (!from || path.resolve(/*turbopackIgnore: true*/ from) === path.resolve(/*turbopackIgnore: true*/ CONFIG.debugDir, "..")) return null;
   const c = countImport(from);
   return c.builds + c.runs + c.exports ? { path: from, ...c } : null;
 }
 
 /** Copy into the data folders, skipping anything already there. Returns what was copied. */
 export function importFrom(from: string): ImportCounts {
-  const src = sources(path.resolve(from));
+  const src = sources(path.resolve(/*turbopackIgnore: true*/ from));
   const copied: ImportCounts = { builds: 0, runs: 0, exports: 0 };
   const copy = (kind: keyof ImportCounts, sub: string, name: string, dest: string) => {
-    const target = path.join(path.resolve(dest), name);
+    const target = path.join(/*turbopackIgnore: true*/ path.resolve(/*turbopackIgnore: true*/ dest), name);
     if (fs.existsSync(target)) return;
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.cpSync(path.join(path.resolve(from), sub, name), target, { recursive: true, errorOnExist: false, force: false });
+    fs.cpSync(path.join(/*turbopackIgnore: true*/ path.resolve(/*turbopackIgnore: true*/ from), sub, name), target, { recursive: true, errorOnExist: false, force: false });
     copied[kind]++;
   };
   for (const n of src.builds) copy("builds", "builds", n, CONFIG.buildsDir);

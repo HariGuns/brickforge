@@ -11,28 +11,11 @@ const nextConfig: NextConfig = {
     ? {
         output: "standalone" as const,
         distDir: ".next-app",
-        // Data folders are read at runtime from paths the tracer can't resolve, so it
-        // would copy the whole project (and your runs) into the bundle. Keep them out;
-        // the app reads and writes its own data folder instead. Patterns start with ./
-        // so they only match at the project root. dist/ is deleted before building instead of
-        // excluded: any "dist/**" pattern also drops node_modules/next/dist.
-        outputFileTracingExcludes: {
-          "/*": [
-            "./ldraw-lib/**",
-            "./debug/**",
-            "./exports/**",
-            "./builds/**",
-            "./logs/**",
-            "./design/**",
-            "./electron/**",
-            "./scripts/**",
-            "./src/**",
-            "./.next/**",
-            "./*.md",
-            "./*.tsbuildinfo",
-            "./package-lock.json",
-          ],
-        },
+        // Runtime data paths (debug/, exports/, builds/, settings) are marked
+        // turbopackIgnore where they're read, so the tracer doesn't copy the project
+        // into the bundle. The app never optimises images, so build-appimage.sh drops
+        // sharp from the bundle.
+        images: { unoptimized: true },
       }
     : {}),
 };

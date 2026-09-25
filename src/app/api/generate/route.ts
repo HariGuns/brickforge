@@ -6,7 +6,7 @@ import { toDetail } from "@/lib/detail";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
 import { CONFIG } from "@/lib/config";
 import { settingsEnabled } from "@/lib/settings/store";
-import { AVAILABLE_PIPELINES, PIPELINES, resolvePipeline, type Pipeline } from "@/lib/claude/pipeline";
+import { PIPELINES, resolvePipeline, type Pipeline } from "@/lib/claude/pipeline";
 
 const IMAGE_TYPES: ImageMediaType[] = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -25,7 +25,7 @@ function friendly(err: unknown): string {
  * "single" | "subbuilds" | "auto" (default CONFIG.generator).
  */
 export async function POST(req: Request) {
-  let body: { text?: string; image?: { mediaType: string; data: string }; detail?: string; size?: string; base?: unknown; baseDesign?: unknown; pipeline?: string };
+  let body: { text?: string; image?: { mediaType: string; data: string }; detail?: string; base?: unknown; baseDesign?: unknown; pipeline?: string };
   try {
     body = await req.json();
   } catch {
@@ -39,8 +39,7 @@ export async function POST(req: Request) {
     image = { mediaType: body.image.mediaType as ImageMediaType, data: body.image.data };
   }
   if (!text?.trim() && !image) return Response.json({ error: "Provide a description or a photo" }, { status: 400 });
-  // Detail (standard | high | very_high); the old size field (small | medium | large) still works.
-  const detail = toDetail(body.detail ?? body.size);
+  const detail = toDetail(body.detail);
   let base: BrickModel | undefined;
   if (body.base !== undefined) {
     const parsed = BrickModelSchema.safeParse(body.base);
@@ -59,9 +58,6 @@ export async function POST(req: Request) {
   }
   if (body.pipeline !== undefined && !PIPELINES.includes(body.pipeline as Pipeline)) return Response.json({ error: `Unknown pipeline "${body.pipeline}"` }, { status: 400 });
   const pipeline = resolvePipeline(body.pipeline as Pipeline | undefined, detail, !!base);
-  if (!AVAILABLE_PIPELINES.includes(pipeline)) {
-    return Response.json({ error: "The sub-build generator isn't built yet. Choose Single pass for now." }, { status: 501 });
-  }
 
   const encoder = new TextEncoder();
   const abort = new AbortController();

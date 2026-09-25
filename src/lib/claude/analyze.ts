@@ -1,5 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { analysisJsonSchema, analysisPrompt, PhotoAnalysisSchema, sizeTarget, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
+import { ANALYSIS_SYSTEM, analysisJsonSchema, analysisPrompt, PhotoAnalysisSchema, sizeTarget, type PhotoAnalysis, type SizeTarget } from "../prompts/analysis";
 import type { Detail } from "../detail";
 import type { Issue } from "../validate/validator";
 import { runLoop, type LoopContext, type RoundSummary } from "./loop";
@@ -31,14 +31,13 @@ export async function analyzePhoto(
   input: { text?: string; image: { mediaType: Anthropic.Base64ImageSource["media_type"]; data: string }; detail?: Detail },
   grid: { x: number; z: number; y: number },
   ctx: LoopContext,
-  system: string,
 ): Promise<AnalysisResult> {
   const text = analysisPrompt(input.text);
   const loop = await runLoop<PhotoAnalysis>(
     {
       scope: "analysis",
       debugPrefix: "analysis.",
-      system,
+      system: ANALYSIS_SYSTEM,
       firstContent: [{ type: "image", source: { type: "base64", media_type: input.image.mediaType, data: input.image.data } }, { type: "text", text }],
       firstText: text,
       schema: analysisJsonSchema(),

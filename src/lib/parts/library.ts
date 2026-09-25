@@ -372,7 +372,6 @@ export const CATALOG_PARTS: PartDef[] = [...catalogEntries.filter((e) => !e.snot
 export const PARTS: PartDef[] = [...CORE_PARTS, ...CATALOG_PARTS];
 
 export const PART_MAP: ReadonlyMap<string, PartDef> = new Map(PARTS.map((p) => [p.id, p]));
-export const PART_IDS = PARTS.map((p) => p.id) as [string, ...string[]];
 
 const SNOT_MAP: ReadonlyMap<string, PartDef> = new Map(SNOT_PARTS.map((p) => [p.id, p]));
 

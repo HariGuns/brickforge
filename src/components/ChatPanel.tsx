@@ -5,7 +5,7 @@ import type { Issue } from "@/lib/validate/validator";
 import type { RoundSummary } from "@/lib/claude/generate";
 import { DETAILS, type Detail } from "@/lib/detail";
 import { CONFIG } from "@/lib/config";
-import { AVAILABLE_PIPELINES, type Pipeline } from "@/lib/claude/pipeline";
+import type { Pipeline } from "@/lib/claude/pipeline";
 import * as I from "./icons";
 
 export interface RoundState {
@@ -370,9 +370,8 @@ export function ChatPanel(props: {
                       ["auto", "Auto"],
                     ] as const
                   ).map(([id, label]) => (
-                    <option key={id} value={id} disabled={!AVAILABLE_PIPELINES.includes(id)}>
+                    <option key={id} value={id}>
                       {label}
-                      {!AVAILABLE_PIPELINES.includes(id) ? " (soon)" : ""}
                     </option>
                   ))}
                 </select>
