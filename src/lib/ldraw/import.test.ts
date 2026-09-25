@@ -37,12 +37,14 @@ describe("LDraw import", () => {
 
   it("imports tilted parts only while sideways building is on", () => {
     const text = "1 4 0 -24 0 1 0 0 0 0 -1 0 1 0 3001.dat";
-    expect(importLdr(text).skipped.map((s) => s.reason)).toEqual(["part is tilted or mirrored"]);
-    CONFIG.sideways.enabled = true;
+    const was = CONFIG.sideways.enabled;
     try {
+      CONFIG.sideways.enabled = false;
+      expect(importLdr(text).skipped.map((s) => s.reason)).toEqual(["part is tilted or mirrored"]);
+      CONFIG.sideways.enabled = true;
       expect(importLdr(text).model.parts[0].frame).toBeDefined();
     } finally {
-      CONFIG.sideways.enabled = false;
+      CONFIG.sideways.enabled = was;
     }
   });
 });

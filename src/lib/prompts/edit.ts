@@ -23,7 +23,11 @@ Make the change and nothing else, so the rest of the model doesn't move; only sh
 export function designListing(d: BrickDesign): string {
   const c = codec();
   const block = (parts: Placement[], uses: Instance[]) =>
-    [...parts.map((p, i) => `  #${i} ${c.formatPlacement(p)}`), ...uses.map((u, i) => `  copy ${i}: ${c.formatInstance(u)}`)].join("\n");
+    [
+      ...parts.map((p, i) => `  #${i} ${c.formatPlacement(p)}`),
+      ...uses.map((u, i) => `  copy ${i}: ${c.formatInstance(u)}`),
+      ...(uses.some((u) => u.mount) ? ["  (A mount's part number refers to this listing too; it's renumbered for you when parts are removed. A part you add is numbered after the last one, in the order you add it.)"] : []),
+    ].join("\n");
   return [
     ...d.subBuilds.map((s) => `Sub-build ${s.id} "${s.name}" (${s.parts.length} parts${s.uses.length ? `, ${s.uses.length} copies inside` : ""}):\n${block(s.parts, s.uses)}`),
     `Main build (${d.main.parts.length} parts, ${d.main.uses.length} copies):\n${block(d.main.parts, d.main.uses)}`,

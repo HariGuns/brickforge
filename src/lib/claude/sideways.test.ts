@@ -1,16 +1,16 @@
 import fs from "node:fs";
-import { afterAll, describe, expect, it, vi } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { generateDesign } from "./subbuilds";
 import { assemblyJsonSchema, assemblyPrompt, planJsonSchema, planPrompt, subBuildPrompt } from "../prompts/subbuilds";
 import { compactCodec, jsonCodec } from "../diff/codec";
+import { applyAssemblyDiff, applyDesignDiff } from "../diff/diff";
+import type { BrickDesign, Instance } from "../design/schema";
 import { partRow } from "../parts/describe";
 import { getPart } from "../parts/library";
 import { searchParts } from "../parts/search";
 import { P } from "../fixtures/samples";
 import { CONFIG } from "../config";
-// Sideways building is off by default; these tests load the side-stud parts.
-vi.hoisted(() => void (process.env.NEXT_PUBLIC_BRICKFORGE_SIDEWAYS = "1"));
 
 
 // A mirrored pair of side panels on a 47905 (studs on both sides), as a sub-build plan.
@@ -26,7 +26,12 @@ const good = ["side on 1:0 at 0,3 spin 0", "side on 1:1 at 1,3 spin 0 m"];
 
 const schemaProps = (q: Anthropic.MessageCreateParams) => ((q.output_config?.format?.schema ?? {}) as { properties?: Record<string, unknown> }).properties ?? {};
 
-function fakeClient() {
+/**
+ * "bad-mount": the first assembly names a side stud 47905 doesn't have; the repair fixes that copy.
+ * "stray-part": the first assembly has a floating part listed before the carrier; the repair only
+ * removes it, so the mounts must be renumbered (carrier #2 → #1) for the result to be valid.
+ */
+function fakeClient(scenario: "bad-mount" | "stray-part" = "bad-mount") {
   const requests: Anthropic.MessageCreateParams[] = [];
   const client = {
     messages: {
@@ -35,10 +40,18 @@ function fakeClient() {
         const props = schemaProps(params);
         let text: string;
         if ("layout" in props) text = JSON.stringify(plan);
-        // The repair: fix the second copy's mount (it named a side stud 47905 doesn't have).
         else if ("setCopies" in props && params.messages.length > 1)
-          text = JSON.stringify({ name: "", description: "", remove: [], set: [], add: [], removeCopies: [], setCopies: [{ index: 1, value: good[1] }], addCopies: [] });
-        else if ("uses" in props) text = JSON.stringify(main([good[0], "side on 1:2 at 1,3 spin 0 m"]));
+          text = JSON.stringify(
+            scenario === "bad-mount"
+              ? { name: "", description: "", remove: [], set: [], add: [], removeCopies: [], setCopies: [{ index: 1, value: good[1] }], addCopies: [] }
+              : { name: "", description: "", remove: [0], set: [], add: [], removeCopies: [], setCopies: [], addCopies: [] },
+          );
+        else if ("uses" in props)
+          text = JSON.stringify(
+            scenario === "bad-mount"
+              ? main([good[0], "side on 1:2 at 1,3 spin 0 m"])
+              : { ...main(["side on 2:0 at 0,3 spin 0", "side on 2:1 at 1,3 spin 0 m"]), parts: [P("plate_1x1", "yellow", 8, 6, 8), ...main([]).parts] },
+          );
         else text = JSON.stringify(side);
         return {
           on() {
@@ -87,6 +100,49 @@ describe("sideways sub-builds (fake Claude)", () => {
     const [a, b] = [...out].map((k) => k.split(",").map(Number));
     expect(a[0] + b[0] === 0 && a[1] + b[1] === 0 && Math.abs(a[0]) + Math.abs(a[1]) === 1).toBe(true);
     expect(r.model!.parts.map((p) => p.part).sort()).toEqual(["41769b", "41770b", "47905", "plate_2x4", "plate_2x4", "plate_4x4"].sort());
+  });
+});
+
+describe("sideways copies survive part edits (fake Claude)", () => {
+  it("renumbers mounts when a repair removes a part listed before the carrier", async () => {
+    const { client, requests } = fakeClient("stray-part");
+    const r = await generateDesign({ text: "two side panels", detail: "standard" }, () => {}, { client });
+    dirs.push(r.debugDir);
+    expect(r.valid).toBe(true);
+    expect(r.rounds.filter((x) => x.scope === "assembly")).toHaveLength(2); // no extra round for the mounts
+    const repair = requests.at(-1)!.messages.at(-1)!.content as string;
+    expect(repair).toMatch(/A mount's part number refers to this listing too/);
+    expect(r.design!.main.parts.map((p) => p.part)).toEqual(["plate_4x4", "47905"]);
+    expect(r.design!.main.uses.map((u) => compactCodec.formatInstance(u))).toEqual(good);
+  });
+
+  it("renumbers by removals and additions, and rejects a mount on a removed part", () => {
+    const base = { name: "n", description: "d", parts: [P("plate_1x1", "red", 0, 0, 0), P("plate_4x4", "green", 0, 0, 0), P("47905", "white", 1, 1, 1)], uses: ["a on 2:0 at 0,0 spin 0", "a on 3:1 at 0,0 spin 0", "a 0 1 0 0"].map((s) => compactCodec.parseInstance(s) as Instance) };
+    const empty = { name: "", description: "", remove: [], set: [], add: [], removeCopies: [], setCopies: [], addCopies: [] };
+    // Remove #0, add one part (listing number 3): carrier #2 → #1, the new part #3 → #2; the plain copy is untouched.
+    const r = applyAssemblyDiff(base, { ...empty, remove: [0], add: [P("87087", "white", 0, 1, 0)] }, compactCodec);
+    expect(r.issues).toEqual([]);
+    expect(r.value!.uses.map((u) => compactCodec.formatInstance(u))).toEqual(["a on 1:0 at 0,0 spin 0", "a on 2:1 at 0,0 spin 0", "a 0 1 0 0"]);
+    // A new copy in the same change also uses listing numbers.
+    expect(applyAssemblyDiff(base, { ...empty, remove: [1], addCopies: ["a on 2:1 at 0,0 spin 0"] }, compactCodec).value!.uses.at(-1)!.mount!.part).toBe(1);
+    // Removing the carrier itself is an issue, not a silent re-target.
+    expect(applyAssemblyDiff(base, { ...empty, remove: [2] }, compactCodec).issues.map((i) => i.message).join(" ")).toMatch(/copy 0 \(a\) is mounted on part #2, which you removed/);
+    // Nothing changes without mounts or without part changes.
+    expect(applyAssemblyDiff(base, { ...empty, set: [{ index: 0, ...P("plate_1x1", "blue", 0, 0, 0) }] }, compactCodec).value!.uses).toEqual(base.uses);
+  });
+
+  it("renumbers mounts in a design diff's sub-builds too", () => {
+    const design: BrickDesign = {
+      name: "n",
+      description: "d",
+      subBuilds: [
+        { id: "a", name: "A", parts: [P("plate_1x1", "red", 0, 0, 0)], uses: [] },
+        { id: "car", name: "Car", parts: [P("plate_1x1", "red", 0, 0, 0), P("47905", "white", 1, 1, 1)], uses: [compactCodec.parseInstance("a on 1:0 at 0,0 spin 0") as Instance] },
+      ],
+      main: { parts: [], uses: [] },
+    };
+    const r = applyDesignDiff(design, { name: "", description: "", changes: [{ id: "car", remove: [0], set: [], add: [], removeCopies: [], setCopies: [], addCopies: [] }], newSubBuilds: [], removeSubBuilds: [] }, compactCodec);
+    expect(r.value!.subBuilds[1].uses[0].mount!.part).toBe(0);
   });
 });
 

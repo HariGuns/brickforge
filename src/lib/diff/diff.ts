@@ -117,10 +117,33 @@ export interface Container {
 }
 
 function applyContainer(c: Container, d: Json, codec: Codec, where: string, issues: Issue[]): Container {
-  return {
-    parts: applyList(c.parts, d.remove, d.set, d.add, codec.parsePlacement, "part", where, issues),
-    uses: applyList(c.uses, d.removeCopies, d.setCopies, d.addCopies, codec.parseInstance, "copy", where, issues),
-  };
+  const parts = applyList(c.parts, d.remove, d.set, d.add, codec.parsePlacement, "part", where, issues);
+  const uses = applyList(c.uses, d.removeCopies, d.setCopies, d.addCopies, codec.parseInstance, "copy", where, issues);
+  return { parts, uses: remapMounts(c.parts.length, parts.length, d.remove, uses, where, issues) };
+}
+
+/**
+ * Sideways copies name their carrier part by index, and indices refer to the
+ * listing before the changes (new parts count on from its end, in the order
+ * added). Renumber them to the parts' new positions; a mount on a removed part
+ * is an issue. Copies without a mount are untouched.
+ */
+function remapMounts(before: number, after: number, remove: unknown, uses: Instance[], where: string, issues: Issue[]): Instance[] {
+  if (!uses.some((u) => u.mount)) return uses;
+  const gone = new Set(arr(remove).filter((i): i is number => typeof i === "number"));
+  const map = new Map<number, number>();
+  let n = 0;
+  for (let i = 0; i < before; i++) if (!gone.has(i)) map.set(i, n++);
+  for (let k = 0; n < after; k++) map.set(before + k, n++);
+  return uses.map((u, ui) => {
+    if (!u.mount) return u;
+    if (gone.has(u.mount.part)) {
+      issues.push(invalid(`${where}: copy ${ui} (${u.sub}) is mounted on part #${u.mount.part}, which you removed. Mount it on another part with side studs, or remove the copy.`));
+      return u;
+    }
+    const to = map.get(u.mount.part);
+    return to === undefined || to === u.mount.part ? u : { ...u, mount: { ...u.mount, part: to } };
+  });
 }
 
 /** Assembly (main build) diff → the new assembly. */

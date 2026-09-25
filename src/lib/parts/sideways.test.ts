@@ -1,10 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { getPart, PARTS, SNOT_PARTS } from "./library";
 import { searchParts } from "./search";
 import { worldSideStuds } from "../model/geometry";
 import { CONFIG } from "../config";
-// Sideways building is off by default; these tests load the side-stud parts.
-vi.hoisted(() => void (process.env.NEXT_PUBLIC_BRICKFORGE_SIDEWAYS = "1"));
 
 
 const snot = (id: string) => SNOT_PARTS.find((p) => p.id === id)!;

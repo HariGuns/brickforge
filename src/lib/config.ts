@@ -60,12 +60,12 @@ export const CONFIG = {
   /** Repair rounds after the initial generation. */
   maxRepairRounds: 4,
   /**
-   * Sideways building (studs on sides, sideways sub-build copies). Off by default
-   * until the live results are in; set NEXT_PUBLIC_BRICKFORGE_SIDEWAYS=1 to turn it
-   * on (read at startup; baked into the client at build time). Off: side-stud parts
-   * aren't loaded, sideways copies can't be made and the prompts are as before.
+   * Sideways building (studs on sides, sideways sub-build copies). On by default;
+   * NEXT_PUBLIC_BRICKFORGE_SIDEWAYS=0 turns it off (read at startup; baked into the
+   * client at build time). Off: side-stud parts aren't loaded, sideways copies can't
+   * be made and the prompts are as before.
    */
-  sideways: { enabled: process.env.NEXT_PUBLIC_BRICKFORGE_SIDEWAYS === "1" },
+  sideways: { enabled: process.env.NEXT_PUBLIC_BRICKFORGE_SIDEWAYS !== "0" },
   /**
    * How parts and copies are written in Claude's answers and in listings:
    * "compact" strings ("brick_2x4 red 3 0 5 90") or "json" objects.
