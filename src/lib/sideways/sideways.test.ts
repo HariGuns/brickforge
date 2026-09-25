@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { CONFIG } from "../config";
 import { compileDesign } from "../design/compile";
 import type { BrickDesign } from "../design/schema";
@@ -71,6 +71,9 @@ import { designSteps } from "../design/steps";
 import { manualPages } from "../manual/pages";
 import { renderModel } from "../render/render";
 import type { Placement } from "../model/schema";
+// Sideways building is off by default; these tests load the side-stud parts.
+vi.hoisted(() => void (process.env.NEXT_PUBLIC_BRICKFORGE_SIDEWAYS = "1"));
+
 
 const same = (a: Placement[], b: Placement[]) => {
   const k = (p: Placement) => `${p.part}|${p.color}|${p.frame ? `${p.frame.m.join(",")}|${p.frame.t.map((v) => v.toFixed(2)).join(",")}` : `${p.x},${p.y},${p.z},${p.rot}`}`;

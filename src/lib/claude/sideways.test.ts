@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { generateDesign } from "./subbuilds";
 import { assemblyJsonSchema, assemblyPrompt, planJsonSchema, planPrompt, subBuildPrompt } from "../prompts/subbuilds";
@@ -9,6 +9,9 @@ import { getPart } from "../parts/library";
 import { searchParts } from "../parts/search";
 import { P } from "../fixtures/samples";
 import { CONFIG } from "../config";
+// Sideways building is off by default; these tests load the side-stud parts.
+vi.hoisted(() => void (process.env.NEXT_PUBLIC_BRICKFORGE_SIDEWAYS = "1"));
+
 
 // A mirrored pair of side panels on a 47905 (studs on both sides), as a sub-build plan.
 const plan = {

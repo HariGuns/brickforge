@@ -289,7 +289,7 @@ Why 885, not 1,000+: most of the rest need connection types the validator doesn'
   - **Everywhere else:** the viewer, manual, PDF and server renderer draw frames. LDraw export writes turned parts, and the design `.mpd` writes turned submodel references; import reads both back. In the manual, the panel is built flat in its own section, then attached after the upright build.
   - **Verification:** `verify-ldraw` mounts a panel on every side stud of every carrier (spins 0 and 90) and checks, in LDraw space, that the panel's anti-stud sits on the side stud. All 41 carriers pass.
 - **Generation** (phase 3): the planner can mark a sub-build `sideways: true` (a panel: w × d is its face, h its thickness). It's designed flat, face up, and the assembly mounts copies with `"<sub> on <part>:<stud> at <cx>,<cz> spin <s>"` (compact) or a `mount` object (JSON). Part rows list side studs, search knows "side studs"/"bracket"/"snot", and a few carriers are in the core menu. Repair hints cover `MOUNT_INVALID` and `SIDEWAYS_DETACHED`.
-- **Switch:** `CONFIG.sideways.enabled` (on). Turned off, side-stud parts aren't loaded and the prompts and schemas are exactly as before. `src/lib/regression.test.ts` snapshots seven saved builds to show upright behaviour is unchanged either way.
+- **Switch:** `CONFIG.sideways.enabled`, off by default until the live results are in; `NEXT_PUBLIC_BRICKFORGE_SIDEWAYS=1` (e.g. in `.env.local`) turns it on. Turned off, side-stud parts aren't loaded and the prompts and schemas are exactly as before. `src/lib/regression.test.ts` snapshots seven saved builds to show upright behaviour is unchanged either way.
 
 **Licences:**
 - The LDraw parts library is CC BY 2.0 / 4.0 (LDraw.org).

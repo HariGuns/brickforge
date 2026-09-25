@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATALOG_PARTS, CORE_PARTS, getPart, localBottom, localStuds, PARTS } from "./library";
+import { CATALOG_PARTS, CORE_PARTS, getPart, localBottom, localStuds, PARTS, SNOT_PARTS } from "./library";
 import { CORE_MENU_CATALOG } from "./core";
 import { coreMenu, searchParts } from "./search";
 import { validate } from "../validate/validator";
@@ -24,7 +24,7 @@ describe("part catalog", () => {
   });
 
   it("has a core menu of 100-150 parts that all exist", () => {
-    expect(CORE_MENU_CATALOG.filter((id) => !getPart(id))).toEqual([]);
+    expect(CORE_MENU_CATALOG.filter((id) => !getPart(id) && !SNOT_PARTS.some((p) => p.id === id))).toEqual([]); // side-stud carriers only while sideways is on
     expect(coreMenu().length).toBeGreaterThanOrEqual(100);
     expect(coreMenu().length).toBeLessThanOrEqual(150);
     expect(coreMenu().slice(0, CORE_PARTS.length)).toEqual(CORE_PARTS);
