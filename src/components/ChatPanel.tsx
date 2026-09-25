@@ -39,6 +39,10 @@ export interface Turn {
   analysis?: { subject: string; ratio: string; size: string; cost: number };
   result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string; parts?: number; subBuilds?: number; copies?: number; compileMs?: number; library?: { reused: number; copies: number; saved: number; added: number } };
   error?: string;
+  /** Budget cap for this build (USD), if one was set. */
+  budget?: number;
+  /** The build stopped at its budget cap. */
+  budgetStop?: { cap: number; spent: number; next: string; resume?: string; savedComponents?: number };
 }
 
 export interface StageState {
@@ -60,6 +64,8 @@ export interface Draft {
   detail: Detail;
   /** Generator path for new builds (testing setting). */
   pipeline: Pipeline;
+  /** Budget cap in USD for new builds and edits (null = none). */
+  budget: number | null;
   image: { name: string; mediaType: "image/jpeg"; data: string; previewUrl: string } | null;
 }
 
@@ -121,6 +127,7 @@ function stageRows(t: Turn): Row[] {
     }
   }
   rows.push(...refineRows(t));
+  if (t.budgetStop) rows.push(budgetRow(t.budgetStop));
   if (t.status === "error" || t.status === "cancelled") rows.push({ label: t.status === "cancelled" ? "Cancelled" : "Failed", state: "fail", note: "" });
   else
     rows.push({
@@ -131,6 +138,12 @@ function stageRows(t: Turn): Row[] {
         : "",
     });
   return rows;
+}
+
+/** "Budget cap reached": what was spent and what didn't start. */
+function budgetRow(b: NonNullable<Turn["budgetStop"]>): Row {
+  const what = b.next.replace(/^(sub|asm|plan|lib):/, "");
+  return { label: "Budget cap reached", state: "fail", note: `${usd(b.spent)} of ${usd(b.cap)} · stopped before ${what}${b.savedComponents ? ` · ${b.savedComponents} sub-builds saved to the library` : ""}` };
 }
 
 /** "Comparing with the photo (1 of 2)": what differed, and whether the correction was taken. */
@@ -192,6 +205,7 @@ function trackerRows(t: Turn): Row[] {
   }
 
   rows.push(...refineRows(t));
+  if (t.budgetStop) rows.push(budgetRow(t.budgetStop));
   if (t.status === "error" || t.status === "cancelled") {
     rows.push({ label: t.status === "cancelled" ? "Cancelled" : "Failed", state: "fail", note: "" });
   } else {
@@ -223,7 +237,10 @@ function Tracker({ turn }: { turn: Turn }) {
       {turn.status === "running" && live && !live.summary && live.thinking && <p className="trk-thinking">…{live.thinking.slice(-160)}</p>}
       <div className="trk-cost">
         <span>Running cost</span>
-        <span>{turn.status !== "running" ? usd(cost) : counted ? `${usd(cost)} so far` : "counted after each round"}</span>
+        <span>
+          {turn.status !== "running" ? usd(cost) : counted ? `${usd(cost)} so far` : "counted after each round"}
+          {turn.budget ? ` · cap ${usd(turn.budget)}` : ""}
+        </span>
       </div>
       {turn.result && <div className="trk-debug mono" title="Raw outputs and validator results for prompt tuning">debug/{turn.result.debugDir.split("/").pop()}</div>}
     </div>
@@ -382,6 +399,17 @@ export function ChatPanel(props: {
                 ))}
               </div>
             )}
+            <label className="path-select" title="Budget cap: the build stops before any call that would take its cost over this (finished stages are kept)">
+              <span className="sr-only">Budget cap</span>
+              <select value={draft.budget ?? ""} onChange={(e) => props.onDraft({ budget: e.target.value ? Number(e.target.value) : null })}>
+                <option value="">No cap</option>
+                {[1, 2, 5, 10, 15, 25].map((v) => (
+                  <option key={v} value={v}>
+                    Cap ${v}
+                  </option>
+                ))}
+              </select>
+            </label>
             {!editing && (
               <label className="path-select" title="Generator path (testing): single pass, sub-builds, or auto (sub-builds for Large)">
                 <span className="sr-only">Generator path</span>

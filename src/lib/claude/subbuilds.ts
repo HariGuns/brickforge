@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import type Anthropic from "@anthropic-ai/sdk";
 import { cacheHit, cacheSummary } from "./usage";
 import { decodeAnswer } from "../diff/codec";
@@ -26,6 +28,9 @@ import { checkChildPlan, checkTreePlan, isLibrary, PlanTree, type LibraryRef, ty
 import { compileSubBuild } from "../design/compile";
 import { importComponent, libraryListing, loadLibrary, makeComponent, markReused, saveComponent, searchLibrary, type Library } from "../components/library";
 import { libraryId } from "./tree";
+import { seedRun } from "../components/seed";
+import { Budget, BudgetExceeded } from "./budget";
+import { costBreakdown, depthsIn, formatBreakdown, roundsIn } from "./breakdown";
 import { validate, type Issue } from "../validate/validator";
 import { buildSteps } from "../steps/steps";
 import { DebugRun } from "./debug";
@@ -155,7 +160,35 @@ export async function resumeDesign(dir: string, onEvent: (e: GenerateEvent) => v
   return generateDesign(checkpoint.input, onEvent, { ...opts, checkpoint });
 }
 
+/**
+ * The sub-build generator, with the budget cap: when the next call would go
+ * over it, the run stops, saves its valid sub-builds to the library, writes
+ * stopped.json and reports how to resume it with a higher cap.
+ */
 export async function generateDesign(input: GenerateInput, onEvent: (e: GenerateEvent) => void = () => {}, opts: DesignOptions = {}): Promise<GenerateResult> {
+  // A resumed run's earlier rounds count toward the cap: it's for the whole model.
+  const spentBefore = opts.checkpoint ? roundsIn(opts.checkpoint.dir).reduce((n, r) => n + r.usage.cost, 0) : 0;
+  const budget = new Budget(opts.budget ?? null, spentBefore);
+  let dir = opts.checkpoint?.dir ?? "";
+  try {
+    return await designRun(input, (e) => (e.type === "start" && (dir = e.debugDir), onEvent(e)), opts, budget);
+  } catch (e) {
+    if (!(e instanceof BudgetExceeded) || !dir) throw e;
+    const rounds = roundsIn(dir);
+    const breakdown = costBreakdown(rounds, depthsIn(dir), [], { cap: e.cap, spent: budget.spent });
+    let savedComponents = 0;
+    if (opts.library !== false && CONFIG.library.enabled) savedComponents = seedRun(loadLibrary(opts.library || undefined), dir);
+    const resume = `npm run gen -- --resume ${path.relative(process.cwd(), dir) || dir} --budget ${Math.ceil(e.cap * 1.5)}`;
+    fs.writeFileSync(path.join(/*turbopackIgnore: true*/ dir, "stopped.json"), JSON.stringify({ reason: "budget", cap: e.cap, spent: budget.spent, next: e.next, at: new Date().toISOString(), savedComponents, resume, breakdown }, null, 1));
+    console.log(`[generate] budget cap $${e.cap.toFixed(2)} reached: spent $${budget.spent.toFixed(2)}; ${e.next.scope} (~$${e.next.estimate.toFixed(2)}) didn't start. ${formatBreakdown(breakdown)}`);
+    onEvent({ type: "budget", cap: e.cap, spent: budget.spent, next: e.next, resume, savedComponents });
+    const err = new BudgetExceeded(e.cap, budget.spent, e.next);
+    err.message = `${e.message} Finished stages are saved${savedComponents ? ` (${savedComponents} valid sub-builds added to the component library)` : ""}. Resume with a higher cap: ${resume}`;
+    throw err;
+  }
+}
+
+async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => void, opts: DesignOptions, budget: Budget): Promise<GenerateResult> {
   if (!input.text?.trim() && !input.image) throw new Error("Provide a description or a photo.");
   const anthropic = opts.client ?? getClient();
   const cp = opts.checkpoint;
@@ -170,7 +203,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   }
   // Rounds from the interrupted run whose stage is redone now still count toward the total cost.
   const earlierRounds: RoundSummary[] = [];
-  const ctx = { anthropic, debug, onEvent, signal: opts.signal };
+  const ctx = { anthropic, debug, onEvent, signal: opts.signal, budget };
   const withImage = (text: string): Anthropic.MessageParam["content"] =>
     input.image
       ? [
@@ -297,6 +330,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
       console.log(`[generate] ${node.id}: no valid child plan, designing it directly`);
     }
     ptree.addLevel(results.filter((r) => r.loop.best?.check.valid).map((r) => ({ parent: r.node.id, child: r.loop.best!.value })));
+    debug.write("tree.json", { depth: ptree.depth(), unique: ptree.nodes.size, copies: ptree.copies(), nodes: [...ptree.nodes.values()] });
   }
   if (tree) debug.write("tree.json", { depth: ptree.depth(), unique: ptree.nodes.size, copies: ptree.copies(), nodes: [...ptree.nodes.values()] });
 
@@ -559,6 +593,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     ...(photo ? { analysis: { analysis: photo.analysis, target: photo.target, cost: photo.usage.cost } } : {}),
     ...(refine ? { refine: refine.log } : {}),
     ...(lib ? { library: { reused: reused.length, copies: reused.reduce((n, r) => n + r.copies, 0), saved: reused.reduce((n, r) => n + r.saved, 0), added: added.length } } : {}),
+    costBreakdown: costBreakdown(rounds, (id) => ptree.nodes.get(id)?.depth ?? 1, reused, { cap: budget.cap, spent: budget.spent }),
   };
   const stages = {
     ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, rounds: photo.rounds.length, cost: photo.usage.cost } } : {}),
@@ -585,7 +620,8 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   const catalog = catalogUsage(result.model);
   console.log(`[generate] ${formatCatalogUsage(catalog)}`);
   const library = lib ? { offered: { plan: offered.length, childPlans: offeredChild }, reused, savedCost: reused.reduce((n, r) => n + r.saved, 0), added, size: lib.components.length } : undefined;
-  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, ...(library ? { library } : {}), rounds, total: usage, cache: cacheSummary(usage), ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
+  console.log(`[generate] cost: ${formatBreakdown(result.costBreakdown!)}`);
+  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, ...(library ? { library } : {}), costBreakdown: result.costBreakdown, rounds, total: usage, cache: cacheSummary(usage), ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
   if (design) debug.write("final-design.json", design);
   if (result.model) debug.write("final-model.json", result.model);
   if (resumed) console.log(`[generate] resumed: reused plan=${resumed.reused.plan}, sub-builds [${resumed.reused.subBuilds.join(", ")}], assembly=${resumed.reused.assembly}; earlier $${resumed.costBefore.toFixed(4)}, now $${resumed.costNow.toFixed(4)}`);
@@ -644,7 +680,7 @@ export async function editDesign(input: GenerateInput & { baseDesign: BrickDesig
         return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
       },
     },
-    { anthropic, debug, onEvent, signal: opts.signal },
+    { anthropic, debug, onEvent, signal: opts.signal, ...(opts.budget !== undefined ? { budget: new Budget(opts.budget) } : {}) },
   );
   const design = loop.best?.value ?? null;
   onEvent({ type: "stage", scope: "edit", label: "Editing the design", status: "done", valid: loop.best?.check.valid ?? false, parts: loop.best?.check.partCount, cost: loop.usage.cost });

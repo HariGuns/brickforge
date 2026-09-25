@@ -36,6 +36,9 @@ const add = (k: string, r: Partial<Row>) => {
 
 const root = path.resolve(CONFIG.debugDir);
 let runs = 0;
+// Tree runs: cost by level (0 = main build) and new vs reused components, from their summaries.
+const levels = new Map<string, { cost: number; calls: number }>();
+const reuse = { runs: 0, newCount: 0, newCost: 0, reused: 0, saved: 0 };
 for (const dir of fs.readdirSync(root).sort()) {
   if (since && dir < since) continue;
   const full = path.join(root, dir);
@@ -44,6 +47,22 @@ for (const dir of fs.readdirSync(root).sort()) {
   const files = fs.readdirSync(full).filter((f) => f.endsWith(".validation.json"));
   if (!files.length) continue;
   runs++;
+  try {
+    const b = JSON.parse(fs.readFileSync(path.join(full, "summary.json"), "utf8")).costBreakdown as { byLevel: Record<string, { cost: number; calls: number }>; components: { new: { count: number; cost: number }; reused: { count: number; saved: number } } } | undefined;
+    if (b && Object.keys(b.byLevel).some((l) => Number(l) > 1)) {
+      for (const [l, v] of Object.entries(b.byLevel)) {
+        const e = levels.get(l) ?? { cost: 0, calls: 0 };
+        levels.set(l, { cost: e.cost + v.cost, calls: e.calls + v.calls });
+      }
+      reuse.runs++;
+      reuse.newCount += b.components.new.count;
+      reuse.newCost += b.components.new.cost;
+      reuse.reused += b.components.reused.count;
+      reuse.saved += b.components.reused.saved;
+    }
+  } catch {
+    // no summary (interrupted run)
+  }
   for (const f of files) {
     let v: { summary?: { scope?: string; round?: number; partCount?: number; model?: string; effort?: string; usage?: { input: number; output: number; cacheRead: number; cacheWrite: number; cost: number } } };
     try {
@@ -55,7 +74,20 @@ for (const dir of fs.readdirSync(root).sort()) {
     if (!s?.usage) continue;
     const scope = s.scope ?? "main";
     const repair = (s.round ?? 0) > 0;
-    const base = scope === "main" ? (edit ? "edit" : "design (single pass)") : scope.startsWith("sub:") ? "sub-build" : scope.startsWith("refine") ? "comparison" : scope;
+    const base =
+      scope === "main"
+        ? edit
+          ? "edit"
+          : "design (single pass)"
+        : scope.startsWith("sub:")
+          ? "sub-build"
+          : scope.startsWith("plan:")
+            ? "child plan"
+            : scope.startsWith("asm:")
+              ? `sub-assembly (${s.effort ?? "high"})`
+              : scope.startsWith("refine")
+                ? "comparison"
+                : scope;
     const stage = `${base}${repair ? " · repair" : ""}`;
     const raw = path.join(full, f.replace(".validation.json", ".raw.json.txt"));
     const answer = fs.existsSync(raw) ? Math.round(fs.statSync(raw).size / CHARS_PER_TOKEN) : 0;
@@ -91,5 +123,14 @@ const byKind = {
 };
 lines.push("", "| cost by token kind | $ | share |", "|---|---|---|", ...Object.entries(byKind).map(([n, c]) => `| ${n} | $${c.toFixed(2)} | ${((c / total) * 100).toFixed(0)}% |`));
 lines.push("", "| model · effort | rounds | output tokens | output / round | cost |", "|---|---|---|---|---|", ...[...settings].map(([n, e]) => `| ${n} | ${e.rounds} | ${k(e.output)} | ${k(Math.round(e.output / e.rounds))} | $${e.cost.toFixed(2)} |`));
+if (levels.size)
+  lines.push(
+    "",
+    `| tree runs (${reuse.runs}): level | calls | cost |`,
+    "|---|---|---|",
+    ...[...levels].sort((a, b) => Number(a[0]) - Number(b[0])).map(([l, v]) => `| ${l === "0" ? "0 (main build)" : l} | ${v.calls} | $${v.cost.toFixed(2)} |`),
+    "",
+    `New components: ${reuse.newCount}, $${reuse.newCost.toFixed(2)} · reused from the library: ${reuse.reused} (~$${reuse.saved.toFixed(2)} not spent)`,
+  );
 console.log(lines.join("\n"));
 if (mdOut) fs.writeFileSync(mdOut, lines.join("\n") + "\n");

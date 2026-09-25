@@ -3,7 +3,7 @@ import path from "node:path";
 import { CONFIG } from "../config";
 import { BrickDesignSchema, type SubBuild } from "../design/schema";
 import { BrickModelSchema } from "../model/schema";
-import { loadLibrary, makeComponent, saveComponent, subtreeOf } from "./library";
+import { loadLibrary, makeComponent, saveComponent, subtreeOf, type Library } from "./library";
 
 /**
  * Seed the component library from what's already there: the valid sub-builds
@@ -149,4 +149,14 @@ export function seedLibrary(o: { dir?: string; debugDir?: string; buildsDir?: st
     else report.duplicates++;
   }
   return report;
+}
+
+/** Save one run's valid sub-builds (e.g. a run stopped at its budget cap). Returns how many were new. */
+export function seedRun(lib: Library, dir: string): number {
+  let added = 0;
+  for (const c of fromRun(dir)) {
+    const comp = makeComponent(c.subBuilds, c.root, c);
+    if (comp && saveComponent(lib, comp).added) added++;
+  }
+  return added;
 }

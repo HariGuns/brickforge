@@ -24,6 +24,8 @@ import { cacheHit, cacheSummary, formatUsage, type RoundUsage } from "./usage";
 import { runLoop, type LoopEvent, type RoundSummary } from "./loop";
 import type { BrickDesign } from "../design/schema";
 import type { CompileResult } from "../design/compile";
+import type { CostBreakdown } from "./breakdown";
+import { Budget } from "./budget";
 
 export type ImageMediaType = "image/jpeg" | "image/png" | "image/webp" | "image/gif";
 
@@ -58,6 +60,20 @@ export interface GenerateResult {
   refine?: RefineLog[];
   /** Sub-build path: components reused from the library, what that saved, and components added to it. */
   library?: { reused: number; copies: number; saved: number; added: number };
+  /** Sub-build path: cost by level, kind of call, and new vs reused components. */
+  costBreakdown?: CostBreakdown;
+}
+
+/** A run stopped at its budget cap: what it spent, what didn't start, and how to finish it. */
+export interface BudgetEvent {
+  type: "budget";
+  cap: number;
+  spent: number;
+  next: { scope: string; estimate: number };
+  /** Command that resumes the run (sub-build runs), with a suggested higher cap. */
+  resume?: string;
+  /** Valid sub-builds of the run saved to the component library. */
+  savedComponents?: number;
 }
 
 /** A stage of the sub-build path starting or finishing ("plan", "plan:<id>", "sub:<id>", "asm:<id>", "assembly"). */
@@ -76,7 +92,7 @@ export interface StageEvent {
   reused?: { component: string; saved: number; recolor?: string[] };
 }
 
-export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | AnalysisEvent | RefineEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };
+export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | AnalysisEvent | RefineEvent | BudgetEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };
 
 let client: { key: string; api: Anthropic } | null = null;
 /** A client for the current key (Settings, or ANTHROPIC_API_KEY in .env.local); rebuilt when the key changes. */
@@ -116,6 +132,8 @@ export function parseModelJson(json: unknown): { model: BrickModel | null; issue
 
 export interface GenerateOptions {
   signal?: AbortSignal;
+  /** Budget cap for the model, USD: no call starts that would go over it (see budget.ts). */
+  budget?: number;
   /** Injected client (tests); defaults to one built from ANTHROPIC_API_KEY. */
   client?: Pick<Anthropic, "messages">;
 }
@@ -129,6 +147,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
   if (!input.text?.trim() && !input.image) throw new Error(input.base ? "Describe the change you want." : "Provide a description or a photo.");
   const anthropic = opts.client ?? getClient();
   const signal = opts.signal;
+  const budget = opts.budget !== undefined ? new Budget(opts.budget) : undefined;
   const debug = new DebugRun(`${input.base ? "edit-" : ""}${input.text?.trim() || "photo"}`);
   onEvent({ type: "start", debugDir: debug.dir });
 
@@ -140,7 +159,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
   if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
 
   // A photo build starts with the analysis: proportions, features, colours, camera angle → target size.
-  const photo = input.image && !input.base ? await analyzePhoto({ text: input.text, image: input.image, detail: input.detail }, CONFIG.grid, { anthropic, debug, onEvent, signal }) : null;
+  const photo = input.image && !input.base ? await analyzePhoto({ text: input.text, image: input.image, detail: input.detail }, CONFIG.grid, { anthropic, debug, onEvent, signal, budget }) : null;
   if (photo) onEvent({ type: "analysis", analysis: photo.analysis, target: photo.target, cost: photo.usage.cost });
 
   const firstText = input.base
@@ -187,7 +206,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
         return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: model.parts.length };
       },
     },
-    { anthropic, debug, onEvent, signal },
+    { anthropic, debug, onEvent, signal, budget },
   );
 
   let bestModel = loop.best?.value ?? null;
@@ -216,7 +235,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
         system,
         tools: [searchPartsTool],
       },
-      { anthropic, debug, onEvent, signal },
+      { anthropic, debug, onEvent, signal, budget },
       onEvent,
     );
     rounds.push(...r.rounds);

@@ -20,12 +20,12 @@ function friendly(err: unknown): string {
 }
 
 /**
- * POST { text?, image?: { mediaType, data(base64) }, detail?, base?, pipeline?, tree? }
+ * POST { text?, image?: { mediaType, data(base64) }, detail?, base?, pipeline?, tree?, budget? }
  * → text/event-stream of GenerateEvent. `base` = model to edit; `pipeline` =
  * "single" | "subbuilds" | "auto" (default CONFIG.generator).
  */
 export async function POST(req: Request) {
-  let body: { text?: string; image?: { mediaType: string; data: string }; detail?: string; base?: unknown; baseDesign?: unknown; pipeline?: string; tree?: boolean };
+  let body: { text?: string; image?: { mediaType: string; data: string }; detail?: string; base?: unknown; baseDesign?: unknown; pipeline?: string; tree?: boolean; budget?: number };
   try {
     body = await req.json();
   } catch {
@@ -59,6 +59,8 @@ export async function POST(req: Request) {
   if (body.pipeline !== undefined && !PIPELINES.includes(body.pipeline as Pipeline)) return Response.json({ error: `Unknown pipeline "${body.pipeline}"` }, { status: 400 });
   const pipeline = resolvePipeline(body.pipeline as Pipeline | undefined, detail, !!base);
 
+  if (body.budget !== undefined && !(typeof body.budget === "number" && body.budget > 0)) return Response.json({ error: "budget must be a positive amount in USD" }, { status: 400 });
+  const budget = body.budget;
   const encoder = new TextEncoder();
   const abort = new AbortController();
   req.signal.addEventListener("abort", () => abort.abort());
@@ -73,8 +75,8 @@ export async function POST(req: Request) {
         }
       };
       try {
-        if (baseDesign) await editDesign({ text, image, baseDesign }, send, { signal: abort.signal });
-        else await (pipeline === "subbuilds" ? generateDesign : generateModel)({ text, image, detail, base, ...(typeof body.tree === "boolean" ? { tree: body.tree } : {}) }, send, { signal: abort.signal });
+        if (baseDesign) await editDesign({ text, image, baseDesign }, send, { signal: abort.signal, budget });
+        else await (pipeline === "subbuilds" ? generateDesign : generateModel)({ text, image, detail, base, ...(typeof body.tree === "boolean" ? { tree: body.tree } : {}) }, send, { signal: abort.signal, budget });
       } catch (err) {
         if (!abort.signal.aborted) {
           console.error("[generate] failed:", err);

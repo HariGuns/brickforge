@@ -63,7 +63,7 @@ export default function Page() {
   const wsRef = useRef<Workspace | null>(null);
   const [manualStep, setManualStep] = useState(1);
   const [turns, setTurns] = useState<Turn[]>([]);
-  const [draft, setDraft] = useState<Draft>({ text: "", detail: "standard", pipeline: CONFIG.generator, image: null });
+  const [draft, setDraft] = useState<Draft>({ text: "", detail: "standard", pipeline: CONFIG.generator, budget: null, image: null });
   const [running, setRunning] = useState(false);
   const [editing, setEditing] = useState(true);
   const [library, setLibrary] = useState<LibraryEntry[] | null>(null);
@@ -250,7 +250,7 @@ export default function Page() {
     const docId = ws?.doc.id;
     setTurns((ts) => [
       ...ts,
-      { id, kind: base ? "edit" : "build", baseName: base?.name, text: d.text.trim(), detail: d.detail, image: d.image ? { name: d.image.name, previewUrl: d.image.previewUrl } : undefined, status: "running", rounds: [] },
+      { id, kind: base ? "edit" : "build", baseName: base?.name, text: d.text.trim(), detail: d.detail, image: d.image ? { name: d.image.name, previewUrl: d.image.previewUrl } : undefined, status: "running", rounds: [], ...(d.budget ? { budget: d.budget } : {}) },
     ]);
     setDraft((x) => ({ ...x, text: "", image: null }));
     setRunning(true);
@@ -259,7 +259,7 @@ export default function Page() {
     abortRef.current = ac;
     try {
       const baseDesign = base ? version?.design : undefined;
-      const body = { text: d.text, detail: d.detail, pipeline: d.pipeline, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined, base, baseDesign };
+      const body = { text: d.text, detail: d.detail, pipeline: d.pipeline, image: d.image ? { mediaType: d.image.mediaType, data: d.image.data } : undefined, base, baseDesign, ...(d.budget ? { budget: d.budget } : {}) };
       for await (const ev of streamGenerate(body, ac.signal)) onEvent(id, ev, base, docId, d.text.trim(), baseDesign);
     } catch (e) {
       if (ac.signal.aborted) updateTurn(id, (t) => ({ ...t, status: "cancelled" }));
@@ -354,6 +354,9 @@ export default function Page() {
         loadLibrary();
         break;
       }
+      case "budget":
+        updateTurn(id, (t) => ({ ...t, budgetStop: { cap: ev.cap, spent: ev.spent, next: ev.next.scope, resume: ev.resume, savedComponents: ev.savedComponents } }));
+        break;
       case "error":
         updateTurn(id, (t) => ({ ...t, status: "error", error: ev.message }));
         break;

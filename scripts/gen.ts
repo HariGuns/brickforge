@@ -7,6 +7,7 @@
  *   npm run gen -- --pipeline single "a castle"         (single | subbuilds | auto; default from CONFIG.generator)
  *   npm run gen -- --resume debug/<run folder>          (finish an interrupted sub-build run)
  *   npm run gen -- --tree / --no-tree "a town square"   (deeper sub-build trees; default on for Very high)
+ *   npm run gen -- --budget 15 "a town square"          (budget cap in USD: stops and reports before a call would go over it)
  * Writes exports/<name>.ldr/.mpd and a debug folder under ./debug.
  */
 import fs from "node:fs";
@@ -19,6 +20,7 @@ const { generateDesign, resumeDesign } = await import("../src/lib/claude/subbuil
 const { exportDesignMpd, exportFileNames, exportLdr, exportMpd } = await import("../src/lib/ldraw/export");
 const { compileDesign } = await import("../src/lib/design/compile");
 const { formatUsage } = await import("../src/lib/claude/usage");
+const { formatBreakdown } = await import("../src/lib/claude/breakdown");
 
 const args = process.argv.slice(2);
 let imagePath: string | undefined;
@@ -54,6 +56,13 @@ for (const [flag, on] of [["--tree", true], ["--no-tree", false]] as const) {
   const k = args.indexOf(flag);
   if (k >= 0) (args.splice(k, 1), (tree = on));
 }
+// --budget 15: cap in USD for the whole model (a resumed run counts what it spent before).
+const bgi = args.indexOf("--budget");
+const budget = bgi >= 0 ? Number(args.splice(bgi, 2)[1]) : undefined;
+if (budget !== undefined && !(budget > 0)) {
+  console.error("--budget needs a positive amount in USD, e.g. --budget 15");
+  process.exit(2);
+}
 const bi = args.indexOf("--base");
 const base = bi >= 0 ? JSON.parse(fs.readFileSync(args.splice(bi, 2)[1], "utf8")) : undefined;
 const text = args.join(" ").trim() || undefined;
@@ -68,6 +77,7 @@ console.log(`pipeline: ${pipeline}`);
 
 const onEvent = (e: import("../src/lib/claude/generate").GenerateEvent) => {
   if (e.type === "stage") console.log(`${"  ".repeat(Math.max(0, (e.depth ?? 1) - 1))}${e.status === "start" ? "▶" : "■"} ${e.scope.startsWith("plan:") ? "plan " : e.scope.startsWith("asm:") ? "assemble " : ""}${e.label}${e.copies ? ` ×${e.copies}` : ""}${e.status === "done" ? ` — ${e.valid ? "ok" : "not valid"}${e.parts !== undefined ? `, ${e.parts}` : ""}${e.cost !== undefined ? `, $${e.cost.toFixed(3)}` : ""}` : ""}`);
+  if (e.type === "budget") console.log(`■ Budget cap $${e.cap.toFixed(2)} reached: $${e.spent.toFixed(2)} spent; ${e.next.scope} (~$${e.next.estimate.toFixed(2)}) didn't start.${e.savedComponents ? ` ${e.savedComponents} valid sub-builds saved to the library.` : ""}${e.resume ? `\n  Resume: ${e.resume}` : ""}`);
   if (e.type === "round_start") console.log(`→ ${e.scope} round ${e.round} (${e.kind})…`);
   if (e.type === "round_end" && e.errors.length) {
     for (const err of e.errors.slice(0, 8)) console.log(`    ${err.code}: ${err.message}`);
@@ -75,14 +85,16 @@ const onEvent = (e: import("../src/lib/claude/generate").GenerateEvent) => {
   }
 };
 const result = resumeDir
-  ? await resumeDesign(resumeDir, onEvent)
+  ? await resumeDesign(resumeDir, onEvent, { budget })
   : pipeline === "subbuilds"
-    ? await generateDesign({ text, image, detail, tree }, onEvent)
-    : await generateModel({ text, image, detail, base }, onEvent);
+    ? await generateDesign({ text, image, detail, tree }, onEvent, { budget })
+    : await generateModel({ text, image, detail, base }, onEvent, { budget });
 
 console.log(`\nValid: ${result.valid} · parts: ${result.model?.parts.length ?? 0} · steps: ${result.steps.length}${result.compile ? ` · sub-builds: ${result.compile.stats.uniqueSubBuilds} unique, ${result.compile.stats.copies} copies · compile ${result.compile.stats.compileMs} ms` : ""}`);
 for (const r of result.rounds) console.log(`  ${r.scope} round ${r.round}: ${r.errorCount} errors · ${r.seconds.toFixed(0)}s · ${formatUsage(r.usage)}${r.reused ? " (earlier run)" : ""}`);
 console.log(`  total: ${formatUsage(result.usage)}`);
+if (result.costBreakdown) console.log(`  cost: ${formatBreakdown(result.costBreakdown)}`);
+if (result.library) console.log(`  library: ${result.library.reused} components reused (${result.library.copies} copies, ~$${result.library.saved.toFixed(2)} saved), ${result.library.added} new components saved`);
 if (result.model) {
   fs.mkdirSync("exports", { recursive: true });
   const n = exportFileNames(result.model);

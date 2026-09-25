@@ -4,6 +4,7 @@ import type { Issue } from "../validate/validator";
 import { repairPrompt } from "../prompts/repair";
 import type { DebugRun } from "./debug";
 import { cacheHit, formatUsage, sumUsage, toRoundUsage, type RoundUsage } from "./usage";
+import type { Budget } from "./budget";
 
 /**
  * The generate → validate → repair loop, shared by the single-pass generator
@@ -109,6 +110,8 @@ export interface LoopContext {
    * writing it.
    */
   onStarted?: () => void;
+  /** Budget cap for the whole model: every call reserves its estimate first (see budget.ts). */
+  budget?: Budget;
 }
 
 export interface LoopResult<T> {
@@ -178,21 +181,31 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     const thinkingParts: string[] = [];
     const callUsage: RoundUsage[] = [];
     let msg: Anthropic.Message;
+    const costStage: Stage = round > 0 && (spec.stage ?? "design") !== "analysis" ? "repair" : (spec.stage ?? "design");
     for (let turn = 0; ; turn++) {
-      const stream = ctx.anthropic.messages.stream(
-        {
-          model: setting.model,
-          max_tokens: CONFIG.maxTokens,
-          thinking: { type: "adaptive", display: "summarized" },
-          output_config: { effort: setting.effort, format: { type: "json_schema", schema } },
-          // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next call.
-          system: [{ type: "text", text: spec.system, ...(spec.cache === false ? {} : { cache_control: { type: "ephemeral" as const } }) }],
-          ...(spec.cache === false ? {} : { cache_control: { type: "ephemeral" as const } }),
-          ...(tools.length ? { tools: tools.map((t) => t.def), tool_choice: turn >= MAX_TOOL_TURNS || spec.toolChoice === "none" ? { type: "none" as const } : { type: "auto" as const } } : {}),
-          messages,
-        },
-        { signal: ctx.signal },
-      );
+      // Throws BudgetExceeded (before anything is sent) if this call would go over the cap.
+      const hold = ctx.budget?.reserve(spec.scope, costStage);
+      const stream = (() => {
+        try {
+          return ctx.anthropic.messages.stream(
+            {
+              model: setting.model,
+              max_tokens: CONFIG.maxTokens,
+              thinking: { type: "adaptive", display: "summarized" },
+              output_config: { effort: setting.effort, format: { type: "json_schema", schema } },
+              // Stable system prompt is cached; top-level cache_control caches the growing conversation for the next call.
+              system: [{ type: "text", text: spec.system, ...(spec.cache === false ? {} : { cache_control: { type: "ephemeral" as const } }) }],
+              ...(spec.cache === false ? {} : { cache_control: { type: "ephemeral" as const } }),
+              ...(tools.length ? { tools: tools.map((t) => t.def), tool_choice: turn >= MAX_TOOL_TURNS || spec.toolChoice === "none" ? { type: "none" as const } : { type: "auto" as const } } : {}),
+              messages,
+            },
+            { signal: ctx.signal },
+          );
+        } catch (e) {
+          hold?.release();
+          throw e;
+        }
+      })();
       stream.on("streamEvent", () => started());
       stream.on("thinking", (delta) => {
         thinkingChars += delta.length;
@@ -203,9 +216,15 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
         outputChars += delta.length;
         emitProgress();
       });
-      msg = await stream.finalMessage();
+      try {
+        msg = await stream.finalMessage();
+      } catch (e) {
+        hold?.release();
+        throw e;
+      }
       started();
       callUsage.push(toRoundUsage(msg.usage, setting.model));
+      hold?.settle(callUsage.at(-1)!.cost);
       thinkingParts.push(...msg.content.flatMap((b) => (b.type === "thinking" ? [b.thinking] : [])));
       if (msg.stop_reason !== "tool_use") break;
 
