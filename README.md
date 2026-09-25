@@ -29,7 +29,7 @@ Optional in `.env.local`: `REBRICKABLE_API_KEY` (only for `npm run fetch-brickli
 ## Desktop app (AppImage)
 
 ```bash
-npm run appimage        # → dist/BrickForge-0.1.0-x86_64.AppImage (152 MB)
+npm run appimage        # → dist/BrickForge-0.1.0-x86_64.AppImage (132 MB)
 ```
 
 The AppImage is the whole app in one file: Electron plus the Next.js standalone server. Run it, and:
