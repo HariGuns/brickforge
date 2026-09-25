@@ -23,6 +23,15 @@ export const InstanceSchema = z.object({
    * axis before it's turned by `rot`. Handed parts swap (wedge right ↔ left).
    */
   mirror: z.boolean().optional(),
+  /**
+   * Sideways building: mount the copy on a side stud instead of placing it at
+   * x/y/z/rot. `part` is a part in the same container (sub-build or main build)
+   * with side studs, `stud` which of its side studs, `at` the copy's own bottom
+   * cell [cx, cz] that clips onto it, `spin` its turn within the face. The copy's
+   * top then faces the stud's direction; seen from outside, its x runs left to
+   * right and its z top to bottom.
+   */
+  mount: z.object({ part: z.number().int(), stud: z.number().int(), at: z.tuple([z.number().int(), z.number().int()]), spin: RotSchema.default(0) }).optional(),
 });
 
 export const SubBuildSchema = z.object({

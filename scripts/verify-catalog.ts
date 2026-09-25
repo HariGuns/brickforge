@@ -13,7 +13,10 @@
  */
 import { CATALOG_PARTS, getPart, SNOT_PARTS, type PartDef } from "../src/lib/parts/library";
 import { footprint, worldBottom, worldPins, worldSideStuds, worldStuds } from "../src/lib/model/geometry";
-import { ldrawTransform, LDU_PLATE, LDU_STUD, type Mat3 } from "../src/lib/ldraw/export";
+import { frameTransform, ldrawTransform, LDU_PLATE, LDU_STUD, type Mat3 } from "../src/lib/ldraw/export";
+import { CONFIG } from "../src/lib/config";
+import { compileDesign } from "../src/lib/design/compile";
+import type { BrickDesign } from "../src/lib/design/schema";
 import type { Placement, Rot } from "../src/lib/model/schema";
 import { wheelMount } from "../src/lib/parts/wheels";
 import { openLibrary, type V } from "./lib/ldrawGeo";
@@ -180,8 +183,51 @@ function checkSideParts(def: PartDef): string[] {
   return problems;
 }
 
+/**
+ * Sideways mounts end to end: a panel mounted on each side stud of a carrier,
+ * exported to LDraw; the panel's real anti-stud snap must sit on the carrier's
+ * real side-stud snap with the same axis (LDCad's mating rule).
+ */
+function checkMounts(carrier: PartDef): string[] {
+  CONFIG.sideways.enabled = true;
+  const problems: string[] = [];
+  const studs = carrier.sideStuds ?? [];
+  studs.forEach((_, k) => {
+    for (const spin of [0, 90] as Rot[]) {
+      const design: BrickDesign = {
+        name: "m",
+        description: "",
+        subBuilds: [{ id: "panel", name: "Panel", parts: [{ part: "plate_2x2", color: "red", x: 0, y: 0, z: 0, rot: 0 }], uses: [] }],
+        main: { parts: [{ part: carrier.id, color: "white", x: 10, y: 10, z: 10, rot: 0 }], uses: [{ sub: "panel", x: 0, y: 0, z: 0, rot: 0, mount: { part: 0, stud: k, at: [1, 1], spin } }] },
+      };
+      const c = compileDesign(design, { structure: "off" });
+      if (c.errors.length) return void problems.push(`stud ${k}: ${c.errors[0].message}`);
+      const snapsOf = (i: number) => {
+        const pl = c.model.parts[i], def = getPart(pl.part)!;
+        const { pos, m } = pl.frame ? frameTransform(pl, def) : ldrawTransform(pl, def);
+        return shadow.snaps(def.ldraw.file).map((s) => ({ ...s, w: add(mul(m, s.pos), pos), axis: norm(mul(m, snapAxis(s))) }));
+      };
+      const side = snapsOf(0).filter((s) => s.gender === "M" && Math.abs(s.axis[1]) < 0.01 && Math.abs((s.secs[0]?.[1] ?? 0) - 6) < 0.01);
+      const anti = snapsOf(1).filter((s) => s.gender === "F" && Math.abs((s.secs[0]?.[1] ?? 0) - 6) < 0.01);
+      const mated = side.some((s) => anti.some((a) => Math.hypot(a.w[0] - s.w[0], a.w[1] - s.w[1], a.w[2] - s.w[2]) < 0.1 && a.axis.every((v, j) => Math.abs(v - s.axis[j]) < 0.01)));
+      if (!mated) problems.push(`stud ${k}, spin ${spin}: the panel's anti-stud doesn't sit on a side stud in LDraw space`);
+      if (!c.validation?.valid) problems.push(`stud ${k}, spin ${spin}: ${c.validation?.errors[0]?.message}`);
+    }
+  });
+  return problems;
+}
+
 let failures = 0;
 const inferred: string[] = [];
+for (const def of SNOT_PARTS) {
+  const m = checkMounts(def);
+  if (m.length) {
+    failures++;
+    console.log(`✗ ${def.id.padEnd(10)} ${def.name} (sideways mount)`);
+    for (const p of [...new Set(m)].slice(0, 4)) console.log(`    ${p}`);
+  }
+}
+console.log(`Sideways mounts: ${SNOT_PARTS.length - failures} of ${SNOT_PARTS.length} carriers mate in LDraw space.`);
 for (const def of SNOT_PARTS) {
   const problems = checkSideParts(def);
   if (problems.length) {

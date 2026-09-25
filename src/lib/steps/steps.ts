@@ -38,7 +38,10 @@ export function buildSteps(model: BrickModel, opts: StepOptions = {}): BuildStep
 
   const layers = new Map<number, number[]>();
   const wheels: number[] = [];
+  const sideways: number[] = [];
   parts.forEach((p, i) => {
+    // Sideways parts go on after the upright build (they clip onto its side studs).
+    if (p.frame) return void sideways.push(i);
     // Wheels go on last, once their holders are in place (they hang below them).
     if (getPart(p.part)?.hub) return void wheels.push(i);
     if (hang.has(i)) return;
@@ -53,6 +56,7 @@ export function buildSteps(model: BrickModel, opts: StepOptions = {}): BuildStep
     const units = layer.map((i) => [i, ...(withHangers.get(i) ?? [])]);
     for (const g of chunkUnits(units, maxPerStep)) steps.push({ n: steps.length + 1, parts: g, y });
   }
+  if (sideways.length) for (const g of chunk(sideways, maxPerStep)) steps.push({ n: steps.length + 1, parts: g, y: Math.min(...g.map((i) => parts[i].y)) });
   if (wheels.length) {
     wheels.sort((a, b) => parts[a].z - parts[b].z || parts[a].x - parts[b].x || a - b);
     for (const g of chunk(wheels, maxPerStep)) steps.push({ n: steps.length + 1, parts: g, y: Math.min(...g.map((i) => parts[i].y)) });
@@ -110,7 +114,7 @@ export function checkStepOrder(model: BrickModel, connections: Connection[], ste
   const bad: number[] = [];
   model.parts.forEach((p, i) => {
     if (!placedAt.has(i)) return bad.push(i);
-    if (p.y === 0) return;
+    if (p.y === 0 || p.frame) return; // sideways parts hang on their mount
     // Wheels and their holders hold each other through the pin; wheels go on last.
     if (connections.some((c) => c.kind === "pin" && (c.lower === i || c.upper === i))) return;
     // Held from below by an earlier part, or by a pinned holder attached in the same step.

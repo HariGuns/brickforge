@@ -4,6 +4,7 @@ import { describe, pinKey, resolve, worldBottom, worldHub, worldPins, worldSolid
 import { oppositeDir } from "../parts/library";
 import { wheelMount } from "../parts/wheels";
 import { searchParts } from "../parts/search";
+import { needsSidewaysPass, sidewaysPass } from "../sideways/validate";
 import type { BrickModel } from "../model/schema";
 import { analyzeStructure, type StructureReport } from "./structure";
 
@@ -39,7 +40,10 @@ export type IssueCode =
   | "DETACHED_SUBBUILD"
   | "SUBBUILD_UNSUPPORTED"
   | "INTERLOCKED"
-  | "MIRROR_UNSUPPORTED";
+  | "MIRROR_UNSUPPORTED"
+  // sideways building
+  | "MOUNT_INVALID"
+  | "SIDEWAYS_DETACHED";
 
 export interface Issue {
   code: IssueCode;
@@ -58,7 +62,7 @@ export interface Connection {
   lower: number;
   upper: number;
   studs: number;
-  kind?: "stud" | "pin";
+  kind?: "stud" | "pin" | "side";
 }
 
 /** Strength a wheel-on-pin joint counts as, in studs. */
@@ -133,7 +137,8 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
       return;
     }
     const { fp } = r;
-    if (fp.x0 < 0 || fp.z0 < 0 || fp.y0 < 0 || fp.x0 + fp.sx > grid.x || fp.z0 + fp.sz > grid.z || fp.y1 > grid.y) {
+    // Sideways parts get their exact bounds checked in the sideways pass.
+    if (!pl.frame && (fp.x0 < 0 || fp.z0 < 0 || fp.y0 < 0 || fp.x0 + fp.sx > grid.x || fp.z0 + fp.sz > grid.z || fp.y1 > grid.y)) {
       errors.push({
         code: "OUT_OF_BOUNDS",
         severity: "error",
@@ -144,10 +149,14 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
     ok.push(r);
   });
 
+  // Grid checks below see upright parts only (for upright models: every part); sideways
+  // parts are handled by the sideways pass.
+  const upright = ok.filter((r) => !r.pl.frame);
+
   // --- overlaps (voxel occupancy) --------------------------------------------
   const occupancy = new Map<string, number>();
   const overlapPairs = new Map<string, { a: number; b: number; cells: number }>();
-  for (const r of ok) {
+  for (const r of upright) {
     for (const [x, y, z] of worldSolidCells(r.pl, r.def)) {
       {
         const k = key3(x, y, z);
@@ -175,11 +184,11 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
   // --- stud connections -------------------------------------------------------
   // Index every anti-stud by (height, cell); a stud at the same height and cell clutches it.
   const underside = new Map<string, number>(); // "y|x,z" -> part index
-  for (const r of ok) {
+  for (const r of upright) {
     for (const [x, z, y] of worldBottom(r.pl, r.def)) underside.set(`${y}|${key2(x, z)}`, r.index);
   }
   const connCount = new Map<string, Connection>();
-  for (const r of ok) {
+  for (const r of upright) {
     for (const [x, z, y] of worldStuds(r.pl, r.def)) {
       const upper = underside.get(`${y}|${key2(x, z)}`);
       if (upper === undefined || upper === r.index) continue;
@@ -194,10 +203,10 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
   // --- wheels on pins ------------------------------------------------------------
   // A wheel attaches only if its hub sits exactly on a free pin of its kind, facing it.
   const pins = new Map<string, { holder: number; pin: WorldPin }>();
-  for (const r of ok) for (const pin of worldPins(r.pl, r.def)) pins.set(pinKey(pin.kind, pin.at, pin.dir), { holder: r.index, pin });
+  for (const r of upright) for (const pin of worldPins(r.pl, r.def)) pins.set(pinKey(pin.kind, pin.at, pin.dir), { holder: r.index, pin });
   const pinned = new Set<number>();
   const usedPins = new Map<string, number>();
-  for (const r of ok) {
+  for (const r of upright) {
     const hub = worldHub(r.pl, r.def);
     if (!hub) continue;
     const k = pinKey(hub.kind, hub.at, oppositeDir(hub.dir));
@@ -218,6 +227,15 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
 
   const adj = new Map<number, Set<number>>(ok.map((r) => [r.index, new Set<number>()]));
   const supportedFromBelow = new Set<number>();
+  // --- sideways building: side-stud connections, exact collisions (only when present) ---
+  if (needsSidewaysPass(ok)) {
+    const side = sidewaysPass(ok, parts, grid);
+    connections.push(...side.connections);
+    errors.push(...side.errors);
+    // A sideways part hangs on its connections, not on something below it.
+    for (const c of side.connections) supportedFromBelow.add(c.upper).add(c.lower);
+  }
+
   for (const c of connections) {
     adj.get(c.lower)!.add(c.upper);
     adj.get(c.upper)!.add(c.lower);
@@ -271,6 +289,7 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
 
   // --- unsupported: attached only from above -----------------------------------
   for (const r of ok) {
+    if (r.pl.frame) continue;
     if (r.fp.y0 > 0 && !supportedFromBelow.has(r.index) && !floating.has(r.index)) {
       errors.push({
         code: "UNSUPPORTED",
@@ -289,7 +308,7 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
     studTotal.set(c.lower, (studTotal.get(c.lower) ?? 0) + c.studs);
   }
   for (const r of ok) {
-    if (r.fp.y0 === 0 || floating.has(r.index) || r.fp.sx * r.fp.sz < 2 || pinned.has(r.index)) continue;
+    if (r.pl.frame || r.fp.y0 === 0 || floating.has(r.index) || r.fp.sx * r.fp.sz < 2 || pinned.has(r.index)) continue;
     const total = studTotal.get(r.index) ?? 0;
     if (total === 1) {
       warnings.push({
@@ -305,7 +324,8 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
   let structure: StructureReport | undefined;
   const mode = opts.structure ?? "warn";
   if (mode !== "off" && errors.length === 0) {
-    structure = analyzeStructure(model, connections, mode === "error" ? "error" : "warning");
+    // The structural estimate covers upright joints (sideways joints aren't modelled yet).
+    structure = analyzeStructure(model, connections.filter((c) => c.kind !== "side"), mode === "error" ? "error" : "warning");
     for (const issue of structure.issues) (issue.severity === "error" ? errors : warnings).push(issue);
   }
 

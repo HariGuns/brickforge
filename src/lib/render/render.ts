@@ -17,6 +17,7 @@ import { getPart } from "../parts/library";
 import { footprint } from "../model/geometry";
 import type { BrickModel } from "../model/schema";
 import { encodePng } from "./png";
+import { placementMatrix } from "@/components/placement";
 
 export interface View {
   azimuth: number;
@@ -67,11 +68,13 @@ async function modelTriangles(model: BrickModel): Promise<{ tris: Tri[]; box: TH
     const geo = partGeometry(pl.part);
     if (!def || !geo) return;
     const fp = footprint(pl, def);
-    const m = new THREE.Matrix4().compose(
-      new THREE.Vector3(fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2),
-      new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (-pl.rot * Math.PI) / 180),
-      new THREE.Vector3(1, 1, 1),
-    );
+    const m = pl.frame
+      ? placementMatrix(pl, def)
+      : new THREE.Matrix4().compose(
+          new THREE.Vector3(fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2),
+          new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (-pl.rot * Math.PI) / 180),
+          new THREE.Vector3(1, 1, 1),
+        );
     const add = (g: THREE.BufferGeometry, colorId: string) => {
       const c = COLOR_MAP.get(colorId);
       const color = hexRgb(c?.hex ?? "#ff00ff");

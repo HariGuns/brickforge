@@ -79,7 +79,7 @@ function containerSteps(model: BrickModel, compiled: CompileResult, parent: numb
     else (uu.parts.push(h), units.splice(hu, 1));
   }
   // Wheels go on last, after the holders they hang from.
-  const isWheel = (u: (typeof units)[number]) => !u.copy && u.parts.length === 1 && !!getPart(model.parts[u.parts[0]].part)?.hub;
+  const isWheel = (u: (typeof units)[number]) => (!u.copy && u.parts.length === 1 && !!getPart(model.parts[u.parts[0]].part)?.hub) || u.parts.some((i) => model.parts[i].frame);
   units.sort((a, b) => Number(isWheel(a)) - Number(isWheel(b)) || a.y - b.y || a.z - b.z || a.x - b.x);
 
   const steps: DesignStep[] = [];

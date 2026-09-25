@@ -43,12 +43,33 @@ export function ldrawTransform(pl: Placement, def: PartDef): { pos: [number, num
 
 const fmt = (n: number) => (Object.is(n, -0) ? "0" : String(Math.round(n * 1000) / 1000));
 
+/** G space (LDU, y up, z front) ↔ LDraw (y down, z back): F = diag(1, −1, −1). F R F for a rotation R. */
+export const flipRot = (r: number[]): Mat3 => [r[0], -r[1], -r[2], -r[3], r[4], r[5], -r[6], r[7], r[8]];
+const flipVec = (v: number[]): [number, number, number] => [v[0], -v[1], -v[2]];
+const mulMV3 = (m: Mat3, v: number[]): [number, number, number] => [m[0] * v[0] + m[1] * v[1] + m[2] * v[2], m[3] * v[0] + m[4] * v[1] + m[5] * v[2], m[6] * v[0] + m[7] * v[1] + m[8] * v[2]];
+const mulMM3 = (a: Mat3, b: Mat3): Mat3 => {
+  const r = new Array(9).fill(0) as Mat3;
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) for (let k = 0; k < 3; k++) r[i * 3 + j] += a[i * 3 + k] * b[k * 3 + j];
+  return r;
+};
+
+/**
+ * A sideways part's LDraw placement: its upright transform at the origin (native
+ * part → its own G space, via F), then its frame. LDraw = F R F · (m0 N + p0) + F t.
+ */
+export function frameTransform(pl: Placement, def: PartDef): { pos: [number, number, number]; m: Mat3 } {
+  const up = ldrawTransform({ ...pl, x: 0, y: 0, z: 0, rot: 0, frame: undefined }, def);
+  const R = flipRot(pl.frame!.m);
+  const rp = mulMV3(R, up.pos), ft = flipVec(pl.frame!.t);
+  return { m: mulMM3(R, up.m), pos: [rp[0] + ft[0], rp[1] + ft[1], rp[2] + ft[2]] };
+}
+
 /** LDraw line(s) for a placement: the part, plus any extra parts it includes (e.g. a door in its frame). */
 export function partLine(pl: Placement): string {
   const def = getPart(pl.part);
   if (!def) throw new Error(`Unknown part ${pl.part}`);
   const color = COLOR_MAP.get(pl.color)?.ldraw ?? 16;
-  const { pos, m } = ldrawTransform(pl, def);
+  const { pos, m } = pl.frame ? frameTransform(pl, def) : ldrawTransform(pl, def);
   const line = (file: string, p: number[]) => ["1", color, ...p.map(fmt), ...m.map(fmt), file].join(" ");
   const out = [line(def.ldraw.file, pos)];
   for (const e of def.ldraw.extra ?? []) {
@@ -135,19 +156,31 @@ function stepBlocks(items: { y: number; line: string }[]): string[] {
  * sub-build. Copies are references to their submodel, so nesting is preserved.
  * Requires a successful compile (for each sub-build's local box).
  */
-export function exportDesignMpd(design: BrickDesign, compiled: Pick<CompileResult, "boxes">): string {
+export function exportDesignMpd(design: BrickDesign, compiled: Pick<CompileResult, "boxes" | "mounts">): string {
   const subFiles = new Set(design.subBuilds.flatMap((s) => [submodelFile(s.id), submodelFile(s.id, true)].map((f) => f.toLowerCase())));
   let mainName = `${safeName(design.name)}.ldr`;
   if (subFiles.has(mainName.toLowerCase())) mainName = `main_${mainName}`;
   const byId = new Map(design.subBuilds.map((s) => [s.id, s]));
-  const block = (file: string, title: string, description: string, parts: Placement[], uses: Instance[]) => {
+  const block = (file: string, title: string, description: string, parts: Placement[], uses: Instance[], owner = "") => {
     const items = [
       ...parts.map((p) => ({ y: p.y, line: partLine(p) })),
-      ...uses.filter((u) => compiled.boxes[u.sub]).map((u) => ({ y: u.y, line: instanceLine(u, compiled.boxes[u.sub], submodelFile(u.sub, !!u.mirror)) })),
+      ...uses.flatMap((u, ui) => {
+        if (!compiled.boxes[u.sub]) return [];
+        const file = submodelFile(u.sub, !!u.mirror);
+        // A sideways copy: the submodel turned by its mount frame (after the upright build).
+        const mount = u.mount ? compiled.mounts?.[`${owner}:${ui}`] : undefined;
+        if (u.mount && !mount) return [];
+        if (mount) {
+          const m = flipRot(mount.m);
+          const pos = flipVec(mount.t);
+          return [{ y: Number.MAX_SAFE_INTEGER, line: ["1", "16", ...pos.map(fmt), ...m.map(fmt), file].join(" ") }];
+        }
+        return [{ y: u.y, line: instanceLine(u, compiled.boxes[u.sub], file) }];
+      }),
     ];
     return [`0 FILE ${file}`, `0 ${title}`, `0 Name: ${file}`, `0 Author: Brick Builder`, `0 !LDRAW_ORG Unofficial_Model`, ...(description ? [`0 // ${description.replace(/\s+/g, " ")}`] : []), "", ...stepBlocks(items), "0 NOFILE"];
   };
-  const lines = block(mainName, design.name, design.description, design.main.parts, design.main.uses);
+  const lines = block(mainName, design.name, design.description, design.main.parts, design.main.uses, "main");
   // Every (sub-build, mirrored?) variant the model reaches gets its own submodel: a mirror
   // image is a real build with left/right parts swapped, not an LDraw mirror matrix.
   const done = new Set<string>();
@@ -161,7 +194,7 @@ export function exportDesignMpd(design: BrickDesign, compiled: Pick<CompileResul
     const parts = mirror ? s.parts.map((p) => mirrorPlacement(p, box.minX, W) ?? p) : s.parts;
     const uses = mirror ? s.uses.map((u) => mirrorInstance(u, compiled.boxes[u.sub], box.minX, W)) : s.uses;
     for (const u of uses) queue.push([u.sub, !!u.mirror]);
-    lines.push(...block(submodelFile(id, mirror), `${s.name}${mirror ? " (mirrored)" : ""}`, "", parts, uses));
+    lines.push(...block(submodelFile(id, mirror), `${s.name}${mirror ? " (mirrored)" : ""}`, "", parts, uses, id));
   }
   return lines.join("\r\n") + "\r\n";
 }

@@ -374,8 +374,11 @@ export const PARTS: PartDef[] = [...CORE_PARTS, ...CATALOG_PARTS];
 export const PART_MAP: ReadonlyMap<string, PartDef> = new Map(PARTS.map((p) => [p.id, p]));
 export const PART_IDS = PARTS.map((p) => p.id) as [string, ...string[]];
 
+const SNOT_MAP: ReadonlyMap<string, PartDef> = new Map(SNOT_PARTS.map((p) => [p.id, p]));
+
+/** A part by id; side-stud parts only while sideways building is enabled (checked at call time). */
 export function getPart(id: string): PartDef | undefined {
-  return PART_MAP.get(id);
+  return PART_MAP.get(id) ?? (CONFIG.sideways.enabled ? SNOT_MAP.get(id) : undefined);
 }
 
 /** Local anti-studs [cx, cz, level] (resolves the "every cell at the bottom" default). */

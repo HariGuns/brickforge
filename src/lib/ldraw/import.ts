@@ -1,8 +1,10 @@
 import { COLORS } from "../parts/colors";
-import { PARTS, type PartDef } from "../parts/library";
+import { PARTS, SNOT_PARTS, type PartDef } from "../parts/library";
+import { CONFIG } from "../config";
+import { approxGrid, type Frame } from "../sideways/frame";
 import { rotatedSize } from "../model/geometry";
 import type { BrickModel, Placement, Rot } from "../model/schema";
-import { LDU_PLATE, LDU_STUD, type Mat3 } from "./export";
+import { flipRot, ldrawTransform, LDU_PLATE, LDU_STUD, type Mat3 } from "./export";
 
 export interface ImportResult {
   model: BrickModel;
@@ -11,6 +13,24 @@ export interface ImportResult {
 }
 
 const byFile = new Map<string, PartDef>(PARTS.map((p) => [p.ldraw.file.toLowerCase(), p]));
+const snotByFile = new Map<string, PartDef>(SNOT_PARTS.map((p) => [p.ldraw.file.toLowerCase(), p]));
+
+/**
+ * The frame of a part line turned onto its side (the inverse of frameTransform):
+ * F R F = M · m0ᵀ and t = F (pos − F R F · p0), where m0, p0 place the part upright
+ * at the origin. Null unless M is an axis-aligned rotation (not mirrored).
+ */
+function sidewaysFrame(lm: Mat3, pos: [number, number, number], def: PartDef): Frame | null {
+  if (!lm.every((v) => near(v, Math.round(v)))) return null;
+  const det = lm[0] * (lm[4] * lm[8] - lm[5] * lm[7]) - lm[1] * (lm[3] * lm[8] - lm[5] * lm[6]) + lm[2] * (lm[3] * lm[7] - lm[4] * lm[6]);
+  if (!near(det, 1)) return null;
+  const up = ldrawTransform({ part: def.id, color: "", x: 0, y: 0, z: 0, rot: 0 }, def);
+  const m0t: Mat3 = [up.m[0], up.m[3], up.m[6], up.m[1], up.m[4], up.m[7], up.m[2], up.m[5], up.m[8]];
+  const frf = mul(lm, m0t).map((v) => Math.round(v)) as Mat3;
+  const fp = apply(frf, up.pos);
+  const r3 = (n: number) => Math.round(n * 1000) / 1000 + 0;
+  return { m: flipRot(frf).map((v) => v + 0) as Frame["m"], t: [r3(pos[0] - fp[0]), r3(-(pos[1] - fp[1])), r3(-(pos[2] - fp[2]))] };
+}
 const byColor = new Map<number, string>(COLORS.map((c) => [c.ldraw, c.id]));
 /** Parts written as extras of a library part (e.g. the door in a door frame): skipped on import. */
 const extraFiles = new Set(PARTS.flatMap((p) => (p.ldraw.extra ?? []).map((e) => e.file.toLowerCase())));
@@ -107,7 +127,7 @@ export function importLdr(text: string, fallbackName = "Imported model"): Import
       }
 
       if (extraFiles.has(ref.toLowerCase())) continue;
-      const def = byFile.get(ref.toLowerCase());
+      const def = byFile.get(ref.toLowerCase()) ?? (CONFIG.sideways.enabled ? snotByFile.get(ref.toLowerCase()) : undefined);
       if (!def) {
         skipped.push({ line: lineNo, reason: `unknown part ${ref.toLowerCase()}` });
         continue;
@@ -120,7 +140,10 @@ export function importLdr(text: string, fallbackName = "Imported model"): Import
       // Only upright yaw rotations: [c,0,s, 0,1,0, -s,0,c] with c,s ∈ {-1,0,1}.
       const upright = near(lm[1], 0) && near(lm[3], 0) && near(lm[4], 1) && near(lm[5], 0) && near(lm[7], 0) && near(lm[0], lm[8]) && near(lm[2], -lm[6]);
       if (!upright) {
-        skipped.push({ line: lineNo, reason: "part is tilted or mirrored" });
+        // Sideways building: a part turned onto its side becomes a part with an exact frame.
+        const frame = CONFIG.sideways.enabled ? sidewaysFrame(lm, [X, Y, Z], def) : null;
+        if (frame) parts.push({ part: def.id, color: colorId, ...approxGrid(frame), rot: 0, frame });
+        else skipped.push({ line: lineNo, reason: "part is tilted or mirrored" });
         continue;
       }
       const theta = (((Math.round((Math.atan2(lm[2], lm[0]) * 180) / Math.PI) - def.ldraw.yaw) % 360) + 360) % 360;

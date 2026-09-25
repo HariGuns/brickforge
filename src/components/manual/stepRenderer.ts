@@ -5,6 +5,7 @@ import { footprint } from "@/lib/model/geometry";
 import type { BrickModel } from "@/lib/model/schema";
 import type { BuildStep } from "@/lib/steps/steps";
 import { loadPartMeshes, partEdges, partFixedPieces, partGeometry, PLATE_H } from "../brickGeometry";
+import { placementBox, placementMatrix } from "../placement";
 
 /**
  * Offscreen renderer for instruction pages. One shared WebGL context renders
@@ -170,15 +171,20 @@ function modelScene(model: BrickModel): ModelScene {
     const g = new THREE.Group();
     if (def && geo && eg) {
       const fp = footprint(pl, def);
-      g.position.set(fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2);
-      g.rotation.y = (-pl.rot * Math.PI) / 180;
+      if (pl.frame) {
+        g.matrixAutoUpdate = false;
+        g.matrix.copy(placementMatrix(pl, def));
+      } else {
+        g.position.set(fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2);
+        g.rotation.y = (-pl.rot * Math.PI) / 180;
+      }
       const mesh = new THREE.Mesh(geo, material(pl.color, false));
       const line = new THREE.LineSegments(eg, OLD_EDGE);
       g.add(mesh, line);
       for (const piece of partFixedPieces(pl.part)) g.add(new THREE.Mesh(piece.geo, material(piece.colorId, false)));
       meshes.push(mesh);
       edges.push(line);
-      const b = new THREE.Box3(new THREE.Vector3(fp.x0, fp.y0 * PLATE_H, fp.z0), new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H + 0.2, fp.z0 + fp.sz));
+      const b = pl.frame ? placementBox(pl, def) : new THREE.Box3(new THREE.Vector3(fp.x0, fp.y0 * PLATE_H, fp.z0), new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H + 0.2, fp.z0 + fp.sz));
       bounds.push(b);
       box.union(b);
     } else {

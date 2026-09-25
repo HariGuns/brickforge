@@ -5,6 +5,7 @@ import type { BrickModel, Placement, Rot } from "../model/schema";
 import { validate, type Issue, type ValidationResult } from "../validate/validator";
 import type { BrickDesign, Instance, SubBuild } from "./schema";
 import { mirrorPlacement } from "../parts/mirror";
+import { approxGrid, compose, mountFrame, uprightFrame, worldBoxes, worldConnectors, type Frame } from "../sideways/frame";
 
 /**
  * Deterministic compiler: expands a design (tree of sub-builds) into a flat
@@ -27,6 +28,8 @@ export interface CompiledInstance {
   parts: number[];
   /** A mirror image of the sub-build (counting mirrors along the path: two mirrors cancel). */
   mirror: boolean;
+  /** Mounted sideways on a side stud. */
+  sideways?: boolean;
 }
 
 export interface SubBuildInfo {
@@ -71,6 +74,8 @@ export interface CompileResult {
   tree: TreeNode;
   /** Footprint box of each sub-build in its own local frame (copies rotate inside it). */
   boxes: Record<string, Box>;
+  /** Sideways copies' frames, by "container:copy index" (sub-build's own G space → the container's). */
+  mounts?: Record<string, Frame>;
   errors: Issue[];
   warnings: Issue[];
   validation: ValidationResult | null;
@@ -107,6 +112,18 @@ function bbox(parts: Placement[]): Box {
   const b = { minX: Infinity, minZ: Infinity, maxX: -Infinity, maxZ: -Infinity, maxY: 0 };
   for (const pl of parts) {
     const def = getPart(pl.part);
+    if (pl.frame && def) {
+      // Sideways parts: their exact extent, rounded out to whole studs / plates.
+      for (const [x0, y0, z0, x1, y1, z1] of worldBoxes(pl, def)) {
+        void y0;
+        b.minX = Math.min(b.minX, Math.floor(x0 / 20 + 1e-6));
+        b.minZ = Math.min(b.minZ, Math.floor(z0 / 20 + 1e-6));
+        b.maxX = Math.max(b.maxX, Math.ceil(x1 / 20 - 1e-6));
+        b.maxZ = Math.max(b.maxZ, Math.ceil(z1 / 20 - 1e-6));
+        b.maxY = Math.max(b.maxY, Math.ceil(y1 / 8 - 1e-6));
+      }
+      continue;
+    }
     const { sx, sz } = def ? rotatedSize(def, pl.rot) : { sx: 1, sz: 1 };
     b.minX = Math.min(b.minX, pl.x);
     b.minZ = Math.min(b.minZ, pl.z);
@@ -125,6 +142,12 @@ function bbox(parts: Placement[]): Box {
  */
 export function transformPlacement(pl: Placement, box: Box, inst: Pick<Instance, "x" | "y" | "z" | "rot">): Placement {
   const def = getPart(pl.part);
+  if (pl.frame) {
+    // A sideways part inside an upright copy: carry its exact frame along with the copy.
+    const parent = compose(uprightFrame({ ...inst, part: "", color: "" }, { w: box.maxX - box.minX, d: box.maxZ - box.minZ }), { m: [1, 0, 0, 0, 1, 0, 0, 0, 1], t: [-box.minX * 20, 0, -box.minZ * 20] });
+    const frame = compose(parent, pl.frame);
+    return { ...pl, ...approxGrid(frame), frame };
+  }
   const { sx, sz } = def ? rotatedSize(def, pl.rot) : { sx: 1, sz: 1 };
   const ox = pl.x - box.minX, oz = pl.z - box.minZ;
   const W = box.maxX - box.minX, D = box.maxZ - box.minZ;
@@ -168,12 +191,31 @@ export function compileDesign(design: BrickDesign, opts: CompileOptions = {}): C
   const broken = new Set<string>();
   const reported = new Set<string>();
 
+  /** Frames of sideways copies, per container and copy index: sub-build's own G space → container's. */
+  const mounts: Record<string, Frame> = {};
+
   function expandUses(uses: Instance[], owner: string, visiting: string[], out: Tagged[]) {
+    const ownParts = out.filter((t) => !t.tag.length).map((t) => t.pl);
     uses.forEach((u, ui) => {
       const child = local(u.sub, [...visiting, owner], owner);
       if (!child || !child.length) return;
       const box = boxes.get(u.sub)!;
+      // A sideways copy: mounted on a side stud of one of the container's own parts.
+      let mount: Frame | null = null;
+      if (u.mount) {
+        mount = mountOf(u, ui, owner, ownParts, box);
+        if (!mount) return;
+        mounts[`${owner}:${ui}`] = mount;
+      }
       for (const c of child) {
+        if (u.mirror && c.pl.frame) {
+          if (!reported.has(`mirror-side:${u.sub}`)) (reported.add(`mirror-side:${u.sub}`), errors.push(err("MIRROR_UNSUPPORTED", `A mirrored copy of "${u.sub}" contains sideways parts; mirroring sideways copies inside another copy isn't supported yet. Mirror the sideways copy itself instead.`)));
+          continue;
+        }
+        if (mount && c.pl.frame) {
+          if (!reported.has(`nested-side:${u.sub}`)) (reported.add(`nested-side:${u.sub}`), errors.push(err("MOUNT_INVALID", `"${u.sub}" is mounted sideways but itself contains sideways copies; sideways copies can't be nested yet.`)));
+          continue;
+        }
         // A mirrored copy: flip each part (its mirror image, mirrored position) inside the box first.
         let pl = c.pl;
         if (u.mirror) {
@@ -184,9 +226,33 @@ export function compileDesign(design: BrickDesign, opts: CompileOptions = {}): C
             errors.push(err("MIRROR_UNSUPPORTED", `A mirrored copy of "${u.sub}" contains ${pl.part} (${getPart(pl.part)?.name ?? "unknown"}), which has no mirror image in the catalog. Use a symmetric part or a left/right pair, or don't mirror this copy.`));
           }
         }
-        out.push({ pl: transformPlacement(pl, box, u), tag: [ui, ...c.tag] });
+        if (mount) {
+          const def = getPart(pl.part);
+          if (!def) continue;
+          const frame = compose(mount, uprightFrame(pl, def));
+          out.push({ pl: { ...pl, ...approxGrid(frame), rot: 0, frame }, tag: [ui, ...c.tag] });
+        } else out.push({ pl: transformPlacement(pl, box, u), tag: [ui, ...c.tag] });
       }
     });
+  }
+
+  /** The frame that mounts copy `u` on its anchor side stud, or null (with an error) if the mount is wrong. */
+  function mountOf(u: Instance, ui: number, owner: string, own: Placement[], box: Box): Frame | null {
+    const m = u.mount!;
+    const where = `${owner === "main" ? "Main build" : `Sub-build "${owner}"`} copy ${ui} (${u.sub})`;
+    const fail = (msg: string) => (errors.push(err("MOUNT_INVALID", `${where}: ${msg}`)), null);
+    const anchor = own[m.part];
+    const def = anchor && getPart(anchor.part);
+    if (!anchor || !def) return fail(`mount.part #${m.part} isn't one of this container's parts (0–${own.length - 1}).`);
+    const side = worldConnectors(anchor, def).studs.filter((s) => s.side);
+    const carriers = own.flatMap((p, i) => ((getPart(p.part)?.sideStuds?.length ?? 0) ? [`#${i} ${p.part}`] : []));
+    if (!side.length) return fail(`#${m.part} ${anchor.part} has no side studs. Parts with side studs here: ${carriers.join(", ") || "none"}.`);
+    const s = side[m.stud];
+    if (!s) return fail(`#${m.part} ${anchor.part} has ${side.length} side stud(s) (0–${side.length - 1}); stud ${m.stud} doesn't exist.`);
+    const W = box.maxX - box.minX, D = box.maxZ - box.minZ;
+    const [cx, cz] = m.at;
+    if (cx < 0 || cz < 0 || cx >= W || cz >= D) return fail(`mount.at [${cx}, ${cz}] is outside the sub-build's ${W}×${D} footprint.`);
+    return compose(mountFrame(s.d, m.spin ?? 0, [(cx + 0.5) * 20, 0, (cz + 0.5) * 20], s.p), { m: [1, 0, 0, 0, 1, 0, 0, 0, 1], t: [-box.minX * 20, 0, -box.minZ * 20] });
   }
 
   function local(id: string, visiting: string[], from: string): Tagged[] | null {
@@ -251,7 +317,7 @@ export function compileDesign(design: BrickDesign, opts: CompileOptions = {}): C
     copyCount.set(inst.sub, copy);
     const index = instances.length;
     const mirror = !!inst.mirror !== (parent >= 0 && instances[parent].mirror);
-    instances.push({ index, sub: inst.sub, name, copy, path: `${parent >= 0 ? `${instances[parent].path} › ` : ""}${name}${mirror ? " (mirrored)" : ""} #${copy}`, parent, depth: tag.length, parts: [], mirror });
+    instances.push({ index, sub: inst.sub, name, copy, path: `${parent >= 0 ? `${instances[parent].path} › ` : ""}${name}${mirror ? " (mirrored)" : ""} #${copy}`, parent, depth: tag.length, parts: [], mirror, ...(inst.mount ? { sideways: true } : {}) });
     byTag.set(key, index);
     return index;
   }
@@ -315,6 +381,7 @@ export function compileDesign(design: BrickDesign, opts: CompileOptions = {}): C
     subBuilds,
     tree,
     boxes: Object.fromEntries(boxes),
+    ...(Object.keys(mounts).length ? { mounts } : {}),
     errors,
     warnings,
     validation,

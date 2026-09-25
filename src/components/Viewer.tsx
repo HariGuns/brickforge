@@ -10,6 +10,7 @@ import { getPart } from "@/lib/parts/library";
 import { footprint } from "@/lib/model/geometry";
 import type { BrickModel } from "@/lib/model/schema";
 import { loadPartMeshes, partEdges, partFixedPieces, partGeometry, PLATE_H } from "./brickGeometry";
+import { placementBox, placementMatrix } from "./placement";
 
 export interface ViewerProps {
   model: BrickModel | null;
@@ -97,11 +98,13 @@ function Parts({ model, visible, highlight, errorParts, warnParts }: ViewerProps
       const edges = partEdges(pl.part);
       if (!def || !geo || !edges) return;
       const fp = footprint(pl, def);
-      const m = new THREE.Matrix4().compose(
-        new THREE.Vector3(fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2),
-        new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (-pl.rot * Math.PI) / 180),
-        new THREE.Vector3(1, 1, 1),
-      );
+      const m = pl.frame
+        ? placementMatrix(pl, def)
+        : new THREE.Matrix4().compose(
+            new THREE.Vector3(fp.x0 + fp.sx / 2, fp.y0 * PLATE_H, fp.z0 + fp.sz / 2),
+            new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (-pl.rot * Math.PI) / 180),
+            new THREE.Vector3(1, 1, 1),
+          );
       const hi = highlight?.has(i) ?? false;
       const key = `${pl.part}|${pl.color}|${hi}`;
       let g = groups.get(key);
@@ -155,6 +158,10 @@ function bounds(model: BrickModel | null): THREE.Box3 {
   for (const pl of model?.parts ?? []) {
     const def = getPart(pl.part);
     if (!def) continue;
+    if (pl.frame) {
+      box.union(placementBox(pl, def));
+      continue;
+    }
     const fp = footprint(pl, def);
     box.expandByPoint(new THREE.Vector3(fp.x0, fp.y0 * PLATE_H, fp.z0));
     box.expandByPoint(new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H, fp.z0 + fp.sz));

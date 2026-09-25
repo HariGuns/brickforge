@@ -15,6 +15,12 @@ export const PlacementSchema = z.object({
   /** Min-z corner of the rotated footprint, in studs. */
   z: z.number().int(),
   rot: RotSchema,
+  /**
+   * Sideways parts only (set by the compiler, never written by Claude): the exact
+   * 3D placement in LDU (see src/lib/sideways/frame.ts). x, y, z are then the
+   * grid cell it's in, for sorting and display.
+   */
+  frame: z.object({ m: z.tuple([z.number(), z.number(), z.number(), z.number(), z.number(), z.number(), z.number(), z.number(), z.number()]), t: z.tuple([z.number(), z.number(), z.number()]) }).optional(),
 });
 
 export const BrickModelSchema = z.object({

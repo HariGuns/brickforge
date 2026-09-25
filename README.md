@@ -282,6 +282,12 @@ Why 885, not 1,000+: most of the rest need connection types the validator doesn'
 - **Brackets:** framed by their plate. The flange is recorded as an LDU extension box.
 - **Excluded for now:** recessed side studs (the headlight brick) and parts with other side connectors.
 - **Verification:** `verify-ldraw` checks side studs through the exporter, and checks the body against the grid box plus extension boxes. All 41 pass.
+- **Sideways copies** (phase 2): a copy of a sub-build can be mounted on a side stud instead of placed on the grid (`mount: { part, stud, at, spin }` on the copy).
+  - **Orientation:** the copy's top faces the stud's direction; seen from outside, its x runs left to right and its z top to bottom. `mirror: true` gives the opposite side.
+  - **Exact placement:** the compiler gives the copy's parts exact frames (`src/lib/sideways/frame.ts`).
+  - **Validation:** an extra pass matches side-stud and sideways joints by exact position and facing, and checks collisions on exact LDU boxes, including bracket flanges (`src/lib/sideways/validate.ts`). It only runs when a model has sideways parts, side studs or flanges.
+  - **Everywhere else:** the viewer, manual, PDF and server renderer draw frames. LDraw export writes turned parts, and the design `.mpd` writes turned submodel references; import reads both back. In the manual, the panel is built flat in its own section, then attached after the upright build.
+  - **Verification:** `verify-ldraw` mounts a panel on every side stud of every carrier (spins 0 and 90) and checks, in LDraw space, that the panel's anti-stud sits on the side stud. All 41 carriers pass.
 - **Not loaded yet:** the app doesn't load these parts until `CONFIG.sideways.enabled`, which stays off until sideways building is complete. `src/lib/regression.test.ts` snapshots seven saved builds to show upright behaviour is unchanged.
 
 **Licences:**
