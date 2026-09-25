@@ -126,7 +126,7 @@ A flat model is a design with no sub-builds, so the single-pass path and older s
 
 **Sub-build generator** (`src/lib/claude/subbuilds.ts`, prompts in `src/lib/prompts/subbuilds.ts`): choose it with the path selector, `--pipeline subbuilds`, or `CONFIG.generator`. The default is **Auto**: sub-builds for High and Very high detail, single pass for Standard.
 1. **Plan:** the sub-builds, each with a size envelope, part budget and copy count, plus a layout.
-2. **Design each unique sub-build once:** 4 in parallel, each validated on its own inside its envelope with its own repair loop.
+2. **Design each unique sub-build once:** all in parallel (up to 8), each validated on its own inside its envelope with its own repair loop.
 3. **Assemble:** copies plus glue parts, placed using a map of each sub-build's top studs and underside. The compiler checks joins, connectivity and structure, and the assembly is repaired until valid.
 
 All stages share the loop in `src/lib/claude/loop.ts` and the cached system prompt. Every stage writes `plan.*`, `sub-<id>.*` and `assembly.*` files to the run's debug folder.

@@ -48,8 +48,12 @@ export const CONFIG = {
    * Renders are width × height px.
    */
   refine: { rounds: 2, repairRounds: 2, width: 768, height: 512 },
-  /** Sub-build generator limits: unique sub-builds, total copies, envelope size (studs), parts per copy, parallel calls. */
-  subbuilds: { maxUnique: 8, maxCopies: 64, maxEnvelope: 32, maxSubParts: 250, planRepairRounds: 2, concurrency: 4 },
+  /**
+   * Sub-build generator limits: unique sub-builds, total copies, envelope size (studs),
+   * parts per copy, parallel calls. Concurrency matches maxUnique, so every sub-build
+   * runs at once (after the first has cached the prompt) instead of in waves.
+   */
+  subbuilds: { maxUnique: 8, maxCopies: 64, maxEnvelope: 32, maxSubParts: 250, planRepairRounds: 2, concurrency: 8 },
   /**
    * Structural estimate (see validate/structure.ts). Mass: grams per 1 stud × 1 stud
    * × 1 plate of part volume (a 2×4 brick ≈ 2.3 g); slopes are ~75% solid.

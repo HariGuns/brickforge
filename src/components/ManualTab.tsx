@@ -127,10 +127,24 @@ function Page({ sections, modelName, page, total }: { sections: StepSection[]; m
   );
 }
 
+/**
+ * A thumbnail renders once it scrolls near the visible part of the strip, not
+ * for every page up front (a 2,000-part build has hundreds of pages, each a full
+ * scene render).
+ */
 function Thumb({ model, steps, local, n, current, ready, onPick }: { model: BrickModel; steps: BuildStep[]; local: number; n: number; current: boolean; ready: boolean; onPick: () => void }) {
-  const url = useStepImage(model, steps, local, THUMB_SIZE, "low", ready);
+  const ref = useRef<HTMLButtonElement>(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || seen) return;
+    const io = new IntersectionObserver((es) => es.some((e) => e.isIntersecting) && setSeen(true), { root: el.parentElement, rootMargin: "0px 400px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [seen]);
+  const url = useStepImage(model, steps, local, THUMB_SIZE, "low", ready && seen);
   return (
-    <button className={`man-thumb ${current ? "on" : ""}`} onClick={onPick} aria-label={`Page ${n}`} aria-current={current ? "page" : undefined}>
+    <button ref={ref} className={`man-thumb ${current ? "on" : ""}`} onClick={onPick} aria-label={`Page ${n}`} aria-current={current ? "page" : undefined}>
       <span className="man-thumb-page">{url && <img src={url} alt="" />}</span>
       <span className="man-thumb-n">{n}</span>
     </button>

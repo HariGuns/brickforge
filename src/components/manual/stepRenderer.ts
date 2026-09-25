@@ -146,9 +146,14 @@ interface RenderCache {
   done: Map<string, string>;
 }
 const caches = new WeakMap<BrickModel, RenderCache>();
+/** Renders are blob URLs, which stay in memory until revoked: free them once their model is gone. */
+const release = new FinalizationRegistry<Map<string, string>>((done) => done.forEach((url) => URL.revokeObjectURL(url)));
 function renderCache(model: BrickModel): RenderCache {
   let c = caches.get(model);
-  if (!c) caches.set(model, (c = { cache: new Map(), done: new Map() }));
+  if (!c) {
+    caches.set(model, (c = { cache: new Map(), done: new Map() }));
+    release.register(model, c.done);
+  }
   return c;
 }
 

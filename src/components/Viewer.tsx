@@ -60,6 +60,7 @@ const warnEdgeMat = new THREE.LineBasicMaterial({ color: "#f2a900" });
 /** One instanced mesh for every copy of a part type in one colour and highlight state. */
 function InstancedGroup({ geo, mat, matrices }: { geo: THREE.BufferGeometry; mat: THREE.Material; matrices: THREE.Matrix4[] }) {
   const ref = useRef<THREE.InstancedMesh>(null);
+  const invalidate = useThree((s) => s.invalidate);
   useLayoutEffect(() => {
     const mesh = ref.current;
     if (!mesh) return;
@@ -67,7 +68,8 @@ function InstancedGroup({ geo, mat, matrices }: { geo: THREE.BufferGeometry; mat
     mesh.count = matrices.length;
     mesh.instanceMatrix.needsUpdate = true;
     mesh.computeBoundingSphere();
-  }, [matrices]);
+    invalidate();
+  }, [matrices, invalidate]);
   return <instancedMesh ref={ref} args={[geo, mat, matrices.length]} castShadow receiveShadow frustumCulled={false} />;
 }
 
@@ -138,6 +140,8 @@ function Parts({ model, visible, highlight, errorParts, warnParts }: ViewerProps
 
   // Merged outline geometries are rebuilt on every change; free the old ones.
   useEffect(() => () => scene.lines.forEach((l) => l.geo.dispose()), [scene]);
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => invalidate(), [scene, invalidate]);
 
   if (!model) return null;
   return (
@@ -169,9 +173,13 @@ function bounds(model: BrickModel | null): THREE.Box3 {
   return box;
 }
 
-/** three's own orbit controls (drei was only used for this): damping, optional auto-rotate, updated every frame. */
+/**
+ * three's own orbit controls (drei was only used for this): damping, optional
+ * auto-rotate, updated every frame. The canvas draws on demand, so every camera
+ * change (drag, zoom, damping still settling) asks for the next frame.
+ */
 function Controls({ spin, controls }: { spin: boolean; controls: React.RefObject<OrbitControlsImpl | null> }) {
-  const { camera, gl, set, get } = useThree();
+  const { camera, gl, set, get, invalidate } = useThree();
   const c = useMemo(() => new OrbitControlsImpl(camera, gl.domElement), [camera, gl]);
   useEffect(() => {
     c.enableDamping = true;
@@ -179,11 +187,14 @@ function Controls({ spin, controls }: { spin: boolean; controls: React.RefObject
     controls.current = c;
     const old = get().controls;
     set({ controls: c });
+    const onChange = () => invalidate();
+    c.addEventListener("change", onChange);
     return () => {
+      c.removeEventListener("change", onChange);
       set({ controls: old });
       c.dispose();
     };
-  }, [c, controls, get, set]);
+  }, [c, controls, get, set, invalidate]);
   useEffect(() => {
     c.autoRotate = spin;
   }, [c, spin]);
@@ -192,7 +203,7 @@ function Controls({ spin, controls }: { spin: boolean; controls: React.RefObject
 }
 
 function CameraFit({ model, fitKey, view, controls }: { model: BrickModel | null; fitKey?: string; view: CameraView; controls: React.RefObject<OrbitControlsImpl | null> }) {
-  const { camera, size } = useThree();
+  const { camera, size, invalidate } = useThree();
   useEffect(() => {
     const box = bounds(model);
     const center = box.getCenter(new THREE.Vector3());
@@ -210,6 +221,7 @@ function CameraFit({ model, fitKey, view, controls }: { model: BrickModel | null
     camera.updateProjectionMatrix();
     controls.current?.target.copy(center);
     controls.current?.update();
+    invalidate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fitKey, view, size.width, size.height]);
   return null;
@@ -230,6 +242,8 @@ export default function Viewer(props: ViewerProps) {
 
   return (
     <Canvas
+      // Draw only when something changes (camera, parts, playback); spinning needs every frame.
+      frameloop={props.spin ? "always" : "demand"}
       shadows="percentage"
       camera={{ fov: 40, position: [20, 16, 24] }}
       gl={{ antialias: true, preserveDrawingBuffer: true }}
