@@ -276,7 +276,7 @@ export default function Page() {
         updateTurn(id, (t) => {
           const stages = t.stages ?? [];
           const i = stages.findIndex((s) => s.scope === ev.scope);
-          const next = { scope: ev.scope, label: ev.label, status: ev.status, valid: ev.valid, parts: ev.parts, copies: ev.copies, cost: ev.cost, depth: ev.depth };
+          const next = { scope: ev.scope, label: ev.label, status: ev.status, valid: ev.valid, parts: ev.parts, copies: ev.copies, cost: ev.cost, depth: ev.depth, reused: ev.reused };
           return { ...t, stages: i < 0 ? [...stages, next] : stages.map((s, j) => (j === i ? { ...s, ...next, copies: next.copies ?? s.copies } : s)) };
         });
         break;
@@ -333,6 +333,7 @@ export default function Page() {
             subBuilds: r.compile?.stats.uniqueSubBuilds,
             copies: r.compile?.stats.copies,
             compileMs: r.compile?.stats.compileMs,
+            library: r.library,
           },
         }));
         const debugDir = r.debugDir.split("/").pop();

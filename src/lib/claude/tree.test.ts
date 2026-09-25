@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
@@ -10,13 +11,19 @@ import { compileDesign } from "../design/compile";
 
 const dirs: string[] = [];
 afterAll(() => dirs.forEach((d) => fs.rmSync(d, { recursive: true, force: true })));
+/** A fresh, empty component library folder. */
+const emptyLibrary = () => {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), "brickforge-lib-"));
+  dirs.push(d);
+  return d;
+};
 
 describe("sub-build trees (simulated Claude)", () => {
   it("plans the town square 3 levels deep, designs each leaf once, assembles each level and compiles", async () => {
     const effort: Record<string, string[]> = {};
     const client = simulatedClient({ onRequest: (q, kind) => (effort[kind] ??= []).push(q.output_config?.effort ?? "") });
     const events: GenerateEvent[] = [];
-    const r = await generateDesign({ text: "a town square", detail: "very_high" }, (e) => events.push(e), { client });
+    const r = await generateDesign({ text: "a town square", detail: "very_high" }, (e) => events.push(e), { client, library: emptyLibrary() });
     dirs.push(r.debugDir);
 
     expect(r.valid).toBe(true);
@@ -64,7 +71,7 @@ describe("sub-build trees (simulated Claude)", () => {
 
   it("repairs a sub-assembly at its own level (join checks per level)", async () => {
     const client = simulatedClient({ failFirst: ["Market stall", "Tree canopy"] });
-    const r = await generateDesign({ text: "a town square", detail: "very_high" }, () => {}, { client });
+    const r = await generateDesign({ text: "a town square", detail: "very_high" }, () => {}, { client, library: emptyLibrary() });
     dirs.push(r.debugDir);
     expect(r.valid).toBe(true);
     const repairs = r.rounds.filter((x) => x.round > 0).map((x) => x.scope).sort();
@@ -85,11 +92,12 @@ describe("sub-build trees (simulated Claude)", () => {
       },
     } as unknown as Pick<Anthropic, "messages">;
     let dir = "";
-    await expect(generateDesign({ text: "a town square", detail: "very_high" }, (e) => e.type === "start" && (dir = e.debugDir), { client: flaky })).rejects.toThrow(/credit/);
+    const library = emptyLibrary();
+    await expect(generateDesign({ text: "a town square", detail: "very_high" }, (e) => e.type === "start" && (dir = e.debugDir), { client: flaky, library })).rejects.toThrow(/credit/);
     dirs.push(dir);
 
     const second = simulatedClient();
-    const r = await resumeDesign(dir, () => {}, { client: second });
+    const r = await resumeDesign(dir, () => {}, { client: second, library });
     expect(r.valid).toBe(true);
     // Every call of the first run passed, so the resumed run makes only the rest.
     const script = new TownScript();

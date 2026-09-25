@@ -24,6 +24,8 @@ import { assemblyJsonSchema, assemblyPrompt, planJsonSchema, planPrompt, subBuil
 import { childPlanJsonSchema, childPlanPrompt, subAssemblyPrompt, type ChildPlan } from "../prompts/tree";
 import { checkChildPlan, checkTreePlan, isLibrary, PlanTree, type LibraryRef, type TreeNode } from "./tree";
 import { compileSubBuild } from "../design/compile";
+import { importComponent, libraryListing, loadLibrary, makeComponent, markReused, saveComponent, searchLibrary, type Library } from "../components/library";
+import { libraryId } from "./tree";
 import { validate, type Issue } from "../validate/validator";
 import { buildSteps } from "../steps/steps";
 import { DebugRun } from "./debug";
@@ -138,6 +140,8 @@ export function useTree(input: GenerateInput): boolean {
 export interface DesignOptions extends GenerateOptions {
   /** Resume an interrupted run: reuse its valid plan and sub-builds, redo the rest. */
   checkpoint?: Checkpoint;
+  /** Component library folder (default CONFIG.componentsDir), or false for none. */
+  library?: string | false;
 }
 
 /** A loop result rebuilt from an earlier run's saved rounds. */
@@ -146,7 +150,7 @@ function reusedLoop<T>(cp: StageCheckpoint<T>, value: T, partCount: number): Loo
 }
 
 /** Resume the sub-build run saved in `dir` (its debug folder). */
-export async function resumeDesign(dir: string, onEvent: (e: GenerateEvent) => void = () => {}, opts: GenerateOptions = {}): Promise<GenerateResult> {
+export async function resumeDesign(dir: string, onEvent: (e: GenerateEvent) => void = () => {}, opts: Omit<DesignOptions, "checkpoint"> = {}): Promise<GenerateResult> {
   const checkpoint = loadCheckpoint(dir);
   return generateDesign(checkpoint.input, onEvent, { ...opts, checkpoint });
 }
@@ -189,8 +193,13 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
 
   // --- 1. plan --------------------------------------------------------------------------
   const tree = useTree(input);
-  const libraryRefs = new Map<string, LibraryRef>();
-  const extras: PlanExtras = { tree };
+  const lib: Library | null = opts.library === false || !CONFIG.library.enabled ? null : loadLibrary(opts.library || undefined);
+  const libraryRefs = new Map<string, LibraryRef>((lib?.components ?? []).map((c) => [c.id, { id: c.id, ...c.size, parts: c.parts, depth: c.depth }]));
+  const request = input.text ?? "";
+  const topQuery = [request, photo?.analysis.subject ?? "", ...(photo?.analysis.keyFeatures ?? [])].join(" ");
+  const offered = lib ? libraryListing(searchLibrary(lib, topQuery, { w: CONFIG.subbuilds.maxEnvelope, d: CONFIG.subbuilds.maxEnvelope, h: 90 })) : [];
+  const extras: PlanExtras = { tree, library: offered };
+  if (offered.length) console.log(`[generate] library: offering ${offered.length} of ${lib!.components.length} components to the plan`);
   onEvent({ type: "stage", scope: "plan", label: "Planning sub-builds", status: "start" });
   const planText = planPrompt(input.text ?? "", input.detail, !!input.image, photo ? analysisBlock(photo.analysis, photo.target) : undefined, extras);
   if (cp && !cp.plan.valid) earlierRounds.push(...cp.plan.rounds);
@@ -231,6 +240,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   // --- 1b. tree: plan each split sub-build as child sub-builds, level by level ------------------
   const ptree = new PlanTree(plan);
   const childLoops: { node: TreeNode; loop: LoopResult<ChildPlan> }[] = [];
+  let offeredChild = 0;
   for (let depth = 1; tree && depth < CONFIG.tree.maxDepth; depth++) {
     const level = ptree.unplanned(depth);
     if (!level.length) break;
@@ -250,7 +260,9 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
       const scope = `plan:${node.id}`;
       onEvent({ type: "stage", scope, label: node.name, status: "start", copies: ptree.totalCopies(node.id), depth: node.depth });
       const ctxT = ptree.context(node.id) ?? { path: [], siblings: plan.subBuilds };
-      const text = childPlanPrompt(plan, node, ctxT, { depth: node.depth, shared, library: [], uniqueLeft, uniqueShare: Math.min(uniqueShare, uniqueLeft) });
+      const offer = lib ? libraryListing(searchLibrary(lib, `${node.name} ${node.purpose} ${node.id.replace(/_/g, " ")}`, node)) : [];
+      offeredChild += offer.length;
+      const text = childPlanPrompt(plan, node, ctxT, { depth: node.depth, shared, library: offer, uniqueLeft, uniqueShare: Math.min(uniqueShare, uniqueLeft) });
       const loop = await reuseOr(`plan-${node.id}.`, (raw) => { const r = ChildPlanSchema.safeParse(raw); return r.success ? r.data : null; }, (c) => c.children.length, () =>
         runLoop<ChildPlan>(
           {
@@ -336,9 +348,26 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     return { sub: node, loop };
   });
   const built = subLoops.filter((s) => s.loop.best).map(({ sub, loop }) => ({ sub, model: loop.best!.value, valid: loop.best!.check.valid }));
-  if (!built.length) throw new Error("None of the sub-builds could be designed; see the debug folder.");
+  if (!built.length && ![...ptree.nodes.values()].some((n) => isLibrary(n.from))) throw new Error("None of the sub-builds could be designed; see the debug folder.");
   const subBuilds: BrickDesign["subBuilds"] = built.map(({ sub, model }) => ({ id: sub.id, name: sub.name, parts: model.parts, uses: [] }));
   debug.write("subbuilds.json", subBuilds);
+
+  // --- 2a. components reused from the library -------------------------------------------------------
+  const reused: { node: string; component: string; name: string; copies: number; recolor: string[]; saved: number }[] = [];
+  const imported = new Set<string>();
+  for (const node of [...ptree.nodes.values()].filter((n) => isLibrary(n.from))) {
+    const comp = lib?.byId.get(libraryId(node.from));
+    if (!comp) continue;
+    const add = importComponent(comp, node.id, node.recolor ?? [], subBuilds, [...ptree.nodes.keys()]);
+    subBuilds.push(...add);
+    add.forEach((s) => imported.add(s.id));
+    node.sideways = comp.sideways;
+    const copies = ptree.totalCopies(node.id);
+    reused.push({ node: node.id, component: comp.id, name: comp.name, copies, recolor: node.recolor ?? [], saved: comp.cost });
+    markReused(lib!, comp.id);
+    console.log(`[generate] library: reused ${comp.id} as ${node.id} ×${copies}${node.recolor?.length ? ` (recoloured ${node.recolor.join(", ")})` : ""}, saves ~$${comp.cost.toFixed(2)}`);
+    onEvent({ type: "stage", scope: `lib:${node.id}`, label: node.name, status: "done", valid: true, parts: comp.parts, copies, cost: 0, ...(tree ? { depth: node.depth } : {}), reused: { component: comp.id, saved: comp.cost, ...(node.recolor?.length ? { recolor: node.recolor } : {}) } });
+  }
 
   /** A finished sub-build as one flat model at the origin (a split one compiled from its children). */
   const flatModel = (id: string): BrickModel | null => {
@@ -412,7 +441,6 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
 
   // --- 3. assembly ------------------------------------------------------------------------
   onEvent({ type: "stage", scope: "assembly", label: "Assembling", status: "start" });
-  const request = input.text ?? "";
   const top = plan.subBuilds.flatMap((sub) => {
     const node = ptree.get(sub.id);
     const model = flatModel(sub.id);
@@ -483,6 +511,35 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     design = r.value;
   }
 
+  // Component library: save every valid sub-build this run designed (not the reused ones).
+  const added: string[] = [];
+  if (lib) {
+    const finalSubs = design?.subBuilds ?? subBuilds;
+    const own = new Map<string, number>();
+    const addCost = (id: string, c: number) => own.set(id, (own.get(id) ?? 0) + c);
+    for (const { sub, loop } of subLoops) addCost(sub.id, loop.usage.cost);
+    for (const { node, loop } of [...childLoops, ...asmLoops]) addCost(node.id, loop.usage.cost);
+    const costOf = (id: string, seen = new Set<string>()): number => {
+      if (seen.has(id)) return 0;
+      seen.add(id);
+      return (own.get(id) ?? 0) + (finalSubs.find((x) => x.id === id)?.uses ?? []).reduce((n, u) => n + costOf(u.sub, seen), 0);
+    };
+    for (const sb of finalSubs) {
+      if (imported.has(sb.id)) continue;
+      const node = ptree.nodes.get(sb.id);
+      const comp = makeComponent(finalSubs, sb.id, {
+        description: node?.purpose,
+        context: [...(ptree.nodes.has(sb.id) ? (ptree.context(sb.id)?.path ?? []).map((p) => p.name) : []), plan.name, request],
+        sideways: node?.sideways,
+        cost: costOf(sb.id),
+        run: debug.dir.split(/[\\/]/).pop(),
+        request,
+      });
+      if (comp && saveComponent(lib, comp).added) added.push(comp.id);
+    }
+    if (added.length || reused.length) console.log(`[generate] library: ${reused.length} reused (${reused.reduce((n, r) => n + r.copies, 0)} copies, ~$${reused.reduce((n, r) => n + r.saved, 0).toFixed(2)} saved), ${added.length} new components saved (${lib.components.length} in the library)`);
+  }
+
   const usage = sumUsage(rounds.map((r) => r.usage));
   const spentNow = sumUsage(rounds.filter((r) => !r.reused).map((r) => r.usage));
   const compiled = design ? compileDesign(design, { structure: assembly.best!.check.valid ? "warn" : "error" }) : null;
@@ -501,6 +558,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     pipeline: "subbuilds",
     ...(photo ? { analysis: { analysis: photo.analysis, target: photo.target, cost: photo.usage.cost } } : {}),
     ...(refine ? { refine: refine.log } : {}),
+    ...(lib ? { library: { reused: reused.length, copies: reused.reduce((n, r) => n + r.copies, 0), saved: reused.reduce((n, r) => n + r.saved, 0), added: added.length } } : {}),
   };
   const stages = {
     ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, rounds: photo.rounds.length, cost: photo.usage.cost } } : {}),
@@ -526,7 +584,8 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   if (resumed) debug.write(`resume-${new Date().toISOString().replace(/[:.]/g, "-")}.json`, resumed);
   const catalog = catalogUsage(result.model);
   console.log(`[generate] ${formatCatalogUsage(catalog)}`);
-  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, rounds, total: usage, cache: cacheSummary(usage), ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
+  const library = lib ? { offered: { plan: offered.length, childPlans: offeredChild }, reused, savedCost: reused.reduce((n, r) => n + r.saved, 0), added, size: lib.components.length } : undefined;
+  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, ...(library ? { library } : {}), rounds, total: usage, cache: cacheSummary(usage), ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
   if (design) debug.write("final-design.json", design);
   if (result.model) debug.write("final-model.json", result.model);
   if (resumed) console.log(`[generate] resumed: reused plan=${resumed.reused.plan}, sub-builds [${resumed.reused.subBuilds.join(", ")}], assembly=${resumed.reused.assembly}; earlier $${resumed.costBefore.toFixed(4)}, now $${resumed.costNow.toFixed(4)}`);

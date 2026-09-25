@@ -77,6 +77,11 @@ export const CONFIG = {
     smallAssembly: 150,
   },
   /**
+   * Component library: planners are offered up to `offer` components that match
+   * what they're planning, and valid sub-builds are saved after each run.
+   */
+  library: { enabled: true, offer: 20 },
+  /**
    * Structural estimate (see validate/structure.ts). Mass: grams per 1 stud × 1 stud
    * × 1 plate of part volume (a 2×4 brick ≈ 2.3 g); slopes are ~75% solid.
    * Limits: a single-stud joint may carry at most this stack height / weight, and
@@ -146,6 +151,8 @@ export const CONFIG = {
   buildsDir: `${DATA}builds`,
   /** .ldr/.mpd files shown in the Library. */
   exportsDir: `${DATA}exports`,
+  /** Component library: one JSON file per saved component (see components/library.ts). */
+  componentsDir: `${DATA}components`,
 };
 
 /** Model and effort for a stage's round (round 0 = its first answer; later rounds are repairs). */

@@ -37,7 +37,7 @@ export interface Turn {
   refines?: { round: number; rounds: number; status: "start" | "done"; matches?: boolean; differences?: string[]; accepted?: boolean; cost?: number }[];
   /** Photo builds: what the analysis found and the size it set. */
   analysis?: { subject: string; ratio: string; size: string; cost: number };
-  result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string; parts?: number; subBuilds?: number; copies?: number; compileMs?: number };
+  result?: { name: string; description: string; valid: boolean; steps: number; problems: number; cost: number; debugDir: string; change?: string; parts?: number; subBuilds?: number; copies?: number; compileMs?: number; library?: { reused: number; copies: number; saved: number; added: number } };
   error?: string;
 }
 
@@ -51,6 +51,8 @@ export interface StageState {
   cost?: number;
   /** Tree mode: 1 = placed by the main build. */
   depth?: number;
+  /** Reused from the component library. */
+  reused?: { component: string; saved: number; recolor?: string[] };
 }
 
 export interface Draft {
@@ -102,6 +104,8 @@ function stageRows(t: Turn): Row[] {
         ? `Planning · ${s.label}`
         : s.scope.startsWith("asm:")
           ? `Assembling · ${s.label}${times}`
+          : s.scope.startsWith("lib:")
+            ? `From library · ${s.label}${times}`
           : s.scope === "plan"
             ? "Planning sub-builds"
             : s.scope === "assembly"
@@ -109,6 +113,7 @@ function stageRows(t: Turn): Row[] {
               : s.label;
     const indent = s.depth ? s.depth - 1 : 0;
     if (s.scope === "analysis") rows.push(analysisRow(t));
+    else if (s.reused) rows.push({ label, state: "done", note: `reused · ${s.parts ?? 0} parts${s.reused.recolor?.length ? ` · recoloured ${s.reused.recolor.join(", ")}` : ""}${s.reused.saved ? ` · saves ~${usd(s.reused.saved)}` : ""}`, indent });
     else if (s.status === "start") rows.push({ label, state: running ? "active" : "fail", note: running ? live(s.scope) : "", indent });
     else {
       const what = s.scope === "plan" ? `${s.parts ?? 0} sub-builds` : s.scope.startsWith("plan:") ? `${s.parts ?? 0} children` : `${s.parts ?? 0} parts`;
@@ -121,7 +126,9 @@ function stageRows(t: Turn): Row[] {
     rows.push({
       label: "Done",
       state: t.status === "done" ? "done" : "todo",
-      note: t.result ? `${t.result.valid ? "buildable" : `${t.result.problems} left`} · ${t.result.subBuilds ?? 0} sub-builds, ${t.result.copies ?? 0} copies` : "",
+      note: t.result
+        ? `${t.result.valid ? "buildable" : `${t.result.problems} left`} · ${t.result.subBuilds ?? 0} sub-builds, ${t.result.copies ?? 0} copies${t.result.library?.reused ? ` · ${t.result.library.reused} from the library` : ""}${t.result.library?.added ? ` · ${t.result.library.added} saved to it` : ""}`
+        : "",
     });
   return rows;
 }

@@ -56,6 +56,8 @@ export interface GenerateResult {
   analysis?: { analysis: PhotoAnalysis; target: SizeTarget; cost: number };
   /** Photo builds: the comparison rounds against the photo (their cost is also counted in `usage`). */
   refine?: RefineLog[];
+  /** Sub-build path: components reused from the library, what that saved, and components added to it. */
+  library?: { reused: number; copies: number; saved: number; added: number };
 }
 
 /** A stage of the sub-build path starting or finishing ("plan", "plan:<id>", "sub:<id>", "asm:<id>", "assembly"). */
@@ -70,6 +72,8 @@ export interface StageEvent {
   cost?: number;
   /** Tree mode: how deep the sub-build is (1 = placed by the main build). */
   depth?: number;
+  /** A component reused from the library ("lib:<id>" stages): which one, and what designing it cost before. */
+  reused?: { component: string; saved: number; recolor?: string[] };
 }
 
 export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | AnalysisEvent | RefineEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };

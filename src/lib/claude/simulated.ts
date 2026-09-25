@@ -69,7 +69,7 @@ export const TOWN_SQUARE: Split = S("main", "Town square", 1, [
   ]),
   S("railing_run", "Railing run", 4, [L("railing_post", "Railing post", 1, 1, 2, "black", 3), L("railing_bar", "Railing bar", 4, 1, 1, "black", 1), L("railing_cap", "Railing cap", 1, 1, 1, "black", 3)]),
   S("clock_tower", "Clock tower", 1, [
-    S("tower_base", "Tower base", 1, [L("tower_door", "Tower door", 2, 1, 4, "reddish_brown", 1), L("window_small", "Small window", 2, 1, 2, "white", 2), L("tower_wall_block", "Tower wall block", 2, 2, 3, "light_gray", 2)]),
+    S("tower_base", "Tower base", 1, [L("tower_door", "Tower door", 2, 1, 4, "dark_tan", 1), L("window_small", "Small window", 2, 1, 2, "white", 2), L("tower_wall_block", "Tower wall block", 2, 2, 3, "light_gray", 2)]),
     L("clock_face", "Clock face", 2, 1, 1, "white", 1),
     S("tower_spire", "Tower spire", 1, [L("spire_cone", "Spire cone", 2, 2, 2, "dark_blue", 1), L("spire_ring", "Spire ring", 4, 1, 1, "yellow", 2)]),
     L("tower_flag", "Tower flag", 1, 1, 1, "red", 1),
