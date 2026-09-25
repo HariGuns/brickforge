@@ -15,12 +15,13 @@ cp -r .next-app/static "$STANDALONE/.next-app/static"
 [ -d public ] && cp -r public "$STANDALONE/public"
 find "$STANDALONE" -maxdepth 1 -name '.env*' -delete
 
-# Refuse to package anything that contains the development key.
-KEY="$(sed -n 's/^ANTHROPIC_API_KEY=//p' .env.local 2>/dev/null | tr -d '"'"'"' ' | head -1 || true)"
-if [ -n "$KEY" ] && grep -rqF -- "$KEY" "$STANDALONE" electron; then
-  echo "✗ The API key from .env.local was found in the build output. Not packaging." >&2
-  exit 1
-fi
+# Refuse to package anything that contains a key from .env.local (Anthropic, Rebrickable, …).
+while IFS= read -r KEY; do
+  if [ -n "$KEY" ] && grep -rqF -- "$KEY" "$STANDALONE" electron; then
+    echo "✗ A key from .env.local was found in the build output. Not packaging." >&2
+    exit 1
+  fi
+done < <(sed -n 's/^[A-Z_]*_KEY=//p' .env.local 2>/dev/null | tr -d '"'"'"' ' || true)
 
 # Offer to import builds from this source folder on first run.
 printf '{ "importFrom": %s }\n' "$(node -e 'console.log(JSON.stringify(process.argv[1]))' "$ROOT")" > electron/build-info.json
