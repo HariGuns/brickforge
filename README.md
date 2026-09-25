@@ -2,6 +2,20 @@
 
 Local web app that turns a text description or a photo into a buildable model made of generic interlocking bricks. Claude (`claude-opus-5-5`) designs the model on a stud grid. A validator checks it is physically buildable, and errors go back to Claude until the model is valid. The app shows the model in 3D, with step-by-step instructions, a parts list and LDraw export.
 
+**Added since the first version** (each has its own section below):
+
+| Area | What it adds |
+|---|---|
+| [The app](#the-app) | BrickForge v2 design, paged instruction manual and PDF, chat editing, undo/redo, versions and Save, Showcase mode |
+| [Sub-builds](#sub-builds) | Designs as a tree of sub-builds: plan → sub-builds → assembly, structural estimate, resume, mirrored copies, `.mpd` with submodels |
+| [Detail and photo analysis](#detail-and-photo-analysis) | Detail levels, photo analysis to an exact target size, server-side renders compared with the photo |
+| [Cost](#cost) | Per-stage model and effort, compact parts format, diffs, prompt caching, token report |
+| [Part catalog](#part-catalog) | 885 upright parts from LDraw + LDCad shadow data, `search_parts`, wheels on pins |
+| [Sideways building](#sideways-building) | 41 side-stud parts, sideways sub-build copies mounted on side studs, exact validation, export and manual |
+| [BrickLink](#bricklink-wanted-list) | Wanted list export, with part and colour numbers for the whole catalog from Rebrickable |
+| [Desktop app](#desktop-app-appimage), [launcher](#one-click-launcher-linux) | AppImage (Electron) and a one-click Linux launcher |
+| [Regression check](#regression-check) | Seven saved builds snapshotted, so upright behaviour can't change unnoticed |
+
 ## Setup
 
 ```bash
@@ -10,15 +24,17 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local   # server-side only, gitignore
 npm run dev                                         # http://localhost:3000
 ```
 
+Optional in `.env.local`: `REBRICKABLE_API_KEY` (only for `npm run fetch-bricklink`), and `NEXT_PUBLIC_BRICKFORGE_SIDEWAYS=0` to turn sideways building off.
+
 ## Desktop app (AppImage)
 
 ```bash
-npm run appimage        # → dist/BrickForge-0.1.0-x86_64.AppImage (~145 MB)
+npm run appimage        # → dist/BrickForge-0.1.0-x86_64.AppImage (152 MB)
 ```
 
 The AppImage is the whole app in one file: Electron plus the Next.js standalone server. Run it, and:
 1. **The server** starts on a free local port and opens in its own window. Closing the window stops it.
-2. **First run:** a welcome screen asks for your Anthropic API key. It's checked with a free API call, then stored in `~/.config/BrickForge/settings.json` (readable by you only). Change it later with the gear button. The key is never bundled: the build refuses to package if the key from `.env.local` appears anywhere in the output.
+2. **First run:** a welcome screen asks for your Anthropic API key. It's checked with a free API call, then stored in `~/.config/BrickForge/settings.json` (readable by you only). Change it later with the gear button. The key is never bundled: the build refuses to package if any key from `.env.local` (Anthropic, Rebrickable) appears anywhere in the output.
 3. **Your existing builds:** the first run also offers to copy the generation runs, saved builds and exports from the folder the AppImage was built from (you can edit the path). Nothing is overwritten.
 4. **Data:** builds, generation runs, exports and logs live in `~/.config/BrickForge` (`builds/`, `debug/`, `exports/`, `logs/server.log`).
 5. **App menu:** on launch the AppImage adds a **BrickForge** entry with its icon (`~/.local/share/applications/brickforge-app.desktop`), updated if you move the file.
@@ -46,7 +62,7 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start the app |
-| `npm test` | Unit tests (validator, steps, LDraw export, repair loop with a fake Claude) |
+| `npm test` | All tests (193): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, BrickLink IDs, and the regression snapshots |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
@@ -58,6 +74,9 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | `npm run build-catalog` | Regenerate the part catalog (`src/lib/parts/catalog.json`, meshes in `public/parts/`) from LDraw + the LDCad shadow library; report in `ldraw-lib/catalog-report.txt` |
 | `npm run catalog-usage` | Which catalog parts generations used, and what Claude searched for, across all runs in `debug/` |
 | `npm run export-sample` | Export the hand-built sample models to `exports/` |
+| `npm run token-report` | Where the tokens and cost go, per stage, model, effort and token kind, across runs in `debug/` |
+| `npm run fetch-bricklink` | Regenerate the BrickLink part and colour numbers from Rebrickable (`src/lib/bricklink/rebrickable.json`; needs `REBRICKABLE_API_KEY`, responses cached) |
+| `npm run gen -- --stage-effort subBuild=medium --stage-model repair=claude-sonnet-5` | Override a stage's effort or model for one run (repeatable); `--refine N` sets the photo comparison rounds |
 | `scripts/leocad-render.sh exports/X.ldr [out.png] [step]` | Render an export with LeoCAD (flatpak `org.leocad.LeoCAD`) to confirm it opens |
 
 LDraw library for `verify-ldraw`, `build-catalog` and LeoCAD rendering:
@@ -77,7 +96,7 @@ The UI follows `design/brickforge-v2.html`.
   - **Parts:** parts list grouped by category.
   - **Design:** the model JSON plus stats.
 - **Other:** dark mode, and the Download menu (.ldr, .mpd, BrickLink wanted list, Open model JSON).
-- **BrickLink wanted list:** `src/lib/bricklink/` maps each part and colour to BrickLink catalogue numbers (these differ from LDraw in places, e.g. 6141 → 4073, and BrickLink colour numbers are its own). Windows are listed as frame plus trans-clear glass, and the door as frame plus door. Upload the .xml at BrickLink › Wanted › Upload.
+- **BrickLink wanted list:** see [below](#bricklink-wanted-list).
 - **Versions, undo/redo and Save:**
   - **Versions:** every chat edit adds a version to the open build, and the Versions menu lists them all (click one to restore it).
   - **Undo/redo:** the top-bar buttons, or ⌘/Ctrl+Z and ⌘/Ctrl+Shift+Z, step through your changes. A new edit clears the redo steps but never deletes a version.
@@ -235,11 +254,11 @@ Across these runs, the JSON answer fell from 18% to 5% of the cost, and answer t
 
 ## Part catalog
 
-Claude can use **937 parts**:
+Claude can use **978 parts**:
 - **Hand-made core:** 52 parts in `src/lib/parts/library.ts`.
-- **Generated catalog:** 885 parts in `src/lib/parts/catalog.json`.
+- **Generated catalog:** 885 upright parts plus 41 side-stud parts in `src/lib/parts/catalog.json` (the side-stud parts only while sideways building is on; 937 parts without them).
 
-The prompt lists a **core menu** of 142: the core parts plus the most useful catalog parts (`src/lib/parts/core.ts`, vehicle parts first). Claude finds the rest with the **`search_parts` tool** during design, which returns ids, sizes and connection info. Each run's `summary.json` records which catalog parts the model used and how many came from search; `npm run catalog-usage` adds them up.
+The prompt lists a **core menu** of 150 (142 with sideways building off): the core parts plus the most useful catalog parts (`src/lib/parts/core.ts`, vehicle parts first). Claude finds the rest with the **`search_parts` tool** during design, which returns ids, sizes and connection info. Each run's `summary.json` records which catalog parts the model used and how many came from search; `npm run catalog-usage` adds them up.
 
 **How the catalog is made** (`npm run build-catalog`, about 25 s):
 1. **Filter** every official LDraw part, dropping prints, stickers, aliases, minifig/Duplo/other systems and assemblies.
@@ -249,14 +268,15 @@ The prompt lists a **core menu** of 142: the core parts plus the most useful cat
    - wheel pins (thin wheel pins, or Technic pins on bricks and plates).
 
    Rejected:
-   - clips, hinges, bars and side studs;
+   - clips, hinges and bars;
+   - side studs (those parts go to the side-stud classifier, see [Sideways building](#sideways-building));
    - off-grid studs;
    - bodies that aren't a whole number of studs and plates (up to 2.5 LDU of overhang is allowed).
 4. **Infer missing anti-studs.** Where the shadow library lacks them (96 parts), anti-studs come from the LDraw geometry's standard underside tubes, and the part is marked `inferred`.
 5. **Compute the space each part fills** from its surfaces, per 1 × 1 stud × 1 plate cell, so a curved slope's thin end or an arch's opening stays free.
 6. **Merge near-duplicates** ("with/without bottom tube" variants), and **pair left/right versions** (22 pairs) for mirrored sub-builds.
 7. **Frame the wheels** (rim + tyre assemblies, e.g. `4624c01`) so their hub lands exactly on a holder's pin.
-8. **Write compact meshes.** Real LDraw geometry goes to `public/parts/<id>.bin` (13 MB; each part loads on demand). Tyres and glass keep their own colour. The viewer, manual and PDF render catalog parts from these meshes.
+8. **Write compact meshes.** Real LDraw geometry goes to `public/parts/<id>.bin` (15 MB; each part loads on demand). Tyres and glass keep their own colour. The viewer, manual and PDF render catalog parts from these meshes.
 
 **Wheels** attach only through holders:
 - A wheel's hub must sit exactly on a free pin of the same kind, facing it. Otherwise the error is `LOOSE_WHEEL`, and it names the exact placement to use.
@@ -268,34 +288,65 @@ The prompt lists a **core menu** of 142: the core parts plus the most useful cat
 - the body fits the footprint;
 - the pins are where the validator says.
 
-It also mounts every wheel on a real holder and checks, in LDraw space, that the hub is on the pin's axis and flush against the holder. **All 885 catalog parts pass.**
+It also mounts every wheel on a real holder and checks, in LDraw space, that the hub is on the pin's axis and flush against the holder. **All 885 upright catalog parts pass** (the 41 side-stud parts have their own checks).
 
 Why 885, not 1,000+: most of the rest need connection types the validator doesn't have yet:
 - Technic beams, axles and gears;
 - hinges and clips;
-- side studs (brackets, headlight bricks), for the later sideways-building phase.
+- recessed side studs (the headlight brick) and parts that mix side studs with other side connectors.
 
 `ldraw-lib/catalog-report.txt` lists every rejected part and the reason.
 
-**Side-stud parts** (sideways building) come from a separate classifier (`scripts/lib/classifySide.ts`), which only runs for parts the normal one rejects, so upright parts are classified exactly as before. It covers 41 parts: bricks with studs on one to four sides, brackets and similar.
-- **Side studs:** each is recorded as an exact point with an outward direction. They sit on stud centres along the face and on a quarter-plate grid in height.
-- **Brackets:** framed by their plate. The flange is recorded as an LDU extension box.
-- **Excluded for now:** recessed side studs (the headlight brick) and parts with other side connectors.
-- **Verification:** `verify-ldraw` checks side studs through the exporter, and checks the body against the grid box plus extension boxes. All 41 pass.
-- **Sideways copies** (phase 2): a copy of a sub-build can be mounted on a side stud instead of placed on the grid (`mount: { part, stud, at, spin }` on the copy).
-  - **Orientation:** the copy's top faces the stud's direction; seen from outside, its x runs left to right and its z top to bottom. `mirror: true` gives the opposite side.
-  - **Exact placement:** the compiler gives the copy's parts exact frames (`src/lib/sideways/frame.ts`).
-  - **Validation:** an extra pass matches side-stud and sideways joints by exact position and facing, and checks collisions on exact LDU boxes, including bracket flanges (`src/lib/sideways/validate.ts`). It only runs when a model has sideways parts, side studs or flanges.
-  - **Everywhere else:** the viewer, manual, PDF and server renderer draw frames. LDraw export writes turned parts, and the design `.mpd` writes turned submodel references; import reads both back. In the manual, the panel is built flat in its own section, then attached after the upright build.
-  - **Verification:** `verify-ldraw` mounts a panel on every side stud of every carrier (spins 0 and 90) and checks, in LDraw space, that the panel's anti-stud sits on the side stud. All 41 carriers pass.
-- **Generation** (phase 3): the planner can mark a sub-build `sideways: true` (a panel: w × d is its face, h its thickness). It's designed flat, face up, and the assembly mounts copies with `"<sub> on <part>:<stud> at <cx>,<cz> spin <s>"` (compact) or a `mount` object (JSON). Part rows list side studs, search knows "side studs"/"bracket"/"snot", and a few carriers are in the core menu. Repair hints cover `MOUNT_INVALID` and `SIDEWAYS_DETACHED`.
-- **Switch:** `CONFIG.sideways.enabled`, on by default; `NEXT_PUBLIC_BRICKFORGE_SIDEWAYS=0` (e.g. in `.env.local`) turns it off, restoring the old prompts and schemas exactly.
-- **Edits keep mounts:** a mount names its carrier by part index; when a change removes or adds parts, the indices are renumbered automatically, and removing a carrier that still holds a copy is reported instead of silently re-targeting it. Turned off, side-stud parts aren't loaded and the prompts and schemas are exactly as before. `src/lib/regression.test.ts` snapshots seven saved builds to show upright behaviour is unchanged either way.
+**Side-stud parts** are catalogued separately; see [Sideways building](#sideways-building).
 
 **Licences:**
 - The LDraw parts library is CC BY 2.0 / 4.0 (LDraw.org).
 - The LDCad shadow library is CC BY-SA 4.0 (Roland Melkert and contributors, github.com/RolandMelkert/LDCadShadowLibrary).
 - The generated `catalog.json` and meshes are derived from both, so they're shared under CC BY-SA 4.0 with this attribution.
+
+## Sideways building
+
+Studs on the sides of parts, so panels can face outwards: smooth or detailed vertical faces such as a car's flanks, doors and facades. It's on by default; `NEXT_PUBLIC_BRICKFORGE_SIDEWAYS=0` turns it off (read at startup, and baked into the browser code at build time). Turned off, side-stud parts aren't loaded, sideways copies can't be made, and the prompts and schemas are exactly as before. `src/lib/regression.test.ts` shows upright behaviour is unchanged either way.
+
+**Side-stud parts** come from a separate classifier (`scripts/lib/classifySide.ts`), which only runs for parts the normal one rejects, so upright parts are classified exactly as before. It covers 41 parts: bricks with studs on one to four sides, brackets and similar.
+- **Side studs:** each is recorded as an exact point with an outward direction. They sit on stud centres along the face and on a quarter-plate grid in height.
+- **Brackets:** framed by their plate. The flange is recorded as an LDU extension box.
+- **Excluded for now:** recessed side studs (the headlight brick) and parts with other side connectors.
+- **Verification:** `verify-ldraw` checks side studs through the exporter, and checks the body against the grid box plus extension boxes. All 41 pass.
+
+**Sideways copies:** a copy of a sub-build can be mounted on a side stud instead of placed on the grid (`mount: { part, stud, at, spin }` on the copy).
+- **Orientation:** the copy's top faces the stud's direction; seen from outside, its x runs left to right and its z top to bottom. `mirror: true` gives the opposite side.
+- **Exact placement:** the compiler gives the copy's parts exact frames (`src/lib/sideways/frame.ts`).
+- **Validation:** an extra pass matches side-stud and sideways joints by exact position and facing, and checks collisions on exact LDU boxes, including bracket flanges (`src/lib/sideways/validate.ts`). It only runs when a model has sideways parts, side studs or flanges. Errors: `MOUNT_INVALID`, `SIDEWAYS_DETACHED`.
+- **Everywhere else:** the viewer, manual, PDF and server renderer draw frames. LDraw export writes turned parts, and the design `.mpd` writes turned submodel references; import reads both back (a tilted part in any `.ldr` becomes a sideways part). In the manual, the panel is built flat in its own section, then attached after the upright build.
+- **Verification:** `verify-ldraw` mounts a panel on every side stud of every carrier (spins 0 and 90) and checks, in LDraw space, that the panel's anti-stud sits on the side stud. All 41 carriers pass.
+- **Not yet:** sideways copies inside sideways copies, and sideways parts inside mirrored copies (both reported).
+
+**Generation:** the planner can mark a sub-build `sideways: true` (a panel: w × d is its face, h its thickness, at most 6 plates). It's designed flat, face up, and the assembly mounts copies with `"<sub> on <part>:<stud> at <cx>,<cz> spin <s>"` (compact) or a `mount` object (JSON). Part rows list side studs, search knows "side studs", "bracket" and "snot", and 8 carriers are in the core menu. A mount names its carrier by part index; when an edit removes or adds parts, the indices are renumbered automatically, and removing a carrier that still holds a copy is reported instead of silently re-targeting it.
+
+**Live results (2026-09-25, $3.48 in total):**
+
+Huracán photo at High, the sideways run next to the tuned single-pass run (`docs/huracan-sideways-compare.png`, LeoCAD):
+
+| Stage | Tuned single pass | Sub-builds + sideways |
+|---|---|---|
+| Photo analysis | $0.09 | $0.07 |
+| Plan | – | $0.09 |
+| Design | $0.91 | sub-builds $0.77 (7, all valid first try; side panel $0.04) + assembly $1.00 (valid first try) |
+| Photo comparison | $0.93 | $0.93 (incl. $0.21 of mount repairs, since fixed) |
+| **Total** | **$1.92, 147 parts** | **$2.86, 368 parts** |
+
+- **Sideways:** the planner chose a mirrored pair of side-intake panels by itself, mounted on 1 × 2 bricks with a side stud (30414). They render flush on the flanks, with a stepped black intake.
+- **Overall:** the single pass is still closer to the photo; the sub-build car is bulkier and taller. That comes from how the sub-build pipeline splits the car, not from the panels (20 of 368 parts).
+- **Upright prompts unaffected:** the red house with sideways off vs on cost $0.303 vs $0.315 (87–89 parts, valid first try, no warnings, equal quality in LeoCAD).
+
+## BrickLink wanted list
+
+Download › BrickLink wanted list writes an `.xml` to upload at BrickLink › Wanted › Upload. `src/lib/bricklink/` maps each part and colour to BrickLink's numbers:
+- **Core parts:** a hand-made table (`ids.ts`). Windows are listed as frame plus trans-clear glass, and the door as frame plus door.
+- **Catalog parts** (upright and sideways): from Rebrickable's LDraw → BrickLink data, generated by `npm run fetch-bricklink` into `rebrickable.json` (by part number, then by LDraw number, following LDraw's "moved to" aliases). 955 of 984 LDraw numbers match, 88 of them to a different BrickLink number (e.g. 6141 → 4073); all 21 colours match.
+- **Flagged:** 28 catalog parts have no BrickLink number on Rebrickable (16 aren't on Rebrickable; 12 are listed without one, such as Braille bricks and plain baseplates). They keep their LDraw number as a best guess and are listed in `UNCONFIRMED_BRICKLINK`.
+- **Checked:** `ids.test.ts` checks every part has a BrickLink ID, the flagged list, the renumbered parts, and that the core table and colours agree with Rebrickable. That check updated six core numbers: tiles 3070/3069/3068, round brick 3062 and door 60616 (BrickLink's current numbers), and the 2 × 1 ridge (3044b).
 
 ## Where to tune things
 
@@ -336,6 +387,10 @@ Each run writes `debug/<timestamp>-<slug>/`, containing:
 
 Token usage and estimated cost are logged per round and in total. They appear in the server console, the UI and `summary.json`. To view a debug model in the app, use **Open model JSON**: it opens `final-model.json` and also designs with sub-builds (`final-design.json`, or a design downloaded from the Design tab).
 
+## Regression check
+
+`src/lib/regression.test.ts` snapshots seven saved builds (`src/lib/fixtures/regression`: house, pickup, train, duck, two Huracáns and a village design). For each it records validation, connections, structure, steps, manual pages, parts list, `.ldr`/`.mpd` hashes and re-import, the BrickLink list, compile stats and a small render. A change that alters any of them fails the test; update the snapshots (`npx vitest run src/lib/regression.test.ts -u`) only for intended changes. So far that's happened once: the BrickLink numbers from Rebrickable.
+
 ## Test results (phase 6)
 
 These are end-to-end runs with `claude-opus-5-5` at effort `high`, using the tuned prompt. Every model was opened and rendered in LeoCAD.
@@ -354,10 +409,12 @@ These are end-to-end runs with `claude-opus-5-5` at effort `high`, using the tun
   - close gable ends and other visible openings (the first house had an open gable)
   - make wheels stick out from the body (the first truck hid them underneath)
 
-## Known limitations (v1)
+## Known limitations
 
 - **No hanging parts:** a part can't be attached only to the underside of a part above it. Every part must rest on studs below it, which is what makes bottom-up build steps possible.
 - **Slopes block their whole box:** collision treats a slope as filling its full bounding box, so nothing can sit in the empty space above a sloped face.
 - **Structure isn't simulated:** the validator checks stud connections only. It doesn't check balance, weight or clutch strength. A part held by a single stud gets a warning, not an error.
-- **Library:** 937 parts (see Part catalog). There are no side studs (SNOT), hinges, clips or Technic beams yet.
+- **Library:** 978 parts (see Part catalog). Side studs are supported through sideways copies only (no recessed side studs); there are no hinges, clips or Technic beams yet.
+- **Sideways copies:** they can't be nested, and a mount names its carrier by part index (renumbered through edits, see [Sideways building](#sideways-building)).
+- **BrickLink:** 28 catalog parts have unconfirmed BrickLink numbers (see [BrickLink wanted list](#bricklink-wanted-list)).
 - **Simple step grouping:** steps are grouped by layer and position (up to 6 parts each). No build-order optimisation is done beyond that.
