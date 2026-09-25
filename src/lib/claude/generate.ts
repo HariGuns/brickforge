@@ -34,6 +34,8 @@ export interface GenerateInput {
   detail?: Detail;
   /** Current model to edit; `text` is then the change request. */
   base?: BrickModel;
+  /** Sub-build path: allow deeper trees (split sub-builds). Default: CONFIG.tree.details has the Detail level. */
+  tree?: boolean;
 }
 
 export type { RoundSummary } from "./loop";
@@ -56,7 +58,7 @@ export interface GenerateResult {
   refine?: RefineLog[];
 }
 
-/** A stage of the sub-build path starting or finishing ("plan", "sub:<id>", "assembly"). */
+/** A stage of the sub-build path starting or finishing ("plan", "plan:<id>", "sub:<id>", "asm:<id>", "assembly"). */
 export interface StageEvent {
   type: "stage";
   scope: string;
@@ -66,6 +68,8 @@ export interface StageEvent {
   parts?: number;
   copies?: number;
   cost?: number;
+  /** Tree mode: how deep the sub-build is (1 = placed by the main build). */
+  depth?: number;
 }
 
 export type GenerateEvent = { type: "start"; debugDir: string } | LoopEvent | StageEvent | AnalysisEvent | RefineEvent | { type: "done"; result: GenerateResult } | { type: "error"; message: string };

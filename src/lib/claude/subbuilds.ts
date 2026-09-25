@@ -20,7 +20,10 @@ import { designEditPrompt } from "../prompts/edit";
 import { compileDesign } from "../design/compile";
 import { surfaceMaps } from "../design/surface";
 import { systemPrompt } from "../prompts/system";
-import { assemblyJsonSchema, assemblyPrompt, planJsonSchema, planPrompt, subBuildPrompt, type Plan } from "../prompts/subbuilds";
+import { assemblyJsonSchema, assemblyPrompt, planJsonSchema, planPrompt, subBuildPrompt, type Plan, type PlanExtras, type PlannedSubBuild } from "../prompts/subbuilds";
+import { childPlanJsonSchema, childPlanPrompt, subAssemblyPrompt, type ChildPlan } from "../prompts/tree";
+import { checkChildPlan, checkTreePlan, isLibrary, PlanTree, type LibraryRef, type TreeNode } from "./tree";
+import { compileSubBuild } from "../design/compile";
 import { validate, type Issue } from "../validate/validator";
 import { buildSteps } from "../steps/steps";
 import { DebugRun } from "./debug";
@@ -52,9 +55,13 @@ const PlanSchema = z.object({
       parts: z.number().int(),
       copies: z.number().int(),
       sideways: z.boolean().optional(),
+      split: z.boolean().optional(),
+      from: z.string().optional(),
+      recolor: z.array(z.string()).optional(),
     }),
   ),
 });
+const ChildPlanSchema = z.object({ layout: z.string(), children: PlanSchema.shape.subBuilds });
 
 const AssemblySchema = z.object({ name: z.string(), description: z.string(), parts: z.array(PlacementSchema), uses: z.array(InstanceSchema) });
 type Assembly = z.infer<typeof AssemblySchema>;
@@ -86,7 +93,8 @@ export function checkPlan(plan: Plan): Issue[] {
     ids.add(b.id);
     if (b.w < 1 || b.d < 1 || b.w > s.maxEnvelope || b.d > s.maxEnvelope) bad(`${b.id}: footprint ${b.w}×${b.d} must be between 1 and ${s.maxEnvelope} studs.`);
     if (b.h < 1 || b.h > 90) bad(`${b.id}: height ${b.h} plates must be between 1 and 90.`);
-    if (b.parts < 3 || b.parts > s.maxSubParts) bad(`${b.id}: part budget ${b.parts} must be between 3 and ${s.maxSubParts}.`);
+    const maxParts = b.split ? CONFIG.tree.maxSplitParts : s.maxSubParts;
+    if (b.parts < 3 || b.parts > maxParts) bad(`${b.id}: part budget ${b.parts} must be between 3 and ${maxParts}.`);
     if (b.copies < 1) bad(`${b.id}: plan at least one copy.`);
     if (b.sideways && b.h > 6) bad(`${b.id}: a sideways panel is at most 6 plates thick (you planned ${b.h}); its face is w × d.`);
   }
@@ -97,19 +105,34 @@ export function checkPlan(plan: Plan): Issue[] {
   return out;
 }
 
-/** Run `fn` over items with at most `n` at a time, keeping order. */
+/**
+ * Run `fn` over items with at most `n` at a time, keeping order. After a
+ * failure no new item starts; the calls already running finish (their rounds
+ * are saved for resume), then the first error is thrown.
+ */
 async function pool<T, R>(items: T[], n: number, fn: (item: T) => Promise<R>): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let next = 0;
+  let failed: { error: unknown } | null = null;
   await Promise.all(
     Array.from({ length: Math.min(n, items.length) }, async () => {
-      while (next < items.length) {
+      while (next < items.length && !failed) {
         const i = next++;
-        out[i] = await fn(items[i]);
+        try {
+          out[i] = await fn(items[i]);
+        } catch (error) {
+          failed ??= { error };
+        }
       }
     }),
   );
+  if (failed) throw (failed as { error: unknown }).error;
   return out;
+}
+
+/** Tree mode: asked for, or on for this Detail level (CONFIG.tree.details). */
+export function useTree(input: GenerateInput): boolean {
+  return input.tree ?? CONFIG.tree.details.includes(input.detail ?? "standard");
 }
 
 export interface DesignOptions extends GenerateOptions {
@@ -137,7 +160,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   const system = systemPrompt();
   const fmt = codec();
   if (!cp) {
-    debug.write("input.json", { mode: "build", pipeline: "subbuilds", text: input.text ?? null, detail: input.detail ?? null, hasImage: !!input.image, config: CONFIG });
+    debug.write("input.json", { mode: "build", pipeline: "subbuilds", text: input.text ?? null, detail: input.detail ?? null, hasImage: !!input.image, tree: useTree(input), config: CONFIG });
     debug.write("system-prompt.md", system);
     if (input.image) debug.writeBinary(`input-image.${input.image.mediaType.split("/")[1]}`, Buffer.from(input.image.data, "base64"));
   }
@@ -165,8 +188,11 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   }
 
   // --- 1. plan --------------------------------------------------------------------------
+  const tree = useTree(input);
+  const libraryRefs = new Map<string, LibraryRef>();
+  const extras: PlanExtras = { tree };
   onEvent({ type: "stage", scope: "plan", label: "Planning sub-builds", status: "start" });
-  const planText = planPrompt(input.text ?? "", input.detail, !!input.image, photo ? analysisBlock(photo.analysis, photo.target) : undefined);
+  const planText = planPrompt(input.text ?? "", input.detail, !!input.image, photo ? analysisBlock(photo.analysis, photo.target) : undefined, extras);
   if (cp && !cp.plan.valid) earlierRounds.push(...cp.plan.rounds);
   const planLoop = cp?.plan.valid ? reusedLoop(cp.plan, cp.plan.valid, 0) : await runLoop<Plan>(
     {
@@ -178,10 +204,11 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
       system,
       firstContent: withImage(planText),
       firstText: planText,
-      schema: planJsonSchema(),
+      schema: planJsonSchema(extras),
       parse: (t) => parseJson(t, PlanSchema),
       check: (plan) => {
-        const errors = checkPlan(plan);
+        const errors = [...checkPlan(plan), ...(tree || libraryRefs.size ? checkTreePlan(plan, libraryRefs) : [])];
+        if (!tree) errors.push(...plan.subBuilds.filter((b) => b.split).map((b) => invalidOutput(`${b.id}: split isn't available here; design it directly.`)));
         return { errors, warnings: [], valid: !errors.length, partCount: plan.subBuilds.reduce((n, b) => n + b.parts * b.copies, 0) };
       },
       maxRepairRounds: CONFIG.subbuilds.planRepairRounds,
@@ -193,31 +220,104 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   if (!plan) throw new Error("Couldn't make a valid sub-build plan; see the debug folder.");
   debug.write("plan.json", plan);
 
-  // --- 2. unique sub-builds, in parallel ------------------------------------------------
+  /** A stage from the interrupted run: reused if it passed, otherwise its rounds count as earlier cost and it's run again. */
+  const reuseOr = async <T,>(prefix: string, parse: (raw: unknown) => T | null, partCount: (v: T) => number, run: () => Promise<LoopResult<T>>): Promise<LoopResult<T>> => {
+    const saved = cp?.stage(prefix, parse);
+    if (saved?.valid) return reusedLoop(saved, saved.valid, partCount(saved.valid));
+    if (saved) earlierRounds.push(...saved.rounds);
+    return run();
+  };
+
+  // --- 1b. tree: plan each split sub-build as child sub-builds, level by level ------------------
+  const ptree = new PlanTree(plan);
+  const childLoops: { node: TreeNode; loop: LoopResult<ChildPlan> }[] = [];
+  for (let depth = 1; tree && depth < CONFIG.tree.maxDepth; depth++) {
+    const level = ptree.unplanned(depth);
+    if (!level.length) break;
+    // At the unique limit already: the rest are designed directly.
+    if (ptree.nodes.size >= CONFIG.tree.maxUnique) {
+      for (const node of level) (node.split = false), (node.parts = Math.min(node.parts, CONFIG.subbuilds.maxSubParts));
+      console.log(`[generate] ${ptree.nodes.size} unique sub-builds: designing ${level.map((n) => n.id).join(", ")} directly`);
+      break;
+    }
+    // Plans of one level run in parallel: each is checked against what the whole tree has left,
+    // and its prompt suggests a fair share of the new unique sub-builds.
+    const uniqueLeft = CONFIG.tree.maxUnique - ptree.nodes.size;
+    const uniqueShare = Math.max(1, Math.ceil(uniqueLeft / level.length));
+    const copiesLeft = Math.max(0, CONFIG.tree.maxCopies - ptree.copies());
+    const shared = ptree.leaves().map((n) => ({ ...n, copies: 1 }));
+    const results = await pool(level, CONFIG.subbuilds.concurrency, async (node) => {
+      const scope = `plan:${node.id}`;
+      onEvent({ type: "stage", scope, label: node.name, status: "start", copies: ptree.totalCopies(node.id), depth: node.depth });
+      const ctxT = ptree.context(node.id) ?? { path: [], siblings: plan.subBuilds };
+      const text = childPlanPrompt(plan, node, ctxT, { depth: node.depth, shared, library: [], uniqueLeft, uniqueShare: Math.min(uniqueShare, uniqueLeft) });
+      const loop = await reuseOr(`plan-${node.id}.`, (raw) => { const r = ChildPlanSchema.safeParse(raw); return r.success ? r.data : null; }, (c) => c.children.length, () =>
+        runLoop<ChildPlan>(
+          {
+            scope,
+            stage: "subPlan",
+            cache: false,
+            debugPrefix: `plan-${node.id}.`,
+            system,
+            firstContent: text,
+            firstText: text,
+            schema: childPlanJsonSchema(),
+            parse: (t) => parseJson(t, ChildPlanSchema),
+            check: (c) => {
+              const errors = checkChildPlan(ptree, node, c, { library: libraryRefs, uniqueLeft, copiesLeft });
+              return { errors, warnings: [], valid: !errors.length, partCount: c.children.reduce((n, x) => n + x.parts * x.copies, 0) };
+            },
+            maxRepairRounds: CONFIG.subbuilds.planRepairRounds,
+          },
+          ctx,
+        ),
+      );
+      const valid = loop.best?.check.valid ?? false;
+      onEvent({ type: "stage", scope, label: node.name, status: "done", valid, parts: valid ? loop.best!.value.children.length : 0, copies: ptree.totalCopies(node.id), cost: loop.usage.cost, depth: node.depth });
+      return { node, loop };
+    });
+    childLoops.push(...results);
+    // A split sub-build without a valid child plan is designed directly instead.
+    for (const { node, loop } of results) {
+      if (loop.best?.check.valid) continue;
+      node.split = false;
+      node.parts = Math.min(node.parts, CONFIG.subbuilds.maxSubParts);
+      console.log(`[generate] ${node.id}: no valid child plan, designing it directly`);
+    }
+    ptree.addLevel(results.filter((r) => r.loop.best?.check.valid).map((r) => ({ parent: r.node.id, child: r.loop.best!.value })));
+  }
+  if (tree) debug.write("tree.json", { depth: ptree.depth(), unique: ptree.nodes.size, copies: ptree.copies(), nodes: [...ptree.nodes.values()] });
+
+  // --- 2. sub-builds designed directly, in parallel ------------------------------------------------
   // The first request goes alone until it starts streaming (its prompt is cached by then);
   // the rest then read the cache instead of all writing it at once.
   let firstStarted!: () => void;
   const cacheWarm = new Promise<void>((r) => (firstStarted = r));
-  const needCalls = plan.subBuilds.filter((s) => !cp?.subs.get(s.id)?.valid);
+  const leaves = ptree.leaves();
+  const needCalls = leaves.filter((s) => !cp?.subs.get(s.id)?.valid);
   if (!needCalls.length) firstStarted();
-  const subLoops = await pool(plan.subBuilds, CONFIG.subbuilds.concurrency, async (sub) => {
-    const scope = `sub:${sub.id}`;
-    onEvent({ type: "stage", scope, label: sub.name, status: "start", copies: sub.copies });
-    const text = subBuildPrompt(plan, sub);
-    const saved = cp?.subs.get(sub.id);
+  const subLoops = await pool(leaves, CONFIG.subbuilds.concurrency, async (node) => {
+    const scope = `sub:${node.id}`;
+    const copies = ptree.totalCopies(node.id);
+    const ctxT = ptree.context(node.id);
+    // Tree leaves are told their copies per copy of their parent; top-level ones their total, as before.
+    const sub: PlannedSubBuild = ctxT ? { ...node, copies: ctxT.siblings.find((x) => x.id === node.id)!.copies } : node;
+    onEvent({ type: "stage", scope, label: node.name, status: "start", copies, ...(tree ? { depth: node.depth } : {}) });
+    const text = subBuildPrompt(plan, sub, ctxT);
+    const saved = cp?.subs.get(node.id);
     if (saved?.valid) {
       const loop = reusedLoop(saved, saved.valid, saved.valid.parts.length);
-      onEvent({ type: "stage", scope, label: sub.name, status: "done", valid: true, parts: saved.valid.parts.length, copies: sub.copies, cost: loop.usage.cost });
-      return { sub, loop };
+      onEvent({ type: "stage", scope, label: node.name, status: "done", valid: true, parts: saved.valid.parts.length, copies, cost: loop.usage.cost, ...(tree ? { depth: node.depth } : {}) });
+      return { sub: node, loop };
     }
     if (saved) earlierRounds.push(...saved.rounds);
-    const first = sub === needCalls[0];
+    const first = node === needCalls[0];
     if (!first) await cacheWarm;
     const loop = await runLoop<BrickModel>(
       {
         scope,
         stage: "subBuild",
-        debugPrefix: `sub-${sub.id}.`,
+        debugPrefix: `sub-${node.id}.`,
         system,
         firstContent: text,
         firstText: text,
@@ -226,28 +326,99 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
         parse: (t) => parseJson(t, BrickModelSchema),
         diff: { schema: modelDiffJsonSchema(fmt), apply: (prev, json) => applyModelDiff(prev, json, fmt), listing: (m) => modelListing(m, fmt), instructions: DIFF_INSTRUCTIONS },
         check: (model, last) => {
-          const v = validate(model, { grid: { x: sub.w, z: sub.d, y: sub.h }, maxParts: Math.min(CONFIG.maxParts, Math.ceil(sub.parts * 1.6) + 10), structure: last ? "warn" : "error" });
+          const v = validate(model, { grid: { x: node.w, z: node.d, y: node.h }, maxParts: Math.min(CONFIG.maxParts, Math.ceil(node.parts * 1.6) + 10), structure: last ? "warn" : "error" });
           return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: model.parts.length };
         },
       },
       first ? { ...ctx, onStarted: firstStarted } : ctx,
     ).finally(() => first && firstStarted());
-    onEvent({ type: "stage", scope, label: sub.name, status: "done", valid: loop.best?.check.valid ?? false, parts: loop.best?.value.parts.length ?? 0, copies: sub.copies, cost: loop.usage.cost });
-    return { sub, loop };
+    onEvent({ type: "stage", scope, label: node.name, status: "done", valid: loop.best?.check.valid ?? false, parts: loop.best?.value.parts.length ?? 0, copies, cost: loop.usage.cost, ...(tree ? { depth: node.depth } : {}) });
+    return { sub: node, loop };
   });
   const built = subLoops.filter((s) => s.loop.best).map(({ sub, loop }) => ({ sub, model: loop.best!.value, valid: loop.best!.check.valid }));
   if (!built.length) throw new Error("None of the sub-builds could be designed; see the debug folder.");
   const subBuilds: BrickDesign["subBuilds"] = built.map(({ sub, model }) => ({ id: sub.id, name: sub.name, parts: model.parts, uses: [] }));
   debug.write("subbuilds.json", subBuilds);
 
+  /** A finished sub-build as one flat model at the origin (a split one compiled from its children). */
+  const flatModel = (id: string): BrickModel | null => {
+    const leaf = built.find((b) => b.sub.id === id);
+    if (leaf) return leaf.model;
+    if (!subBuilds.some((s) => s.id === id)) return null;
+    return compileSubBuild({ name: id, description: "", subBuilds, main: { parts: [], uses: [] } }, id, { structure: "off" }).model;
+  };
+  /** A sub-build and every sub-build inside it. */
+  const subtree = (id: string, out = new Map<string, BrickDesign["subBuilds"][number]>()) => {
+    const s = subBuilds.find((x) => x.id === id);
+    if (!s || out.has(id)) return out;
+    out.set(id, s);
+    for (const u of s.uses) subtree(u.sub, out);
+    return out;
+  };
+
+  // --- 2b. tree: assemble each split sub-build from its children, deepest first ---------------------
+  const asmLoops: { node: TreeNode; loop: LoopResult<Assembly> }[] = [];
+  const splits = ptree.splits();
+  for (const depth of [...new Set(splits.map((n) => n.depth))]) {
+    const level = splits.filter((n) => n.depth === depth);
+    const results = await pool(level, CONFIG.subbuilds.concurrency, async (node) => {
+      const scope = `asm:${node.id}`;
+      const copies = ptree.totalCopies(node.id);
+      onEvent({ type: "stage", scope, label: node.name, status: "start", copies, depth: node.depth });
+      const kids = ptree.childrenOf(node.id).flatMap((c) => {
+        const m = flatModel(c.id);
+        return m ? [{ id: c.id, name: c.name, copies: c.uses.find((u) => u.parent === node.id)!.copies, parts: m.parts.length, maps: surfaceMaps(m), sideways: CONFIG.sideways.enabled && c.sideways }] : [];
+      });
+      const text = subAssemblyPrompt(plan, node, node.child!, ptree.context(node.id) ?? { path: [], siblings: [] }, kids);
+      const kidIds = kids.map((k) => k.id);
+      const designFor = (a: Assembly): BrickDesign => {
+        const inside = new Map<string, BrickDesign["subBuilds"][number]>();
+        for (const id of kidIds) subtree(id, inside);
+        return { name: node.name, description: a.description, subBuilds: [...inside.values(), { id: node.id, name: node.name, parts: a.parts, uses: a.uses }], main: { parts: [], uses: [] } };
+      };
+      const small = node.parts <= CONFIG.tree.smallAssembly;
+      const loop = await reuseOr(`asm-${node.id}.`, (raw) => { const r = AssemblySchema.safeParse(raw); return r.success ? r.data : null; }, () => 0, () =>
+        runLoop<Assembly>(
+          {
+            scope,
+            stage: small ? "subAssembly" : "assembly",
+            debugPrefix: `asm-${node.id}.`,
+            system,
+            firstContent: text,
+            firstText: text,
+            schema: assemblyJsonSchema(),
+            tools: [searchPartsTool],
+            parse: (t) => parseJson(t, AssemblySchema),
+            diff: {
+              schema: assemblyDiffJsonSchema(fmt),
+              apply: (prev, json) => applyAssemblyDiff(prev, json, fmt),
+              listing: (a) => designListing({ name: a.name, description: a.description, subBuilds: [], main: { parts: a.parts, uses: a.uses } }),
+              instructions: `Return only the changes to this sub-build: remove / set / add for its parts and removeCopies / setCopies / addCopies for its copies, by index into the listing above (before your changes). Leave the name and description empty to keep them. Everything you don't mention stays as it is.`,
+            },
+            check: (a, last) => {
+              const c = compileSubBuild(designFor(a), node.id, { grid: { x: node.w, z: node.d, y: node.h }, structure: last ? "warn" : "error" });
+              return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
+            },
+          },
+          ctx,
+        ),
+      );
+      onEvent({ type: "stage", scope, label: node.name, status: "done", valid: loop.best?.check.valid ?? false, parts: loop.best?.check.partCount, copies, cost: loop.usage.cost, depth: node.depth });
+      return { node, loop };
+    });
+    asmLoops.push(...results);
+    for (const { node, loop } of results) if (loop.best) subBuilds.push({ id: node.id, name: node.name, parts: loop.best.value.parts, uses: loop.best.value.uses });
+  }
+
   // --- 3. assembly ------------------------------------------------------------------------
   onEvent({ type: "stage", scope: "assembly", label: "Assembling", status: "start" });
   const request = input.text ?? "";
-  const aText = assemblyPrompt(
-    request,
-    plan,
-    built.map(({ sub, model }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: model.parts.length, maps: surfaceMaps(model), sideways: CONFIG.sideways.enabled && sub.sideways })),
-  );
+  const top = plan.subBuilds.flatMap((sub) => {
+    const node = ptree.get(sub.id);
+    const model = flatModel(sub.id);
+    return model ? [{ id: sub.id, name: sub.name, copies: sub.copies, parts: model.parts.length, maps: surfaceMaps(model), sideways: CONFIG.sideways.enabled && node.sideways }] : [];
+  });
+  const aText = assemblyPrompt(request, plan, top);
   const designOf = (a: Assembly): BrickDesign => ({ name: a.name, description: a.description, subBuilds, main: { parts: a.parts, uses: a.uses } });
   const savedAssembly = cp?.assembly.valid ? AssemblySchema.safeParse(cp.assembly.valid) : null;
   if (cp && !savedAssembly?.success) earlierRounds.push(...cp.assembly.rounds);
@@ -279,7 +450,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   onEvent({ type: "stage", scope: "assembly", label: "Assembling", status: "done", valid: assembly.best?.check.valid ?? false, parts: assembly.best?.check.partCount, cost: assembly.usage.cost });
 
   // --- result -------------------------------------------------------------------------------
-  const rounds = [...(photo?.rounds ?? []), ...earlierRounds, ...planLoop.rounds, ...subLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
+  const rounds = [...(photo?.rounds ?? []), ...earlierRounds, ...planLoop.rounds, ...childLoops.flatMap((s) => s.loop.rounds), ...subLoops.flatMap((s) => s.loop.rounds), ...asmLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
   let design = a ? designOf(a) : null;
 
   // Photo builds: compare renders with the photo and refine the design (valid designs only).
@@ -334,7 +505,14 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
   const stages = {
     ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, rounds: photo.rounds.length, cost: photo.usage.cost } } : {}),
     plan: { rounds: planLoop.rounds.length, cost: planLoop.usage.cost },
-    subBuilds: subLoops.map(({ sub, loop }) => ({ id: sub.id, name: sub.name, copies: sub.copies, parts: loop.best?.value.parts.length ?? 0, valid: loop.best?.check.valid ?? false, rounds: loop.rounds.length, cost: loop.usage.cost })),
+    subBuilds: subLoops.map(({ sub, loop }) => ({ id: sub.id, name: sub.name, copies: ptree.totalCopies(sub.id), parts: loop.best?.value.parts.length ?? 0, valid: loop.best?.check.valid ?? false, rounds: loop.rounds.length, cost: loop.usage.cost })),
+    ...(tree
+      ? {
+          childPlans: childLoops.map(({ node, loop }) => ({ id: node.id, name: node.name, depth: node.depth, children: loop.best?.check.valid ? loop.best.value.children.length : 0, valid: loop.best?.check.valid ?? false, rounds: loop.rounds.length, cost: loop.usage.cost })),
+          subAssemblies: asmLoops.map(({ node, loop }) => ({ id: node.id, name: node.name, depth: node.depth, copies: ptree.totalCopies(node.id), parts: loop.best?.check.partCount ?? 0, valid: loop.best?.check.valid ?? false, rounds: loop.rounds.length, cost: loop.usage.cost, stage: node.parts <= CONFIG.tree.smallAssembly ? "subAssembly" : "assembly" })),
+          tree: { depth: ptree.depth(), unique: ptree.nodes.size, copies: ptree.copies() },
+        }
+      : {}),
     assembly: { rounds: assembly.rounds.length, cost: assembly.usage.cost, valid: assembly.best?.check.valid ?? false },
     ...(refine ? { refine: { rounds: refine.log, cost: refine.usage.cost } } : {}),
   };

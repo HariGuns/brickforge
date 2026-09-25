@@ -7,7 +7,7 @@ const DATA = process.env.BRICKFORGE_DATA_DIR ? `${process.env.BRICKFORGE_DATA_DI
 
 export type Effort = "low" | "medium" | "high";
 /** Generation stages that call Claude (see CONFIG.stages). */
-export type Stage = "analysis" | "plan" | "design" | "subBuild" | "assembly" | "edit" | "refine" | "repair";
+export type Stage = "analysis" | "plan" | "subPlan" | "design" | "subBuild" | "subAssembly" | "assembly" | "edit" | "refine" | "repair";
 export interface StageSetting {
   model?: string;
   effort?: Effort;
@@ -55,6 +55,28 @@ export const CONFIG = {
    */
   subbuilds: { maxUnique: 8, maxCopies: 64, maxEnvelope: 32, maxSubParts: 250, planRepairRounds: 2, concurrency: 8 },
   /**
+   * Deeper sub-build trees: a planned sub-build can be split into child
+   * sub-builds (planned by their own call), down to small components that are
+   * designed directly. Used for the Detail levels in `details` (or --tree).
+   * - maxDepth: levels of sub-builds below the main build (the compiler allows CONFIG.design.maxDepth).
+   * - maxUnique / maxCopies: unique sub-builds and expanded copies in the whole tree.
+   * - maxChildren: child sub-builds in one split sub-build's plan.
+   * - maxSplitParts: part budget of one copy of a split sub-build (leaves keep subbuilds.maxSubParts).
+   * - parts: the whole model's part target per Detail level when the tree is used.
+   * - smallAssembly: a split sub-build with a part budget up to this is assembled
+   *   with the `subAssembly` stage (medium); larger ones and the main build use `assembly` (high).
+   */
+  tree: {
+    details: ["very_high"] as string[],
+    maxDepth: 3,
+    maxUnique: 60,
+    maxCopies: 400,
+    maxChildren: 8,
+    maxSplitParts: 1500,
+    parts: { very_high: 3000 } as Record<string, number>,
+    smallAssembly: 150,
+  },
+  /**
    * Structural estimate (see validate/structure.ts). Mass: grams per 1 stud × 1 stud
    * × 1 plate of part volume (a 2×4 brick ≈ 2.3 g); slopes are ~75% solid.
    * Limits: a single-stud joint may carry at most this stack height / weight, and
@@ -94,10 +116,14 @@ export const CONFIG = {
   stages: {
     analysis: { effort: "medium" },
     plan: {},
+    // Child plans of split sub-builds (same model and effort as the plan).
+    subPlan: {},
     design: {},
     // Medium matched high on the Huracán sub-builds (same plan) for 33% less.
     // Assembly, refine and design were tested at medium too (README, "Effort A/B"): they lost quality on vehicles.
     subBuild: { effort: "medium" },
+    // Sub-assemblies of small split sub-builds (part budget ≤ tree.smallAssembly); larger ones use `assembly`.
+    subAssembly: { effort: "medium" },
     assembly: {},
     edit: {},
     refine: {},

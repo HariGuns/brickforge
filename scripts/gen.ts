@@ -6,6 +6,7 @@
  *   npm run gen -- --base model.json "add a chimney"  (edit an existing model)
  *   npm run gen -- --pipeline single "a castle"         (single | subbuilds | auto; default from CONFIG.generator)
  *   npm run gen -- --resume debug/<run folder>          (finish an interrupted sub-build run)
+ *   npm run gen -- --tree / --no-tree "a town square"   (deeper sub-build trees; default on for Very high)
  * Writes exports/<name>.ldr/.mpd and a debug folder under ./debug.
  */
 import fs from "node:fs";
@@ -47,6 +48,12 @@ const ri = args.indexOf("--resume");
 const resumeDir = ri >= 0 ? args.splice(ri, 2)[1] : undefined;
 const pi = args.indexOf("--pipeline");
 const pipelineArg = pi >= 0 ? (args.splice(pi, 2)[1] as "single" | "subbuilds" | "auto") : undefined;
+// --tree / --no-tree: deeper sub-build trees (default: CONFIG.tree.details).
+let tree: boolean | undefined;
+for (const [flag, on] of [["--tree", true], ["--no-tree", false]] as const) {
+  const k = args.indexOf(flag);
+  if (k >= 0) (args.splice(k, 1), (tree = on));
+}
 const bi = args.indexOf("--base");
 const base = bi >= 0 ? JSON.parse(fs.readFileSync(args.splice(bi, 2)[1], "utf8")) : undefined;
 const text = args.join(" ").trim() || undefined;
@@ -56,11 +63,11 @@ const mediaType = ({ jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", we
 const image = imagePath ? { mediaType, data: fs.readFileSync(imagePath).toString("base64") } : undefined;
 
 const { resolvePipeline } = await import("../src/lib/claude/pipeline");
-const pipeline = resumeDir ? "subbuilds" : resolvePipeline(pipelineArg, detail, !!base);
+const pipeline = resumeDir || tree ? "subbuilds" : resolvePipeline(pipelineArg, detail, !!base);
 console.log(`pipeline: ${pipeline}`);
 
 const onEvent = (e: import("../src/lib/claude/generate").GenerateEvent) => {
-  if (e.type === "stage") console.log(`${e.status === "start" ? "▶" : "■"} ${e.label}${e.copies ? ` ×${e.copies}` : ""}${e.status === "done" ? ` — ${e.valid ? "ok" : "not valid"}${e.parts !== undefined ? `, ${e.parts}` : ""}${e.cost !== undefined ? `, $${e.cost.toFixed(3)}` : ""}` : ""}`);
+  if (e.type === "stage") console.log(`${"  ".repeat(Math.max(0, (e.depth ?? 1) - 1))}${e.status === "start" ? "▶" : "■"} ${e.scope.startsWith("plan:") ? "plan " : e.scope.startsWith("asm:") ? "assemble " : ""}${e.label}${e.copies ? ` ×${e.copies}` : ""}${e.status === "done" ? ` — ${e.valid ? "ok" : "not valid"}${e.parts !== undefined ? `, ${e.parts}` : ""}${e.cost !== undefined ? `, $${e.cost.toFixed(3)}` : ""}` : ""}`);
   if (e.type === "round_start") console.log(`→ ${e.scope} round ${e.round} (${e.kind})…`);
   if (e.type === "round_end" && e.errors.length) {
     for (const err of e.errors.slice(0, 8)) console.log(`    ${err.code}: ${err.message}`);
@@ -70,7 +77,7 @@ const onEvent = (e: import("../src/lib/claude/generate").GenerateEvent) => {
 const result = resumeDir
   ? await resumeDesign(resumeDir, onEvent)
   : pipeline === "subbuilds"
-    ? await generateDesign({ text, image, detail }, onEvent)
+    ? await generateDesign({ text, image, detail, tree }, onEvent)
     : await generateModel({ text, image, detail, base }, onEvent);
 
 console.log(`\nValid: ${result.valid} · parts: ${result.model?.parts.length ?? 0} · steps: ${result.steps.length}${result.compile ? ` · sub-builds: ${result.compile.stats.uniqueSubBuilds} unique, ${result.compile.stats.copies} copies · compile ${result.compile.stats.compileMs} ms` : ""}`);

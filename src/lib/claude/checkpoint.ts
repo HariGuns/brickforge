@@ -24,6 +24,8 @@ export interface Checkpoint {
   plan: StageCheckpoint<Plan>;
   subs: Map<string, StageCheckpoint<BrickModel>>;
   assembly: StageCheckpoint<unknown>;
+  /** Any stage by its debug-file prefix (e.g. "plan-house.", "asm-house."), read on demand. */
+  stage: <T>(prefix: string, parse: (raw: unknown) => T | null) => StageCheckpoint<T>;
   /** The photo analysis, if the run got that far (reused on resume). */
   analysis?: { analysis: PhotoAnalysis; target: SizeTarget; rounds: RoundSummary[] };
 }
@@ -56,7 +58,7 @@ function stage<T>(dir: string, prefix: string, parse: (raw: unknown) => T | null
 
 export function loadCheckpoint(dir: string): Checkpoint {
   const abs = path.resolve(/*turbopackIgnore: true*/ dir);
-  const input = readJson(path.join(/*turbopackIgnore: true*/ abs, "input.json")) as { pipeline?: string; text?: string | null; detail?: string | null; size?: string | null; hasImage?: boolean } | null;
+  const input = readJson(path.join(/*turbopackIgnore: true*/ abs, "input.json")) as { pipeline?: string; text?: string | null; detail?: string | null; size?: string | null; hasImage?: boolean; tree?: boolean } | null;
   if (!input) throw new Error(`${abs} has no input.json; it isn't a generation run.`);
   if (input.pipeline !== "subbuilds") throw new Error("Only sub-build runs can be resumed (single-pass runs are one call; just run them again).");
   let image: GenerateInput["image"];
@@ -68,7 +70,10 @@ export function loadCheckpoint(dir: string): Checkpoint {
   }
   const plan = stage<Plan>(abs, "plan.", (raw) => (raw && typeof raw === "object" && "subBuilds" in raw ? (raw as Plan) : null));
   const subs = new Map<string, StageCheckpoint<BrickModel>>();
-  for (const sub of plan.valid?.subBuilds ?? []) {
+  // Every sub-build designed in the run (a tree's deeper ones aren't in the top plan).
+  const designed = new Set([...(plan.valid?.subBuilds ?? []).map((s) => s.id), ...fs.readdirSync(abs).flatMap((f) => f.match(/^sub-([a-z][a-z0-9_]*)\.round-\d+\.validation\.json$/)?.[1] ?? [])]);
+  for (const id of designed) {
+    const sub = { id };
     subs.set(sub.id, stage(abs, `sub-${sub.id}.`, (raw) => {
       const r = BrickModelSchema.safeParse(raw);
       return r.success ? r.data : null;
@@ -79,5 +84,13 @@ export function loadCheckpoint(dir: string): Checkpoint {
   const parsedAnalysis = PhotoAnalysisSchema.safeParse(saved?.analysis);
   const analysis = parsedAnalysis.success && saved?.target ? { analysis: parsedAnalysis.data, target: saved.target, rounds: stage<unknown>(abs, "analysis.", (raw) => raw ?? null).rounds } : undefined;
   // Older runs saved a Small/Medium/Large size; toDetail maps it.
-  return { dir: abs, input: { text: input.text ?? undefined, detail: toDetail(input.detail ?? input.size), image }, plan, subs, assembly, ...(analysis ? { analysis } : {}) };
+  return {
+    dir: abs,
+    input: { text: input.text ?? undefined, detail: toDetail(input.detail ?? input.size), image, ...(input.tree !== undefined ? { tree: input.tree } : {}) },
+    plan,
+    subs,
+    assembly,
+    stage: (prefix, parse) => stage(abs, prefix, parse),
+    ...(analysis ? { analysis } : {}),
+  };
 }

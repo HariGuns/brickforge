@@ -20,12 +20,12 @@ function friendly(err: unknown): string {
 }
 
 /**
- * POST { text?, image?: { mediaType, data(base64) }, detail?, base?, pipeline? }
+ * POST { text?, image?: { mediaType, data(base64) }, detail?, base?, pipeline?, tree? }
  * → text/event-stream of GenerateEvent. `base` = model to edit; `pipeline` =
  * "single" | "subbuilds" | "auto" (default CONFIG.generator).
  */
 export async function POST(req: Request) {
-  let body: { text?: string; image?: { mediaType: string; data: string }; detail?: string; base?: unknown; baseDesign?: unknown; pipeline?: string };
+  let body: { text?: string; image?: { mediaType: string; data: string }; detail?: string; base?: unknown; baseDesign?: unknown; pipeline?: string; tree?: boolean };
   try {
     body = await req.json();
   } catch {
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
       };
       try {
         if (baseDesign) await editDesign({ text, image, baseDesign }, send, { signal: abort.signal });
-        else await (pipeline === "subbuilds" ? generateDesign : generateModel)({ text, image, detail, base }, send, { signal: abort.signal });
+        else await (pipeline === "subbuilds" ? generateDesign : generateModel)({ text, image, detail, base, ...(typeof body.tree === "boolean" ? { tree: body.tree } : {}) }, send, { signal: abort.signal });
       } catch (err) {
         if (!abort.signal.aborted) {
           console.error("[generate] failed:", err);

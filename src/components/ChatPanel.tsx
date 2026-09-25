@@ -49,6 +49,8 @@ export interface StageState {
   parts?: number;
   copies?: number;
   cost?: number;
+  /** Tree mode: 1 = placed by the main build. */
+  depth?: number;
 }
 
 export interface Draft {
@@ -75,6 +77,8 @@ interface Row {
   label: string;
   state: RowState;
   note: string;
+  /** Indent (tree mode: sub-builds below the top level). */
+  indent?: number;
 }
 
 /** Tracker rows for the sub-build path: planning, one row per unique sub-build, assembly. */
@@ -91,12 +95,24 @@ function stageRows(t: Turn): Row[] {
   const running = t.status === "running";
   for (const s of t.stages ?? []) {
     const reps = Math.max(0, roundsOf(s.scope).length - 1);
-    const label = s.scope.startsWith("sub:") ? `Sub-build · ${s.label}${s.copies && s.copies > 1 ? ` ×${s.copies}` : ""}` : s.scope === "plan" ? "Planning sub-builds" : s.scope === "assembly" ? "Assembling" : s.label;
+    const times = s.copies && s.copies > 1 ? ` ×${s.copies}` : "";
+    const label = s.scope.startsWith("sub:")
+      ? `Sub-build · ${s.label}${times}`
+      : s.scope.startsWith("plan:")
+        ? `Planning · ${s.label}`
+        : s.scope.startsWith("asm:")
+          ? `Assembling · ${s.label}${times}`
+          : s.scope === "plan"
+            ? "Planning sub-builds"
+            : s.scope === "assembly"
+              ? "Assembling"
+              : s.label;
+    const indent = s.depth ? s.depth - 1 : 0;
     if (s.scope === "analysis") rows.push(analysisRow(t));
-    else if (s.status === "start") rows.push({ label, state: running ? "active" : "fail", note: running ? live(s.scope) : "" });
+    else if (s.status === "start") rows.push({ label, state: running ? "active" : "fail", note: running ? live(s.scope) : "", indent });
     else {
-      const what = s.scope === "plan" ? `${s.parts ?? 0} sub-builds` : `${s.parts ?? 0} parts`;
-      rows.push({ label, state: s.valid ? "done" : "fail", note: `${what}${reps ? ` · ${reps} repair${reps === 1 ? "" : "s"}` : ""}${s.valid ? "" : " · has problems"}` });
+      const what = s.scope === "plan" ? `${s.parts ?? 0} sub-builds` : s.scope.startsWith("plan:") ? `${s.parts ?? 0} children` : `${s.parts ?? 0} parts`;
+      rows.push({ label, state: s.valid ? "done" : "fail", note: `${what}${reps ? ` · ${reps} repair${reps === 1 ? "" : "s"}` : ""}${s.valid ? "" : " · has problems"}`, indent });
     }
   }
   rows.push(...refineRows(t));
@@ -188,7 +204,7 @@ function Tracker({ turn }: { turn: Turn }) {
   return (
     <div className="tracker">
       {trackerRows(turn).map((row, i) => (
-        <div key={i} className={`trk-row ${row.state}`}>
+        <div key={i} className={`trk-row ${row.state}`} style={row.indent ? { paddingLeft: row.indent * 14 } : undefined}>
           <span className={`trk-dot ${row.state}`} aria-hidden="true">
             {row.state === "done" && <I.Check size={11} />}
             {row.state === "fail" && <I.Close size={11} strokeWidth={3.5} />}
