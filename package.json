@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "gen": "tsx scripts/gen.ts",
     "export-sample": "tsx scripts/export-sample.ts",
+    "fetch-bricklink": "tsx scripts/fetch-bricklink.ts",
     "verify-ldraw": "tsx scripts/verify-ldraw.ts && tsx scripts/verify-catalog.ts",
     "bench": "tsx scripts/bench.ts",
     "probe-ldraw": "tsx scripts/probe-ldraw.ts",
