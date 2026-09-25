@@ -51,7 +51,7 @@ scripts/install-launcher.sh --uninstall
 
 Clicking **BrickForge**:
 1. installs dependencies if they're missing;
-2. rebuilds only if the code changed since the last build;
+2. rebuilds only if the code, dependencies, part meshes (`public/`) or `.env.local` changed since the last build;
 3. starts the app on http://localhost:3000, or reuses one that's already running;
 4. opens your browser.
 
@@ -265,7 +265,7 @@ Each stage was run at **medium** against its earlier **high** run. Assembly and 
 | Design | Pickup | $0.47, 97 parts | $0.27, 65 parts | **worse**: slab cab with bare studs, no slopes or windscreen |
 | Design | Train (High detail) | $0.56, 231 parts | $0.45, 230 parts | equal |
 
-Medium keeps up on simple, regular builds (village, train) and falls behind where shape matters (vehicles), or where it has to find problems (comparison). The runs are the `ab-*` and `2026-09-25_10-10-56-*` folders in `debug/`.
+Medium keeps up on simple, regular builds (village, train) and falls behind where shape matters (vehicles), or where it has to find problems (comparison). The design runs are the `2026-09-25_10-10-56-*` folders in `debug/`. The resumed copies were deleted afterwards: they held the originals' plan and sub-build rounds, which the token report would have counted twice, so their $0.68 of medium rounds is recorded only here.
 
 ## Part catalog
 

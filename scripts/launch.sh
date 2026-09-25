@@ -31,8 +31,9 @@ if answers; then open_browser; exit 0; fi
 [[ -f .env.local ]] || echo "BrickForge: no .env.local, so generating models won't work until you add ANTHROPIC_API_KEY (viewing saved models still works)." >&2
 [[ -d node_modules ]] || { echo "Installing dependencies…"; npm install >"$LOGDIR/install.log" 2>&1 || fail "npm install failed (see logs/install.log)."; }
 
-# Rebuild only when something that affects the app is newer than the last build.
-if [[ ! -f .next/BUILD_ID ]] || [[ -n $(find src package.json next.config.ts -newer .next/BUILD_ID -print -quit 2>/dev/null) ]]; then
+# Rebuild only when something that affects the app is newer than the last build: the code,
+# the dependencies, the part meshes, or .env.local (NEXT_PUBLIC_* settings are baked in at build time).
+if [[ ! -f .next/BUILD_ID ]] || [[ -n $(find src public package.json package-lock.json next.config.ts .env.local -newer .next/BUILD_ID -print -quit 2>/dev/null) ]]; then
   echo "Building BrickForge (only after code changes)…"
   command -v notify-send >/dev/null && notify-send -i "$ROOT/src/app/icon.svg" "BrickForge" "Building the app, this takes a minute the first time…"
   npm run build >"$LOGDIR/build.log" 2>&1 || fail "the build failed (see logs/build.log)."
