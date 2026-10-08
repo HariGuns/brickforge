@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATALOG_PARTS, CORE_PARTS, getPart, localBottom, localStuds, PARTS, SNOT_PARTS } from "./library";
+import { CATALOG_PARTS, CORE_PARTS, getPart, localBottom, localSolids, localStuds, PARTS, SNOT_PARTS } from "./library";
 import { CORE_MENU_CATALOG } from "./core";
 import { coreMenu, searchParts } from "./search";
 import { validate } from "../validate/validator";
@@ -17,6 +17,11 @@ describe("part catalog", () => {
     expect(CATALOG_PARTS.length).toBeGreaterThan(850);
     expect(new Set(PARTS.map((p) => p.id)).size).toBe(PARTS.length);
     for (const p of CATALOG_PARTS) {
+      if (p.category === "baseplate") {
+        // A ground layer: no height, a stud on every top cell at y = 0, nothing underneath.
+        expect([p.h, localStuds(p).length, localBottom(p).length, localSolids(p).length], p.id).toEqual([0, p.w * p.d, 0, 0]);
+        continue;
+      }
       for (const [x, z, l] of localStuds(p)) expect(x >= 0 && z >= 0 && x < p.w && z < p.d && l >= 1 && l <= p.h, `${p.id} stud`).toBe(true);
       for (const [x, z, l] of localBottom(p)) expect(x >= 0 && z >= 0 && x < p.w && z < p.d && l >= 0 && l < p.h, `${p.id} anti-stud`).toBe(true);
       if (!p.hub) expect(localBottom(p).length, `${p.id} can be attached from below`).toBeGreaterThan(0);

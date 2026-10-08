@@ -32,6 +32,7 @@ const CATEGORY_LABEL: Record<PartCategory, string> = {
   panel: "Panels",
   holder: "Wheel holders",
   wheel: "Wheels",
+  baseplate: "Baseplates",
   vehicle: "Vehicle parts",
   technic: "Technic bricks",
   other: "Other",

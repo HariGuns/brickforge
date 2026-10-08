@@ -50,6 +50,20 @@ const WHEELS: { file: string; kind: PinKind; name: string; tyre: string; rim: st
   { file: "55981c01.dat", kind: "tpin", name: "Wheel on Technic pin, large (rim 14×18, tyre Ø30 mm)", rim: "55981", tyre: "58090" },
 ];
 
+/**
+ * Baseplates: thin (4 LDU, half a plate), studs on top, nothing underneath. The general
+ * classifier can't frame them (bodies must be whole plates), so these are framed by hand:
+ * height 0 on the grid, top surface at y = 0, the body below it. Other baseplates (raised,
+ * road, printed) stay excluded.
+ */
+const BASEPLATES: { file: string; w: number; d: number }[] = [
+  { file: "3867.dat", w: 16, d: 16 },
+  { file: "3334.dat", w: 24, d: 16 },
+  { file: "3811.dat", w: 32, d: 32 },
+  { file: "3645.dat", w: 40, d: 24 },
+  { file: "4186.dat", w: 48, d: 48 },
+];
+
 /** Parts we never want: prints, stickers, aliases, minifig/Duplo/other systems, moved or obsolete files. */
 function excluded(file: string, title: string, lines: string[]): string | null {
   if (/^[~=_|]/.test(title)) return "alias, moved or shortcut";
@@ -221,6 +235,40 @@ function buildWheel(spec: (typeof WHEELS)[number]): { entry: CatalogEntry; bin: 
   return { entry, bin: meshBin(binTris, mesh.colors, (x, y, z) => [x, y, z]) };
 }
 
+/** A baseplate (see BASEPLATES): checked against its real studs and thickness, framed with its top at y = 0. */
+function buildBaseplate(spec: (typeof BASEPLATES)[number]): { entry: CatalogEntry; bin: Buffer } {
+  const mesh = partMesh(lib, spec.file);
+  if (mesh.missing.size) throw new Error(`${spec.file}: missing ${[...mesh.missing].join(", ")}`);
+  const [minX, minY, minZ] = mesh.min, [maxX, maxY, maxZ] = mesh.max;
+  const w = (maxX - minX) / 20, d = (maxZ - minZ) / 20;
+  // LDraw files are centred; some are long along z, so turn those to lie along x like our w × d.
+  if (!(w === spec.w && d === spec.d) && !(w === spec.d && d === spec.w)) throw new Error(`${spec.file}: ${w}×${d} studs, expected ${spec.w}×${spec.d}`);
+  const yaw = w === spec.w ? 0 : 90;
+  if (Math.abs(minY) > 0.01 || Math.abs(maxY - 4) > 0.01) throw new Error(`${spec.file}: expected the top at Y 0 and the body to Y 4, got ${minY}..${maxY}`);
+  const R = yawMatrix(yaw);
+  const tris: number[] = [];
+  for (let i = 0; i < mesh.tris.length; i += 3) tris.push(...mulV(R, [mesh.tris[i], mesh.tris[i + 1], mesh.tris[i + 2]]));
+  void minZ;
+  const id = spec.file.replace(/\.dat$/, "");
+  const title = tidy((lib.readLines(spec.file)?.[0] ?? "").replace(/^0\s*/, ""));
+  const entry: CatalogEntry = {
+    id,
+    name: title,
+    cat: "baseplate",
+    w: spec.w,
+    d: spec.d,
+    h: 0,
+    bottom: [],
+    solids: [],
+    mass: 0.5,
+    ldraw: { file: spec.file, yaw, origin: [0, 0, 0] },
+    hint: `ground layer: top at y = 0, studs on top only, nothing below; parts at y = 0 stand on its studs. Must lie at y = 0 in the main build.`,
+  };
+  const binTris: number[] = [];
+  for (let i = 0; i < tris.length; i += 3) binTris.push(tris[i] + 10 * spec.w, -tris[i + 1], 10 * spec.d - tris[i + 2]);
+  return { entry, bin: meshBin(binTris, mesh.colors, (x, y, z) => [x, y, z]) };
+}
+
 function entryFor(c: Classified, id: string): CatalogEntry {
   const all = (cs: { cell: [number, number] }[]) => cs.length === c.w * c.d;
   const studsAllTop = c.studs.length === c.w * c.d && c.studs.every((s) => s.level === c.h);
@@ -354,6 +402,12 @@ for (const spec of WHEELS) {
   fs.writeFileSync(path.join(OUT_MESH, `${entry.id}.bin`), bin);
   meshBytes += bin.length;
 }
+for (const spec of BASEPLATES) {
+  const { entry, bin } = buildBaseplate(spec);
+  entries.push(entry);
+  fs.writeFileSync(path.join(OUT_MESH, `${entry.id}.bin`), bin);
+  meshBytes += bin.length;
+}
 
 // Left/right pairs: from the titles, confirmed by LDCad's MIRROR_INFO where present.
 const byId = new Map(entries.map((e) => [e.id, e]));
@@ -371,7 +425,7 @@ fs.writeFileSync(OUT_JSON, JSON.stringify({ generated: new Date().toISOString().
 const byCat = new Map<string, number>();
 for (const e of entries) byCat.set(e.cat, (byCat.get(e.cat) ?? 0) + 1);
 const lines: string[] = [];
-lines.push(`Catalog: ${entries.length} parts (${unique.length} from ${kept.length} usable after merging near-duplicates, + ${WHEELS.length} wheels), ${files.length} LDraw files scanned in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+lines.push(`Catalog: ${entries.length} parts (${unique.length} from ${kept.length} usable after merging near-duplicates, + ${WHEELS.length} wheels, + ${BASEPLATES.length} baseplates), ${files.length} LDraw files scanned in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
 lines.push(`Meshes: ${(meshBytes / 1e6).toFixed(1)} MB in public/parts/`);
 lines.push(`By category: ${[...byCat].sort((a, b) => b[1] - a[1]).map(([c, n]) => `${c} ${n}`).join(", ")}`);
 lines.push(`Left/right pairs: ${entries.filter((e) => e.mirror).length / 2}`);

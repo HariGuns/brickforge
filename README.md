@@ -324,9 +324,10 @@ Medium keeps up on simple, regular builds (village, train) and falls behind wher
 
 ## Part catalog
 
-Claude can use **978 parts**:
+Claude can use **983 parts**:
 - **Hand-made core:** 52 parts in `src/lib/parts/library.ts`.
-- **Generated catalog:** 885 upright parts plus 41 side-stud parts in `src/lib/parts/catalog.json` (the side-stud parts only while sideways building is on; 937 parts without them).
+- **Generated catalog:** 885 upright parts, 41 side-stud parts and 5 baseplates in `src/lib/parts/catalog.json` (the side-stud parts only while sideways building is on; 942 parts without them).
+- **Baseplates:** 16×16 (3867), 24×16 (3334), 32×32 (3811), 40×24 (3645, BrickLink x244) and 48×48 (4186), framed by hand in `build-catalog` (other baseplates stay excluded). They're 4 LDU thick (half a plate), with studs on top only.
 
 The prompt lists a **core menu** of 150 (142 with sideways building off): the core parts plus the most useful catalog parts (`src/lib/parts/core.ts`, vehicle parts first). Claude finds the rest with the **`search_parts` tool** during design, which returns ids, sizes and connection info. Each run's `summary.json` records which catalog parts the model used and how many came from search; `npm run catalog-usage` adds them up.
 

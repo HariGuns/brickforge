@@ -53,6 +53,7 @@ export type PartCategory =
   | "flower"
   | "holder"
   | "wheel"
+  | "baseplate"
   | "vehicle"
   | "technic"
   | "other";

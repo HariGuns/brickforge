@@ -8,7 +8,7 @@ const ALL = [...CORE_PARTS, ...CATALOG_PARTS, ...SNOT_PARTS.filter((p) => !CATAL
 
 describe("BrickLink IDs (from Rebrickable)", () => {
   it("every part in the catalog, upright and sideways, has a BrickLink ID", () => {
-    expect(ALL.length).toBe(CORE_PARTS.length + 926);
+    expect(ALL.length).toBe(CORE_PARTS.length + 931); // 926 + 5 baseplates
     const missing = ALL.filter((p) => !bricklinkFor(p.id)?.every((b) => /^[a-z0-9]+$/i.test(b.id)));
     expect(missing.map((p) => p.id)).toEqual([]);
   });
