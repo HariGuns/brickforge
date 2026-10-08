@@ -1,7 +1,7 @@
-import { footprint, worldBottom } from "../model/geometry";
+import { footprint } from "../model/geometry";
 import type { BrickModel, Placement } from "../model/schema";
 import { getPart, PARTS } from "../parts/library";
-import { analyzeStructure } from "../validate/structure";
+import { baseplatesFor } from "../parts/baseplates";
 import { validate, type Issue } from "../validate/validator";
 
 /**
@@ -9,8 +9,8 @@ import { validate, type Issue } from "../validate/validator";
  * sub-build stands on the ground, and the ground holds anything: a lamp post
  * that is one tall 1×1 part passes. In a model it stands on studs, and that
  * single stud has to hold the whole post. So it's checked twice:
- *  - on a baseplate: a virtual studded surface joined to every part standing
- *    at y = 0 through its underside (weak joints and overhangs, any size);
+ *  - on a baseplate: the smallest real one under its footprint (weak joints
+ *    and overhangs: on a baseplate the ground no longer holds anything);
  *  - on a plate: a real plate under its footprint, compiled with the
  *    validator (parts that don't take studs, joints, overhangs). Skipped when
  *    the footprint is larger than the biggest plate, or for exact-frame parts.
@@ -47,31 +47,28 @@ export interface PlacementResult {
 }
 
 export function placementCheck(model: BrickModel): { errors: Issue[]; results: PlacementResult[] } {
-  const own = validate(model, { grid: FAR, maxParts: Infinity, structure: "off" });
-  const ownStructure = new Set(analyzeStructure(model, own.connections.filter((c) => c.kind !== "side"), "error").issues.map(key));
-
   // --- on a baseplate ---------------------------------------------------------------------
+  // The smallest real baseplate under its footprint, added after its parts so their numbers
+  // stay the same. It stands as it is (a baseplate has no height), so heights stay the same too.
+  const b = bounds(model.parts);
   const base = model.parts.length;
-  const joins = model.parts.flatMap((p, i) => {
-    const def = getPart(p.part);
-    if (!def || p.y !== 0 || p.frame) return [];
-    const studs = worldBottom(p, def).filter(([, , y]) => y === 0).length;
-    return studs ? [{ lower: base, upper: i, studs, kind: "stud" as const }] : [];
-  });
-  const onBase = analyzeStructure(
-    { ...model, parts: [...model.parts, { part: "__baseplate__", color: "black", x: 0, y: 0, z: 0, rot: 0 }] },
-    [...own.connections.filter((c) => c.kind !== "side"), ...joins],
-    "error",
-    { anchors: new Set([base]) },
-  ).issues.filter((i) => !ownStructure.has(key({ ...i, parts: i.parts.filter((k) => k !== base) })));
-  const baseplate: PlacementResult = {
-    surface: "baseplate",
-    issues: onBase.map((i) => ({ ...i, parts: i.parts.filter((k) => k !== base), message: `Standing on a baseplate, as it will in the model: ${i.message}` })),
-  };
+  const [bp] = baseplatesFor({ x0: b.x0, z0: b.z0, w: b.w, d: b.d }, "green");
+  let baseplate: PlacementResult;
+  {
+    const before = new Set(validate(model, { grid: FAR, maxParts: Infinity, structure: "error" }).errors.map(key));
+    const placed = validate({ ...model, parts: [...model.parts, bp] }, { grid: FAR, maxParts: Infinity, structure: "error" });
+    baseplate = {
+      surface: "baseplate",
+      plate: { id: bp.part, rot: bp.rot as 0 | 90 },
+      issues: placed.errors
+        .map((i) => ({ ...i, parts: i.parts.filter((k) => k !== base) }))
+        .filter((i) => !before.has(key(i)))
+        .map((i) => ({ ...i, message: `Standing on a baseplate (${getPart(bp.part)!.name}), as it will in the model: ${i.message}` })),
+    };
+  }
 
   // --- on a plate ------------------------------------------------------------------------------
   let plate: PlacementResult;
-  const b = bounds(model.parts);
   // The smallest plate that covers the footprint, turned 90° if only that way fits.
   const fit = PLATES.map(([w, d, id]) => (w >= b.w && d >= b.d ? { w, d, id, rot: 0 as const } : d >= b.w && w >= b.d ? { w: d, d: w, id, rot: 90 as const } : null)).find((x) => x);
   if (model.parts.some((p) => p.frame)) plate = { surface: "plate", issues: [], skipped: "it has exact-frame (sideways) parts" };

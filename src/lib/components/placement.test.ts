@@ -38,7 +38,8 @@ describe("placement check", () => {
     ]);
     // Reported once, with the original part numbers.
     expect(r.errors).toHaveLength(1);
-    expect(r.errors[0].message).toMatch(/^Standing on a baseplate, as it will in the model: #0 43888 @\(x=0,y=0,z=0\)/);
+    expect(r.errors[0].message).toMatch(/^Standing on a baseplate \(Baseplate 16×16\), as it will in the model: #0 43888 @\(x=0,y=0,z=0\)/);
+    expect(r.results[0].plate).toEqual({ id: "3867", rot: 0 });
   });
 
   it("passes a post with a 2×2 lower half, and leaves sound sub-builds alone", () => {

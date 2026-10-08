@@ -65,7 +65,7 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start the app |
-| `npm test` | All tests (224): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
+| `npm test` | All tests (227): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
@@ -196,7 +196,7 @@ Every valid sub-build is saved as a **component** in `components/` (one JSON fil
 - **Logs:** one `[generate] library:` line per reuse.
 - **`summary.json`:** `library` records what was offered, reused and saved.
 
-**Placement gate** (`src/lib/components/placement.ts`): on its own a sub-build stands on the ground, which holds anything, so a lamp post that is one tall 1×1 part passes. It's also checked standing on a baseplate (a virtual studded surface, any size) and on the smallest plate covering its footprint, as an assembly will place it. Sub-builds and split sub-builds get this check in their own repair loop (so a single-stud base is widened while it's designed), and a component that fails it isn't saved. Sideways panels are skipped. `npm run check-components` re-checks the library and lists failures; `--quarantine` moves them (and `--move <id>` any named one) to `components-quarantine/`, which planners never see.
+**Placement gate** (`src/lib/components/placement.ts`): on its own a sub-build stands on the ground, which holds anything, so a lamp post that is one tall 1×1 part passes. It's also checked standing on the smallest real baseplate under its footprint (where the baseplate, not the table, holds it) and on the smallest plate covering its footprint, as an assembly will place it. Sub-builds and split sub-builds get this check in their own repair loop (so a single-stud base is widened while it's designed), and a component that fails it isn't saved. Sideways panels are skipped. `npm run check-components` re-checks the library and lists failures; `--quarantine` moves them (and `--move <id>` any named one) to `components-quarantine/`, which planners never see.
 
 **Seeding:** `npm run seed-components` adds the valid sub-builds of every run in `debug/` and every saved build (`--from ~/.config/BrickForge` adds another data folder too). The default library also seeds itself the first time it's used, which covers runs copied into the desktop app. Seeded from this repo and the desktop app's runs: 70 components (one Huracán wheel set isn't valid on its own).
 
