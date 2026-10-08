@@ -171,3 +171,25 @@ The simulated town square (`npm run gen -- --simulate --detail very_high`) is th
 | 2026-10-08 | Sub-build trees and the component library | $4.59, 66 calls | $0.39, 2 calls | 406 |
 | 2026-10-09 | Repairs may not delete; placement gate | $4.59 | $0.39 | 406 (unchanged) |
 | 2026-10-09 | Scenes on baseplates: the town square is a scene and stands on a 48×48 green baseplate (its 48×32 footprint; there's no 48×32 baseplate) | $4.59 | $0.39 | **407** (+ the baseplate) |
+
+## 5. Live scene on a baseplate (2026-10-09, $0.68)
+
+`npm run gen -- --detail high --budget 5 "a park with a pond, a bench and two trees"`. Medium detail no longer exists, and High is the lowest level that uses the sub-build planner, which is what marks scenes. Log: `logs/live-scene-1.log`. Run folder: `debug/2026-10-08_19-52-47-subbuilds-a-park-with-a-pond-a-bench-and`.
+
+| | |
+|---|---|
+| Valid | yes, first try: no repair rounds, no removals, no warnings |
+| Plan | `scene: true`, ground green; 7 unique sub-builds, 15 copies |
+| Baseplate | one green 24×40 (3645) under the footprint, laid by the code |
+| Connections | all 31 parts at y = 0 stand on its studs (249 studs). Without it the scene falls apart into 25 separate sections, so the baseplate really is what ties it together |
+| Manual | page 1 is "Baseplate" (3645 ×1); the main build starts with it in place |
+| Parts | 305 |
+| Library | 4 components reused (trees, bench, lamp posts, fence: 8 copies, ~$0.21 saved), 3 new saved |
+| Cost / time | $0.68 / 215 s |
+| LeoCAD | renders (`docs/live-scene-park.png`) |
+
+**Result: it works, so baseplates stay on by default.**
+
+**One thing to note:** the scene covers only about the back half of the baseplate. A few stray small parts at the front stretch the footprint, so the smallest baseplate that covers it is larger than the scene needs.
+
+**Total API spend since sub-builds were introduced:** $40.89 + $0.68 = **$41.57**.
