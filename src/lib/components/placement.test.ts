@@ -20,6 +20,12 @@ const tmp = () => {
 
 // A lamp post like run 1's: one tall round 1×1 brick with a lamp on top.
 const lamp = [P("43888", "black", 0, 0, 0), P("round_brick_1x1", "yellow", 0, 18, 0), P("round_plate_1x1", "black", 0, 21, 0)];
+// The hand fix: a 2×2 lower half, so no single stud holds more than 12 plates.
+const fixedLamp = [
+  P("round_plate_2x2", "black", 0, 0, 0), P("round_brick_2x2", "black", 0, 1, 0), P("round_brick_2x2", "black", 0, 4, 0),
+  P("round_brick_1x1", "black", 0, 7, 0), P("round_brick_1x1", "black", 0, 10, 0), P("round_brick_1x1", "black", 0, 13, 0),
+  P("round_plate_1x1", "trans_clear", 0, 16, 0), P("round_tile_1x1", "black", 0, 17, 0),
+];
 const sub = (id: string, parts: ReturnType<typeof P>[]) => [{ id, name: "Lamp post", parts, uses: [] }];
 
 describe("placement check", () => {
@@ -35,9 +41,9 @@ describe("placement check", () => {
     expect(r.errors[0].message).toMatch(/^Standing on a baseplate, as it will in the model: #0 43888 @\(x=0,y=0,z=0\)/);
   });
 
-  it("passes the same post on a 2×2 round plate, and leaves sound sub-builds alone", () => {
-    const fixed = [P("round_plate_2x2", "black", 0, 0, 0), ...lamp.map((p) => ({ ...p, y: p.y + 1 }))];
-    expect(placementCheck({ name: "l", description: "", parts: fixed }).errors).toEqual([]);
+  it("passes a post with a 2×2 lower half, and leaves sound sub-builds alone", () => {
+    expect(placementCheck({ name: "l", description: "", parts: fixedLamp }).errors).toEqual([]);
+    expect(validate({ name: "l", description: "", parts: fixedLamp }, { structure: "error" }).valid).toBe(true);
     for (const s of SAMPLE_VILLAGE.subBuilds.filter((x) => !x.uses.length)) expect(placementCheck({ name: s.id, description: "", parts: s.parts }).errors).toEqual([]);
   });
 
@@ -50,8 +56,12 @@ describe("placement check", () => {
   it("keeps a component that only passes on its own out of the library, with the reason", () => {
     let why = "";
     expect(makeComponent(sub("lamp_post", lamp), "lamp_post", { rejected: (w) => (why = w) })).toBeNull();
-    expect(why).toMatch(/fails when placed: WEAK_JOINT/);
-    expect(makeComponent(sub("lamp_post", [P("round_plate_2x2", "black", 0, 0, 0), ...lamp.map((p) => ({ ...p, y: p.y + 1 }))]), "lamp_post", {})).not.toBeNull();
+    expect(why).toMatch(/fails the placement gate: WEAK_JOINT/);
+    // A 2×2 plate under the same post doesn't help: the post still stands on one stud (a warning on its own).
+    why = "";
+    expect(makeComponent(sub("lamp_post", [P("round_plate_2x2", "black", 0, 0, 0), ...lamp.map((p) => ({ ...p, y: p.y + 1 }))]), "lamp_post", { rejected: (w) => (why = w) })).toBeNull();
+    expect(why).toMatch(/WEAK_JOINT/);
+    expect(makeComponent(sub("lamp_post", fixedLamp), "lamp_post", {})).not.toBeNull();
   });
 
   it("makes a sub-build repair a single-stud base during its own design (simulated Claude)", async () => {

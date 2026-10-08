@@ -13,7 +13,7 @@ const HINTS: Partial<Record<IssueCode, string>> = {
   UNKNOWN_COLOR: "Use only colors from the color list.",
   INVALID_OUTPUT: "Return valid JSON matching the schema.",
   FEATURE_REMOVED: "Don't delete planned parts or copies to make an error go away. Put back what you removed, then fix it in place: move it, re-attach it with glue parts, or put a wider part under it.",
-  WEAK_JOINT: "The part holds too much on one stud. Don't delete it: put a wider part under it (e.g. a 2×2 plate or round plate under a 1×1 post), or bond it to neighbours so more studs clutch it; split tall single-stud stacks with plates that tie into the rest.",
+  WEAK_JOINT: "The part holds too much on one stud. Don't delete it: make the lower part wider (e.g. a tall 1×1 post becomes 2×2 round bricks at the bottom, with at most 12 plates of 1×1 on top), or or bond it to neighbours so more studs clutch it; split tall single-stud stacks with plates that tie into the rest.",
   OVERSTRESSED: "The weight sits too far from the studs holding it. Add support closer to the weight (a pillar or a wider part underneath), shorten the overhang, or clutch it with more studs near the load.",
   DETACHED_SUBBUILD: "Move the copy so its bottom sits on studs of the model, or add glue parts that tie it in.",
   SUBBUILD_UNSUPPORTED: "A copy is placed as one piece, so its bottom must sit on studs below it (or the ground), not hang from something above.",

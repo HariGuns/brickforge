@@ -97,3 +97,14 @@ export function placementCheck(model: BrickModel): { errors: Issue[]; results: P
   const errors = [...baseplate.issues, ...plate.issues.filter((i) => !seen.has(key(i)))];
   return { errors, results: [baseplate, plate] };
 }
+
+/**
+ * The library gate: what keeps a compiled sub-build out of the library. Its
+ * own structural warnings (a weak joint is only a warning after the last
+ * repair round) plus what the placement check finds. Sideways panels mount on
+ * side studs and are only checked for their own warnings.
+ */
+export function gateProblems(model: BrickModel, ownWarnings: Issue[], sideways = false): Issue[] {
+  const own = ownWarnings.filter((w) => w.code === "WEAK_JOINT" || w.code === "OVERSTRESSED");
+  return sideways ? own : [...own, ...placementCheck(model).errors];
+}
