@@ -121,7 +121,7 @@ export function seedLibrary(o: { dir?: string; debugDir?: string; buildsDir?: st
   const candidates: Candidate[] = [];
   for (const r of list(debugDir).sort()) {
     const dir = path.join(/*turbopackIgnore: true*/ debugDir, r);
-    if (!fs.statSync(dir).isDirectory()) continue;
+    if (!fs.statSync(dir, { throwIfNoEntry: false })?.isDirectory()) continue; // gone since the listing
     const c = fromRun(dir);
     if (c.length) report.runs++;
     candidates.push(...c);
