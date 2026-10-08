@@ -123,3 +123,41 @@ Logs: `logs/live-tree-{1,2}.log`. Runs: `debug/2026-10-08_18-38-01-subbuilds-a-t
 | **Total** | **$38.61** |
 
 $34.56 of that came before this test, and these two runs added $4.05. Not counted: requests that failed before they wrote a round. There are 3 run folders with no rounds; failed requests are normally not billed.
+
+## 4. Re-run after the repair and library fixes (2026-10-09, $2.28)
+
+The fixes:
+- **Repairs may not delete planned features** (`FEATURE_REMOVED`, see `src/lib/claude/features.ts`). A repair round fails when copies of a sub-build are gone, when a part type is gone completely, or when a container lost more than 3 parts or 10% of its parts (whichever is smaller). Removals are listed in `summary.json` (`repairRemovals`).
+- **Placement gate** (`src/lib/components/placement.ts`). A sub-build must hold standing on a baseplate and on a plate:
+  - it's checked in its own repair loop;
+  - a component that fails isn't saved to the library;
+  - its own structural warnings fail the gate too.
+- **Library clean-up.** `npm run check-components` re-checked the 92 components, and only `lamp_post_b0bf21` failed.
+  - It and the faceless `clock_tower_05c36d` were moved to `components-quarantine/`.
+  - The hand-fixed lamp post (`lamp_post_6e7e2b`, with `handFixed` metadata) has a 2×2 lower half, so no single stud holds more than 12 plates.
+
+Run 1 again (same prompt, empty library, `--budget 10`). Log: `logs/live-tree-3.log`. Run folder: `debug/2026-10-08_19-21-20-subbuilds-a-town-square-…`.
+
+| | Run 1 (before) | Re-run |
+|---|---|---|
+| Valid | yes | yes |
+| Parts / unique / copies | 1,575 / 18 / 69 | 1,144 / 15 / 52 |
+| Lamp posts (planned → in the model) | 6 → 0 (replaced by loose bricks) | **6 → 6** |
+| Clock faces | 4 sideways faces planned, all removed by the repair | built into the clock stage's walls (white squares with black hands); not a separate sub-build this time, so nothing was removed |
+| Repair rounds | 3 | 7 |
+| Repair removals | 6 lamp-post copies, 4 clock faces and 11 parts, all accepted | 3: 2 rejected (lamp post, tree), then fixed in place; 1 accepted (2 tree parts) |
+| Cost / time | $2.93 / 547 s | **$2.28** / 256 s |
+| LeoCAD | renders | renders (`docs/live-tree-rerun.png`, tower: `docs/live-tree-rerun-clock-tower.png`) |
+
+**Lamp post:**
+1. Its first answer was a 1×1 column on one stud (`WEAK_JOINT`).
+2. The first repair deleted 2 parts and was rejected (`FEATURE_REMOVED`), with the placement check still reporting the weak joint.
+3. The second repair fixed it in place.
+
+**Tree:** the first repair deleted every round 1×1 brick and was rejected. The second kept them, removing only 2 parts, which is within the limit.
+
+**Clock faces: not settled.** They survive, but this run didn't test the sideways case that failed before. The planner wrote "clock faces mounted on side-stud bricks" for the clock stage, but the stage was built with no side-stud parts. The faces are simple and read partly like windows.
+
+**Library afterwards:** 106 components (the 91 before plus 15 new), all passing the gate. 2 are in quarantine.
+
+**Total API spend since sub-builds were introduced:** $38.61 + $2.28 = **$40.89**.
