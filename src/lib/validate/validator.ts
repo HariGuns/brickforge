@@ -21,6 +21,7 @@ export type IssueCode =
   | "UNSUPPORTED"
   | "DISCONNECTED"
   | "WEAK_CONNECTION"
+  | "FEATURE_REMOVED"
   // wheels
   | "LOOSE_WHEEL"
   | "PIN_TAKEN"

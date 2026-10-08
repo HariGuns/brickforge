@@ -65,7 +65,7 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start the app |
-| `npm test` | All tests (210): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
+| `npm test` | All tests (214): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
@@ -442,6 +442,7 @@ Download › BrickLink wanted list writes an `.xml` to upload at BrickLink › W
 
   It also gives a `WEAK_CONNECTION` warning for a part held by a single stud. Parts connect only when the studs on top of one plug into the underside of the part directly above. Sitting on the ground supports a part but doesn't connect it to anything.
 - **Repair loop** (`src/lib/claude/generate.ts`): uses structured JSON output (a hand-written JSON schema, so enums are enforced), adaptive thinking and effort `high`. Each repair round continues the same conversation and appends the validator's errors. The loop stops at the first valid model, or after `maxRepairRounds` and returns the attempt with the fewest errors.
+- **Repairs don't delete** (`src/lib/claude/features.ts`, `CONFIG.repair`): each repair round is compared with the loop's first answer. It fails with `FEATURE_REMOVED` when copies of a sub-build are gone, when a part type is gone completely, or when a container lost more than 3 parts or 10% of its parts (whichever is smaller). Replacing a part is fine. Every removal, accepted or rejected, is listed in `summary.json` (`repairRemovals`) and by the CLI.
 - **Steps** (`src/lib/steps/steps.ts`): parts are grouped into layers by bottom height and split into balanced steps. Every part rests on a part from an earlier step. `checkStepOrder` verifies this.
 - **LDraw** (`src/lib/ldraw/export.ts`): 1 stud = 20 LDU, 1 plate = 8 LDU, and −Y is up. The grid is turned 180° about x, so parts are never mirrored. Each part carries its own LDraw yaw and origin offset, and `verify-ldraw` checks them.
 

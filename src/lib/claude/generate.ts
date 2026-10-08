@@ -26,6 +26,7 @@ import type { BrickDesign } from "../design/schema";
 import type { CompileResult } from "../design/compile";
 import type { CostBreakdown } from "./breakdown";
 import { Budget } from "./budget";
+import type { Removal } from "./features";
 
 export type ImageMediaType = "image/jpeg" | "image/png" | "image/webp" | "image/gif";
 
@@ -62,6 +63,8 @@ export interface GenerateResult {
   library?: { reused: number; copies: number; saved: number; added: number };
   /** Sub-build path: cost by level, kind of call, and new vs reused components. */
   costBreakdown?: CostBreakdown;
+  /** Parts, part types and copies that repair rounds removed, and whether each counted as a failed repair. */
+  repairRemovals?: Removal[];
 }
 
 /** A run stopped at its budget cap: what it spent, what didn't start, and how to finish it. */
@@ -199,6 +202,8 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
       },
       // Repairs return only the changes.
       diff: { schema: modelDiffJsonSchema(fmt), apply: (prev, json) => applyModelDiff(prev, json, fmt), listing: (m) => modelListing(m, fmt), instructions: DIFF_INSTRUCTIONS },
+      // Repairs may not delete what the first answer built (see features.ts).
+      containers: (m) => [{ id: "main", parts: m.parts }],
       // Structural issues (weak joints, overhangs) block acceptance during repair
       // rounds; after the last round they're reported as warnings instead.
       check: (model, last) => {
@@ -259,6 +264,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
     pipeline: "single",
     ...(photo ? { analysis: { analysis: photo.analysis, target: photo.target, cost: photo.usage.cost } } : {}),
     ...(refine ? { refine: refine.log } : {}),
+    repairRemovals: loop.removals,
   };
   const catalog = catalogUsage(result.model);
   console.log(`[generate] ${formatCatalogUsage(catalog)}`);
@@ -266,6 +272,7 @@ export async function generateModel(input: GenerateInput, onEvent: (e: GenerateE
     pipeline: "single",
     valid: result.valid,
     rounds: loop.rounds,
+    repairRemovals: loop.removals,
     ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, usage: photo.usage } } : {}),
     ...(refine ? { refine: { rounds: refine.log, usage: refine.usage } } : {}),
     total: result.usage,

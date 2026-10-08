@@ -151,7 +151,7 @@ export interface DesignOptions extends GenerateOptions {
 
 /** A loop result rebuilt from an earlier run's saved rounds. */
 function reusedLoop<T>(cp: StageCheckpoint<T>, value: T, partCount: number): LoopResult<T> {
-  return { best: { value, check: { errors: [], warnings: [], valid: true, partCount } }, rounds: cp.rounds, usage: sumUsage(cp.rounds.map((r) => r.usage)) };
+  return { best: { value, check: { errors: [], warnings: [], valid: true, partCount } }, rounds: cp.rounds, removals: [], usage: sumUsage(cp.rounds.map((r) => r.usage)) };
 }
 
 /** Resume the sub-build run saved in `dir` (its debug folder). */
@@ -373,6 +373,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
         tools: [searchPartsTool],
         parse: (t) => parseJson(t, BrickModelSchema),
         diff: { schema: modelDiffJsonSchema(fmt), apply: (prev, json) => applyModelDiff(prev, json, fmt), listing: (m) => modelListing(m, fmt), instructions: DIFF_INSTRUCTIONS },
+        containers: (m) => [{ id: scope, parts: m.parts }],
         check: (model, last) => {
           const v = validate(model, { grid: { x: node.w, z: node.d, y: node.h }, maxParts: Math.min(CONFIG.maxParts, Math.ceil(node.parts * 1.6) + 10), structure: last ? "warn" : "error" });
           return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: model.parts.length };
@@ -460,6 +461,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
               listing: (a) => designListing({ name: a.name, description: a.description, subBuilds: [], main: { parts: a.parts, uses: a.uses } }),
               instructions: `Return only the changes to this sub-build: remove / set / add for its parts and removeCopies / setCopies / addCopies for its copies, by index into the listing above (before your changes). Leave the name and description empty to keep them. Everything you don't mention stays as it is.`,
             },
+            containers: (a) => [{ id: node.id, parts: a.parts, uses: a.uses }],
             check: (a, last) => {
               const c = compileSubBuild(designFor(a), node.id, { grid: { x: node.w, z: node.d, y: node.h }, structure: last ? "warn" : "error" });
               return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
@@ -503,6 +505,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
         listing: (a) => designListing({ name: a.name, description: a.description, subBuilds: [], main: { parts: a.parts, uses: a.uses } }),
         instructions: `Return only the changes to the main build: remove / set / add for its parts and removeCopies / setCopies / addCopies for its copies, by index into the listing above (before your changes). Leave the name and description empty to keep them. Everything you don't mention stays as it is.`,
       },
+      containers: (a) => [{ id: "main", parts: a.parts, uses: a.uses }],
       check: (a, last) => {
         const c = compileDesign(designOf(a), { structure: last ? "warn" : "error" });
         return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
@@ -516,6 +519,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
   // --- result -------------------------------------------------------------------------------
   const rounds = [...(photo?.rounds ?? []), ...earlierRounds, ...planLoop.rounds, ...childLoops.flatMap((s) => s.loop.rounds), ...subLoops.flatMap((s) => s.loop.rounds), ...asmLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
   let design = a ? designOf(a) : null;
+  const repairRemovals = [...subLoops, ...asmLoops].flatMap((s) => s.loop.removals).concat(assembly.removals);
 
   // Photo builds: compare renders with the photo and refine the design (valid designs only).
   let refine: { usage: RoundUsage; log: RefineLog[] } | null = null;
@@ -596,6 +600,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
     ...(refine ? { refine: refine.log } : {}),
     ...(lib ? { library: { reused: reused.length, copies: reused.reduce((n, r) => n + r.copies, 0), saved: reused.reduce((n, r) => n + r.saved, 0), added: added.length } } : {}),
     costBreakdown: costBreakdown(rounds, (id) => ptree.nodes.get(id)?.depth ?? 1, reused, { cap: budget.cap, spent: budget.spent }),
+    repairRemovals,
   };
   const stages = {
     ...(photo ? { analysis: { subject: photo.analysis.subject, target: photo.target, rounds: photo.rounds.length, cost: photo.usage.cost } } : {}),
@@ -623,7 +628,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
   console.log(`[generate] ${formatCatalogUsage(catalog)}`);
   const library = lib ? { offered: { plan: offered.length, childPlans: offeredChild }, reused, savedCost: reused.reduce((n, r) => n + r.saved, 0), added, size: lib.components.length } : undefined;
   console.log(`[generate] cost: ${formatBreakdown(result.costBreakdown!)}`);
-  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, ...(library ? { library } : {}), costBreakdown: result.costBreakdown, rounds, total: usage, cache: cacheSummary(usage), ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
+  debug.write("summary.json", { pipeline: "subbuilds", valid: result.valid, stages, ...(library ? { library } : {}), costBreakdown: result.costBreakdown, repairRemovals, rounds, total: usage, cache: cacheSummary(usage), ...(resumed ? { resumed } : {}), partCount: result.model?.parts.length ?? 0, compile: compiled?.stats, catalog });
   if (design) debug.write("final-design.json", design);
   if (result.model) debug.write("final-model.json", result.model);
   if (resumed) console.log(`[generate] resumed: reused plan=${resumed.reused.plan}, sub-builds [${resumed.reused.subBuilds.join(", ")}], assembly=${resumed.reused.assembly}; earlier $${resumed.costBefore.toFixed(4)}, now $${resumed.costNow.toFixed(4)}`);

@@ -108,6 +108,11 @@ console.log(`\nValid: ${result.valid} · parts: ${result.model?.parts.length ?? 
 for (const r of result.rounds) console.log(`  ${r.scope} round ${r.round}: ${r.errorCount} errors · ${r.seconds.toFixed(0)}s · ${formatUsage(r.usage)}${r.reused ? " (earlier run)" : ""}`);
 console.log(`  total: ${formatUsage(result.usage)}`);
 if (result.costBreakdown) console.log(`  cost: ${formatBreakdown(result.costBreakdown)}`);
+if (result.repairRemovals?.length) {
+  const { formatRemoval } = await import("../src/lib/claude/features");
+  console.log(`  repair removals: ${result.repairRemovals.length} (${result.repairRemovals.filter((r) => r.rejected).length} rejected)`);
+  for (const r of result.repairRemovals) console.log(`    ${formatRemoval(r)}`);
+} else console.log("  repair removals: none");
 if (result.library) console.log(`  library: ${result.library.reused} components reused (${result.library.copies} copies, ~$${result.library.saved.toFixed(2)} saved), ${result.library.added} new components saved`);
 if (result.model) {
   const out = CONFIG.exportsDir;

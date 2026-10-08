@@ -44,7 +44,7 @@ describe("model and effort per stage", () => {
   it("sends each round with its stage's model and effort, and prices it with that model's rates", async () => {
     CONFIG.stages.design = { effort: "high" };
     CONFIG.stages.repair = { model: "claude-sonnet-5", effort: "medium" };
-    const broken = { ...SAMPLE_HOUSE, parts: [...SAMPLE_HOUSE.parts, P("brick_2x2", "red", 20, 9, 20)] };
+    const broken = { ...SAMPLE_HOUSE, parts: [...SAMPLE_HOUSE.parts, P("brick_1x2", "red", 20, 9, 20)] };
     const { client, requests } = fake([JSON.stringify(broken), JSON.stringify({ name: "", description: "", remove: [broken.parts.length - 1], set: [], add: [] })]);
     const r = await generateModel({ text: "tiny house" }, () => {}, { client });
     dirs.push(r.debugDir);

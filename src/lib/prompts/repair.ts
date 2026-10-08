@@ -3,7 +3,7 @@ import type { Issue, IssueCode } from "../validate/validator";
 
 /** Short fix hints per error type, appended once per type present. */
 const HINTS: Partial<Record<IssueCode, string>> = {
-  OVERLAP: "Move or resize one of the two parts, or remove one. Remember slopes fill their whole box and rot 90/270 swaps the footprint.",
+  OVERLAP: "Move or resize one of the two parts (for a sideways copy, mount it on another side stud, or use a brick with side studs instead of a bracket); don't delete planned copies. Remember slopes fill their whole box and rot 90/270 swaps the footprint.",
   FLOATING: "Put the part directly on studs of a part below it (its y must equal that part's top), or add a supporting part underneath. Side-by-side contact does not connect.",
   UNSUPPORTED: "Rest the part on studs of a part below it. A part can't hang from the underside of a part above.",
   DISCONNECTED: "Tie the section to the main structure with parts that span both (e.g. a plate or brick across the gap), or bond it via the base layer.",
@@ -12,7 +12,8 @@ const HINTS: Partial<Record<IssueCode, string>> = {
   UNKNOWN_PART: "Use only part ids from the parts table.",
   UNKNOWN_COLOR: "Use only colors from the color list.",
   INVALID_OUTPUT: "Return valid JSON matching the schema.",
-  WEAK_JOINT: "The part holds too much on one stud. Put a wider part under it, or bond it to neighbours so more studs clutch it; split tall single-stud stacks with plates that tie into the rest.",
+  FEATURE_REMOVED: "Don't delete planned parts or copies to make an error go away. Put back what you removed, then fix it in place: move it, re-attach it with glue parts, or put a wider part under it.",
+  WEAK_JOINT: "The part holds too much on one stud. Don't delete it: put a wider part under it (e.g. a 2×2 plate or round plate under a 1×1 post), or bond it to neighbours so more studs clutch it; split tall single-stud stacks with plates that tie into the rest.",
   OVERSTRESSED: "The weight sits too far from the studs holding it. Add support closer to the weight (a pillar or a wider part underneath), shorten the overhang, or clutch it with more studs near the load.",
   DETACHED_SUBBUILD: "Move the copy so its bottom sits on studs of the model, or add glue parts that tie it in.",
   SUBBUILD_UNSUPPORTED: "A copy is placed as one piece, so its bottom must sit on studs below it (or the ground), not hang from something above.",

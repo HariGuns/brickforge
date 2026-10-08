@@ -28,8 +28,9 @@ const schemaProps = (q: Anthropic.MessageCreateParams) => ((q.output_config?.for
 
 /**
  * "bad-mount": the first assembly names a side stud 47905 doesn't have; the repair fixes that copy.
- * "stray-part": the first assembly has a floating part listed before the carrier; the repair only
- * removes it, so the mounts must be renumbered (carrier #2 → #1) for the result to be valid.
+ * "stray-part": the first assembly has a floating part listed before the carrier. The first repair
+ * only removes it: the mounts are renumbered (carrier #2 → #1), but deleting a planned part type is a
+ * failed repair (FEATURE_REMOVED). The second repair puts the part back, attached to the base.
  */
 function fakeClient(scenario: "bad-mount" | "stray-part" = "bad-mount") {
   const requests: Anthropic.MessageCreateParams[] = [];
@@ -44,7 +45,9 @@ function fakeClient(scenario: "bad-mount" | "stray-part" = "bad-mount") {
           text = JSON.stringify(
             scenario === "bad-mount"
               ? { name: "", description: "", remove: [], set: [], add: [], removeCopies: [], setCopies: [{ index: 1, value: good[1] }], addCopies: [] }
-              : { name: "", description: "", remove: [0], set: [], add: [], removeCopies: [], setCopies: [], addCopies: [] },
+              : params.messages.length === 3
+                ? { name: "", description: "", remove: [0], set: [], add: [], removeCopies: [], setCopies: [], addCopies: [] }
+                : { name: "", description: "", remove: [], set: [], add: [P("plate_1x1", "yellow", 0, 1, 0)], removeCopies: [], setCopies: [], addCopies: [] },
           );
         else if ("uses" in props)
           text = JSON.stringify(
@@ -104,15 +107,18 @@ describe("sideways sub-builds (fake Claude)", () => {
 });
 
 describe("sideways copies survive part edits (fake Claude)", () => {
-  it("renumbers mounts when a repair removes a part listed before the carrier", async () => {
+  it("renumbers mounts when a repair removes a part listed before the carrier, and rejects deleting it", async () => {
     const { client, requests } = fakeClient("stray-part");
     const r = await generateDesign({ text: "two side panels", detail: "standard" }, () => {}, { client });
     dirs.push(r.debugDir);
     expect(r.valid).toBe(true);
-    expect(r.rounds.filter((x) => x.scope === "assembly")).toHaveLength(2); // no extra round for the mounts
+    // Round 1 (the deletion) fails only for the deletion: its mounts were renumbered correctly.
+    expect(r.rounds.filter((x) => x.scope === "assembly").map((x) => x.errorCodes)).toEqual([{ FLOATING: 1 }, { FEATURE_REMOVED: 1 }, {}]);
+    expect(r.repairRemovals).toEqual([expect.objectContaining({ scope: "assembly", round: 1, typesLost: ["plate_1x1"], rejected: true })]);
     const repair = requests.at(-1)!.messages.at(-1)!.content as string;
     expect(repair).toMatch(/A mount's part number refers to this listing too/);
-    expect(r.design!.main.parts.map((p) => p.part)).toEqual(["plate_4x4", "47905"]);
+    expect(repair).toMatch(/\[FEATURE_REMOVED\]/);
+    expect(r.design!.main.parts.map((p) => p.part)).toEqual(["plate_4x4", "47905", "plate_1x1"]);
     expect(r.design!.main.uses.map((u) => compactCodec.formatInstance(u))).toEqual(good);
   });
 

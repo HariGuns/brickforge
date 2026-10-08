@@ -49,7 +49,7 @@ afterAll(() => dirs.forEach((d) => fs.rmSync(d, { recursive: true, force: true }
 
 describe("generate/repair loop (fake Claude)", () => {
   it("feeds validator errors back and stops when the model is valid", async () => {
-    const broken = { ...SAMPLE_HOUSE, parts: [...SAMPLE_HOUSE.parts, P("brick_2x2", "red", 20, 9, 20)] }; // floating part
+    const broken = { ...SAMPLE_HOUSE, parts: [...SAMPLE_HOUSE.parts, P("brick_1x2", "red", 20, 9, 20)] }; // floating part (a type the house has, so removing it is allowed)
     // The repair removes the floating part by its index.
     const { client, requests } = fakeClient([JSON.stringify(broken), diff({ remove: [broken.parts.length - 1] })]);
     const events: GenerateEvent[] = [];

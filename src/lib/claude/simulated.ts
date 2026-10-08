@@ -215,8 +215,10 @@ export class TownScript {
 }
 
 export interface SimOptions {
-  /** Names whose first answer is broken (a raised copy or a floating brick), to exercise repairs. */
+  /** Names whose first answer is broken (a raised copy, or a leaf's top brick lifted off its studs), to exercise repairs. */
   failFirst?: string[];
+  /** Split sub-builds (or "Town square" for the main build) whose first repair deletes the copies of their first child; the next repair puts them back. */
+  dropOnRepair?: string[];
   /** Pretend usage per call is this many times the default (default 1). */
   costScale?: number;
   /** Library components to recolour when reused: component name → ["red>blue"]. */
@@ -277,9 +279,13 @@ export function simulatedClient(o: SimOptions = {}): Pick<Anthropic, "messages">
       const n = name ? script.byName.get(name) : script.root;
       if (!n || !isSplit(n)) throw new Error(`Simulated Claude: no split sub-build "${name}".`);
       const key = name || "main";
-      const broken = !repair && o.failFirst?.includes(n.name) && !failed.has(key);
+      const drop = o.dropOnRepair?.includes(n.name);
+      const broken = !repair ? (drop || o.failFirst?.includes(n.name)) && !failed.has(key) : false;
       if (broken) failed.add(key);
-      return { kind: name ? "subAssembly" : "assembly", name: n.name, json: script.assembly(n, broken) };
+      const json = script.assembly(n, broken);
+      // First repair of a dropOnRepair build: "fixes" the raised copy by deleting that child's copies.
+      if (drop && params.messages.length === 3) json.uses = json.uses.filter((u) => u.sub !== json.uses[0].sub);
+      return { kind: name ? "subAssembly" : "assembly", name: n.name, json };
     }
     const name = quoted(/Design the sub-build "([^"]+)"/);
     const n = script.byName.get(name);
@@ -287,7 +293,7 @@ export function simulatedClient(o: SimOptions = {}): Pick<Anthropic, "messages">
     const parts = script.leafParts(n);
     const broken = !repair && o.failFirst?.includes(n.name) && !failed.has(n.name);
     if (broken) failed.add(n.name);
-    return { kind: "leaf", name, json: { name: n.name, description: `${n.name} (simulated).`, parts: broken ? [...parts, pl("brick_1x1", "red", 0, n.layers * 3 + 3, 0)] : parts } };
+    return { kind: "leaf", name, json: { name: n.name, description: `${n.name} (simulated).`, parts: broken ? parts.map((p, i) => (i === parts.length - 1 ? { ...p, y: p.y + 3 } : p)) : parts } };
   }
 
   /** Library components listed in a plan prompt: component name → id. */

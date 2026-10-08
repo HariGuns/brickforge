@@ -5,6 +5,7 @@ import { repairPrompt } from "../prompts/repair";
 import type { DebugRun } from "./debug";
 import { cacheHit, formatUsage, sumUsage, toRoundUsage, type RoundUsage } from "./usage";
 import type { Budget } from "./budget";
+import { featureLoss, formatRemoval, type FeatureContainer, type Removal } from "./features";
 
 /**
  * The generate → validate → repair loop, shared by the single-pass generator
@@ -67,6 +68,8 @@ export interface LoopSpec<T> {
   parse: (text: string) => { value: T | null; issues: Issue[] };
   /** Validate a parsed value. `last` = no repair round follows (structural issues become warnings). */
   check: (value: T, last: boolean) => CheckResult;
+  /** The value's containers (parts and copies): repair rounds may not delete from them (see features.ts). */
+  containers?: (value: T) => FeatureContainer[];
   maxRepairRounds?: number;
   repairText?: (errors: Issue[], warnings: Issue[], round: number) => string;
   /** Client-side tools Claude may call before answering. */
@@ -118,6 +121,8 @@ export interface LoopResult<T> {
   /** The first valid value, or the one with the fewest errors. */
   best: { value: T; check: CheckResult } | null;
   rounds: RoundSummary[];
+  /** What repair rounds removed against the first answer (see features.ts). */
+  removals: Removal[];
   usage: RoundUsage;
 }
 
@@ -147,6 +152,9 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
   let best: LoopResult<T>["best"] = null;
   /** The last answer that parsed (valid or not): what a repair diff applies to. */
   let lastValue: T | null = null;
+  /** The first answer that parsed: what repairs may not delete from. */
+  let firstValue: T | null = null;
+  const removals: Removal[] = [];
   const schema = spec.diff ? mergedSchema(spec.schema, spec.diff.schema) : spec.schema;
   let startedOnce = false;
   const started = () => {
@@ -280,6 +288,13 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
       if (value !== null) lastValue = value;
       if (value !== null) {
         check = spec.check(value, round === maxRounds);
+        if (spec.containers && firstValue !== null && round > 0) {
+          const loss = featureLoss(spec.scope, round, spec.containers(firstValue), spec.containers(value));
+          removals.push(...loss.removals);
+          for (const r of loss.removals) console.log(`[generate] repair removal: ${formatRemoval(r)}`);
+          if (loss.issues.length) check = { ...check, errors: [...check.errors, ...loss.issues], valid: false };
+        }
+        firstValue ??= value;
         issues = check.errors;
         warnings = check.warnings;
       } else {
@@ -322,5 +337,5 @@ export async function runLoop<T>(spec: LoopSpec<T>, ctx: LoopContext): Promise<L
     messages.push({ role: "user", content: (spec.repairText ?? ((e, w, r) => repairPrompt(e, w, { round: r, diff })))(issues, warnings, round + 1) });
   }
 
-  return { best, rounds, usage: sumUsage(rounds.map((r) => r.usage)) };
+  return { best, rounds, removals, usage: sumUsage(rounds.map((r) => r.usage)) };
 }

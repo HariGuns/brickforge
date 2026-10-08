@@ -93,6 +93,12 @@ export const CONFIG = {
   /** Repair rounds after the initial generation. */
   maxRepairRounds: 4,
   /**
+   * A repair may not delete planned features (see claude/features.ts): a
+   * container may lose at most maxPartLoss parts or maxPartLossShare of its
+   * parts, whichever is smaller; losing copies or a whole part type fails too.
+   */
+  repair: { maxPartLoss: 3, maxPartLossShare: 0.1 },
+  /**
    * Sideways building (studs on sides, sideways sub-build copies). On by default;
    * NEXT_PUBLIC_BRICKFORGE_SIDEWAYS=0 turns it off (read at startup; baked into the
    * client at build time). Off: side-stud parts aren't loaded, sideways copies can't
