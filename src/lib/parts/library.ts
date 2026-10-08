@@ -377,6 +377,9 @@ export const PART_MAP: ReadonlyMap<string, PartDef> = new Map(PARTS.map((p) => [
 const SNOT_MAP: ReadonlyMap<string, PartDef> = new Map(SNOT_PARTS.map((p) => [p.id, p]));
 
 /** A part by id; side-stud parts only while sideways building is enabled (checked at call time). */
+/** How far a part reaches below its footprint, in plates: a baseplate's 4 LDU body lies under y = 0. */
+export const depthBelow = (def: PartDef): number => (def.category === "baseplate" ? 0.5 : 0);
+
 export function getPart(id: string): PartDef | undefined {
   const def = PART_MAP.get(id) ?? SNOT_MAP.get(id);
   return def?.snot && !CONFIG.sideways.enabled ? undefined : def;

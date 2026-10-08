@@ -161,13 +161,7 @@ function bounds(model: BrickModel | null): THREE.Box3 {
   for (const pl of model?.parts ?? []) {
     const def = getPart(pl.part);
     if (!def) continue;
-    if (pl.frame) {
-      box.union(placementBox(pl, def));
-      continue;
-    }
-    const fp = footprint(pl, def);
-    box.expandByPoint(new THREE.Vector3(fp.x0, fp.y0 * PLATE_H, fp.z0));
-    box.expandByPoint(new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H, fp.z0 + fp.sz));
+    box.union(placementBox(pl, def));
   }
   if (box.isEmpty()) box.set(new THREE.Vector3(0, 0, 0), new THREE.Vector3(8, 2, 8));
   return box;
@@ -265,8 +259,9 @@ export default function Viewer(props: ViewerProps) {
         shadow-camera-bottom={-gridSize}
       />
       <directionalLight position={[center.x - 30, 20, center.z - 20]} intensity={0.4} />
-      <gridHelper key={props.theme} args={[gridSize, gridSize, scene.grid1, scene.grid2]} position={[Math.round(center.x), -0.001, Math.round(center.z)]} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[center.x, -0.002, center.z]} receiveShadow>
+      {/* The floor sits under anything that reaches below y = 0 (a baseplate's body). */}
+      <gridHelper key={props.theme} args={[gridSize, gridSize, scene.grid1, scene.grid2]} position={[Math.round(center.x), Math.min(0, box.min.y) - 0.001, Math.round(center.z)]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[center.x, Math.min(0, box.min.y) - 0.002, center.z]} receiveShadow>
         <planeGeometry args={[gridSize, gridSize]} />
         <shadowMaterial opacity={scene.shadow} />
       </mesh>

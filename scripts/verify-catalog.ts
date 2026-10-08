@@ -11,7 +11,7 @@
  *
  * Usage: npm run verify-ldraw   (runs this after the core check)
  */
-import { CATALOG_PARTS, getPart, SNOT_PARTS, type PartDef } from "../src/lib/parts/library";
+import { CATALOG_PARTS, depthBelow, getPart, SNOT_PARTS, type PartDef } from "../src/lib/parts/library";
 import { footprint, worldBottom, worldPins, worldSideStuds, worldStuds } from "../src/lib/model/geometry";
 import { frameTransform, ldrawTransform, LDU_PLATE, LDU_STUD, type Mat3 } from "../src/lib/ldraw/export";
 import { CONFIG } from "../src/lib/config";
@@ -89,7 +89,7 @@ function checkPart(def: PartDef, rot: Rot): string[] {
       if (pinCyl.length && vs.every(inPin)) continue;
       for (const v of vs) for (let a = 0; a < 3; a++) (min[a] = Math.min(min[a], v[a]), (max[a] = Math.max(max[a], v[a])));
     }
-    const exp = { minX: fp.x0 * LDU_STUD, maxX: (fp.x0 + fp.sx) * LDU_STUD, minZ: -(fp.z0 + fp.sz) * LDU_STUD, maxZ: -fp.z0 * LDU_STUD, minY: -fp.y1 * LDU_PLATE, maxY: -fp.y0 * LDU_PLATE };
+    const exp = { minX: fp.x0 * LDU_STUD, maxX: (fp.x0 + fp.sx) * LDU_STUD, minZ: -(fp.z0 + fp.sz) * LDU_STUD, maxZ: -fp.z0 * LDU_STUD, minY: -fp.y1 * LDU_PLATE, maxY: -(fp.y0 - depthBelow(def)) * LDU_PLATE }; // a baseplate's body reaches 4 LDU below its top
     const xz = OVERHANG + 1.01, y = 1.31;
     if (exp.minX - min[0] > xz || max[0] - exp.maxX > xz || exp.minZ - min[2] > xz || max[2] - exp.maxZ > xz) problems.push(`body sticks out of the footprint: x ${min[0].toFixed(1)}..${max[0].toFixed(1)} vs ${exp.minX}..${exp.maxX}, z ${min[2].toFixed(1)}..${max[2].toFixed(1)} vs ${exp.minZ}..${exp.maxZ}`);
     if (!near(min[1], exp.minY, y) || !near(max[1], exp.maxY, y)) problems.push(`height: y ${min[1].toFixed(1)}..${max[1].toFixed(1)} vs ${exp.minY}..${exp.maxY}`);

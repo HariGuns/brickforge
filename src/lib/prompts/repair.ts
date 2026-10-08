@@ -12,6 +12,7 @@ const HINTS: Partial<Record<IssueCode, string>> = {
   UNKNOWN_PART: "Use only part ids from the parts table.",
   UNKNOWN_COLOR: "Use only colors from the color list.",
   INVALID_OUTPUT: "Return valid JSON matching the schema.",
+  BASEPLATE_NOT_ON_GROUND: "A baseplate is the ground layer: put it at y=0 in the main build and build on its studs; it can't be raised or stacked.",
   FEATURE_REMOVED: "Don't delete planned parts or copies to make an error go away. Put back what you removed, then fix it in place: move it, re-attach it with glue parts, or put a wider part under it.",
   WEAK_JOINT: "The part holds too much on one stud. Don't delete it: make the lower part wider (e.g. a tall 1×1 post becomes 2×2 round bricks at the bottom, with at most 12 plates of 1×1 on top), or or bond it to neighbours so more studs clutch it; split tall single-stud stacks with plates that tie into the rest.",
   OVERSTRESSED: "The weight sits too far from the studs holding it. Add support closer to the weight (a pillar or a wider part underneath), shorten the overhang, or clutch it with more studs near the load.",

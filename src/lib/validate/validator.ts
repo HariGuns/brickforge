@@ -22,6 +22,7 @@ export type IssueCode =
   | "DISCONNECTED"
   | "WEAK_CONNECTION"
   | "FEATURE_REMOVED"
+  | "BASEPLATE_NOT_ON_GROUND"
   // wheels
   | "LOOSE_WHEEL"
   | "PIN_TAKEN"
@@ -179,6 +180,21 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
     });
   }
 
+  // --- baseplates: a ground layer --------------------------------------------------
+  // Height 0, top at y = 0: they fill no grid cells, so the voxel check can't see them.
+  // They must lie on the ground (nothing can go under them) and not on each other.
+  const baseplates = ok.filter((r) => r.def.category === "baseplate");
+  for (const r of baseplates)
+    if (r.pl.frame || r.pl.y !== 0)
+      errors.push({ code: "BASEPLATE_NOT_ON_GROUND", severity: "error", parts: [r.index], message: `${describe(r.pl, r.index)} is a baseplate: it must lie flat on the ground at y=0 (in the main build), with nothing under it.` });
+  for (let i = 0; i < baseplates.length; i++)
+    for (let j = i + 1; j < baseplates.length; j++) {
+      const a = baseplates[i].fp, b = baseplates[j].fp;
+      const cells = Math.max(0, Math.min(a.x0 + a.sx, b.x0 + b.sx) - Math.max(a.x0, b.x0)) * Math.max(0, Math.min(a.z0 + a.sz, b.z0 + b.sz) - Math.max(a.z0, b.z0));
+      if (cells && a.y0 === b.y0)
+        errors.push({ code: "OVERLAP", severity: "error", parts: [baseplates[i].index, baseplates[j].index], message: `${describe(parts[baseplates[i].index], baseplates[i].index)} and ${describe(parts[baseplates[j].index], baseplates[j].index)} are baseplates lying on the same ${cells} stud cell(s); put them side by side.` });
+    }
+
   // --- stud connections -------------------------------------------------------
   // Index every anti-stud by (height, cell); a stud at the same height and cell clutches it.
   const underside = new Map<string, number>(); // "y|x,z" -> part index
@@ -323,7 +339,11 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
   const mode = opts.structure ?? "warn";
   if (mode !== "off" && errors.length === 0) {
     // The structural estimate covers upright joints (sideways joints aren't modelled yet).
-    structure = analyzeStructure(model, connections.filter((c) => c.kind !== "side"), mode === "error" ? "error" : "warning");
+    // On a baseplate the ground is the baseplate: a part standing on its studs is held by them,
+    // not by the table (a single-stud post on a baseplate is a weak joint, as it would be for real).
+    const onPlate = new Set(baseplates.map((r) => r.index));
+    const anchors = onPlate.size ? new Set(ok.filter((r) => onPlate.has(r.index) || (r.pl.y === 0 && !connections.some((c) => c.upper === r.index && onPlate.has(c.lower)))).map((r) => r.index)) : undefined;
+    structure = analyzeStructure(model, connections.filter((c) => c.kind !== "side"), mode === "error" ? "error" : "warning", { anchors });
     for (const issue of structure.issues) (issue.severity === "error" ? errors : warnings).push(issue);
   }
 

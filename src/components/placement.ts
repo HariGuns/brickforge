@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { footprint } from "@/lib/model/geometry";
 import type { Placement } from "@/lib/model/schema";
-import type { PartDef } from "@/lib/parts/library";
+import { depthBelow, type PartDef } from "@/lib/parts/library";
 import { worldBoxes } from "@/lib/sideways/frame";
 import { PLATE_H } from "./brickGeometry";
 
@@ -30,7 +30,7 @@ export function placementMatrix(pl: Placement, def: PartDef): THREE.Matrix4 {
 export function placementBox(pl: Placement, def: PartDef): THREE.Box3 {
   if (!pl.frame) {
     const fp = footprint(pl, def);
-    return new THREE.Box3(new THREE.Vector3(fp.x0, fp.y0 * PLATE_H, fp.z0), new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H, fp.z0 + fp.sz));
+    return new THREE.Box3(new THREE.Vector3(fp.x0, (fp.y0 - depthBelow(def)) * PLATE_H, fp.z0), new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H, fp.z0 + fp.sz));
   }
   const b = new THREE.Box3();
   for (const [x0, y0, z0, x1, y1, z1] of worldBoxes(pl, def)) b.union(new THREE.Box3(new THREE.Vector3(x0 / 20, y0 / 20, z0 / 20), new THREE.Vector3(x1 / 20, y1 / 20, z1 / 20)));

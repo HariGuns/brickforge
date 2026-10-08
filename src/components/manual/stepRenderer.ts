@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { COLOR_MAP } from "@/lib/parts/colors";
-import { getPart } from "@/lib/parts/library";
+import { depthBelow, getPart } from "@/lib/parts/library";
 import { footprint } from "@/lib/model/geometry";
 import type { BrickModel } from "@/lib/model/schema";
 import type { BuildStep } from "@/lib/steps/steps";
@@ -189,7 +189,7 @@ function modelScene(model: BrickModel): ModelScene {
       for (const piece of partFixedPieces(pl.part)) g.add(new THREE.Mesh(piece.geo, material(piece.colorId, false)));
       meshes.push(mesh);
       edges.push(line);
-      const b = pl.frame ? placementBox(pl, def) : new THREE.Box3(new THREE.Vector3(fp.x0, fp.y0 * PLATE_H, fp.z0), new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H + 0.2, fp.z0 + fp.sz));
+      const b = pl.frame ? placementBox(pl, def) : new THREE.Box3(new THREE.Vector3(fp.x0, (fp.y0 - depthBelow(def)) * PLATE_H, fp.z0), new THREE.Vector3(fp.x0 + fp.sx, fp.y1 * PLATE_H + 0.2, fp.z0 + fp.sz));
       bounds.push(b);
       box.union(b);
     } else {
@@ -280,7 +280,7 @@ export function renderPartIcon(partId: string, colorId: string): Promise<PartIco
         g.add(new THREE.Mesh(geo, material(colorId, false)), new THREE.LineSegments(eg, OLD_EDGE));
         for (const piece of partFixedPieces(partId)) g.add(new THREE.Mesh(piece.geo, material(piece.colorId, false)));
         scene.add(g);
-        box.set(new THREE.Vector3(-def.w / 2, 0, -def.d / 2), new THREE.Vector3(def.w / 2, def.h * PLATE_H + 0.2, def.d / 2));
+        box.set(new THREE.Vector3(-def.w / 2, -depthBelow(def) * PLATE_H, -def.d / 2), new THREE.Vector3(def.w / 2, def.h * PLATE_H + 0.2, def.d / 2));
       } else box.set(new THREE.Vector3(), new THREE.Vector3(1, 1, 1));
       const { cam, x0, x1, y0, y1 } = isoView(box);
       const pad = 0.12;

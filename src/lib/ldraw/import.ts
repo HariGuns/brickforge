@@ -162,7 +162,8 @@ export function importLdr(text: string, fallbackName = "Imported model"): Import
         skipped.push({ line: lineNo, reason: "part is off the stud grid" });
         continue;
       }
-      parts.push({ part: def.id, color: colorId, x: Math.round(x), y: Math.round(y), z: Math.round(z), rot });
+      // + 0 turns -0 into 0 (a baseplate's top at LDraw Y 0 gives y = -0).
+      parts.push({ part: def.id, color: colorId, x: Math.round(x) + 0, y: Math.round(y) + 0, z: Math.round(z) + 0, rot });
     }
   }
 

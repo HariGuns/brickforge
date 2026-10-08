@@ -37,11 +37,14 @@ export function buildSteps(model: BrickModel, opts: StepOptions = {}): BuildStep
   for (const [h, upper] of hang) (withHangers.get(upper) ?? withHangers.set(upper, []).get(upper)!).push(h);
 
   const layers = new Map<number, number[]>();
+  const baseplates: number[] = [];
   const wheels: number[] = [];
   const sideways: number[] = [];
   parts.forEach((p, i) => {
     // Sideways parts go on after the upright build (they clip onto its side studs).
     if (p.frame) return void sideways.push(i);
+    // Baseplates are laid first, in a step of their own.
+    if (getPart(p.part)?.category === "baseplate") return void baseplates.push(i);
     // Wheels go on last, once their holders are in place (they hang below them).
     if (getPart(p.part)?.hub) return void wheels.push(i);
     if (hang.has(i)) return;
@@ -51,6 +54,7 @@ export function buildSteps(model: BrickModel, opts: StepOptions = {}): BuildStep
   });
 
   const steps: BuildStep[] = [];
+  if (baseplates.length) steps.push({ n: 1, parts: baseplates.sort((a, b) => parts[a].z - parts[b].z || parts[a].x - parts[b].x || a - b), y: 0 });
   for (const y of [...layers.keys()].sort((a, b) => a - b)) {
     const layer = layers.get(y)!.sort((a, b) => parts[a].z - parts[b].z || parts[a].x - parts[b].x || a - b);
     const units = layer.map((i) => [i, ...(withHangers.get(i) ?? [])]);
