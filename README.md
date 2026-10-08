@@ -65,14 +65,14 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start the app |
-| `npm test` | All tests (209): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
+| `npm test` | All tests (210): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
 | `npm run gen -- --detail high "a rubber duck"` | Detail: `standard` (default), `high` or `very_high`, the same choice as the Detail buttons in the chat |
 | `npm run gen -- --pipeline subbuilds --detail high "a castle"` | Generator path: `single`, `subbuilds` or `auto` (the default: sub-builds for High and Very high) |
 | `npm run gen -- --tree "a town square"` | Deeper sub-build trees (`--no-tree` to turn them off); on by default for Very high |
-| `npm run gen -- --budget 15 "a town square"` | Budget cap in USD for the model: stops before a call would go over it and prints how to resume |
+| `npm run gen -- --budget 15 "a town square"` | Budget cap in USD for the model: stops before a call would go over it and prints how to resume. Without `--budget`, the CLI caps every run at `CONFIG.defaultBudget` ($5) |
 | `npm run gen -- --simulate "a town square"` | The simulated Claude (no API calls): builds the scripted town square in tree mode; its data goes to `sim/` |
 | `npm run seed-components` | Seed the component library from the valid sub-builds of every run and saved build (`--dry-run`, `--from <data folder>`) |
 | `npm run gen -- --resume debug/<run folder>` | Finish an interrupted sub-build run: reuses its valid plan, sub-builds and assembly, redoes the rest, and writes into the same folder. Earlier and new cost are reported separately |
@@ -202,7 +202,7 @@ Simulated result: the town square, run twice with the same library. Run 1 made 6
 ## Budget cap
 
 `--budget 15` (CLI), the **Cap** menu in the chat, or `budget` in the API sets a cap in USD for the whole model (`src/lib/claude/budget.ts`):
-- **Before each call:** every API call reserves an estimate first: the larger of a per-stage default and 1.25× the costliest call of that stage so far. A call that would take spent + reserved over the cap doesn't start. Calls that are already running finish.
+- **Before each call:** every API call reserves an estimate first: the larger of a per-stage default and 1.25× the costliest call of that stage so far. A call that would take spent + reserved over the cap doesn't start, and from then on no call starts. Calls that are already running finish, and the stop is reported once they have, so the progress line, the error and `stopped.json` give the same total.
 - **When it's reached:** a sub-build run stops and saves its valid sub-builds to the library. It writes `stopped.json` (spent, what didn't start, the cost breakdown) and prints the command to resume with a higher cap. Earlier spending counts toward the new cap.
 - **Limits:** a call can cost more than its estimate, so a run can end slightly over; it's reported as it is.
 

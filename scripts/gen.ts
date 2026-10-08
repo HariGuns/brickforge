@@ -7,7 +7,8 @@
  *   npm run gen -- --pipeline single "a castle"         (single | subbuilds | auto; default from CONFIG.generator)
  *   npm run gen -- --resume debug/<run folder>          (finish an interrupted sub-build run)
  *   npm run gen -- --tree / --no-tree "a town square"   (deeper sub-build trees; default on for Very high)
- *   npm run gen -- --budget 15 "a town square"          (budget cap in USD: stops and reports before a call would go over it)
+ *   npm run gen -- --budget 15 "a town square"          (budget cap in USD: stops and reports before a call would go over it;
+ *                                                        without it, CONFIG.defaultBudget ($5) applies)
  *   npm run gen -- --simulate "a town square"           (simulated Claude, no API calls: always the scripted town square,
  *                                                        tree mode; data goes to sim/ instead of the repo's debug/, exports/, components/)
  * Writes exports/<name>.ldr/.mpd and a debug folder under ./debug.
@@ -66,13 +67,14 @@ for (const [flag, on] of [["--tree", true], ["--no-tree", false]] as const) {
   const k = args.indexOf(flag);
   if (k >= 0) (args.splice(k, 1), (tree = on));
 }
-// --budget 15: cap in USD for the whole model (a resumed run counts what it spent before).
+// --budget 15: cap in USD for the whole model (a resumed run counts what it spent before). Never uncapped: CONFIG.defaultBudget otherwise.
 const bgi = args.indexOf("--budget");
-const budget = bgi >= 0 ? Number(args.splice(bgi, 2)[1]) : undefined;
-if (budget !== undefined && !(budget > 0)) {
+const budget = bgi >= 0 ? Number(args.splice(bgi, 2)[1]) : CONFIG.defaultBudget;
+if (!(budget > 0)) {
   console.error("--budget needs a positive amount in USD, e.g. --budget 15");
   process.exit(2);
 }
+console.log(`budget cap: $${budget.toFixed(2)}${bgi >= 0 ? "" : " (default; --budget to change it)"}`);
 const bi = args.indexOf("--base");
 const base = bi >= 0 ? JSON.parse(fs.readFileSync(args.splice(bi, 2)[1], "utf8")) : undefined;
 const text = args.join(" ").trim() || undefined;

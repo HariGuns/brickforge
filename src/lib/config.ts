@@ -81,6 +81,8 @@ export const CONFIG = {
    * what they're planning, and valid sub-builds are saved after each run.
    */
   library: { enabled: true, offer: 20 },
+  /** Budget cap in USD for a CLI run without --budget, so a live run is never uncapped by accident. */
+  defaultBudget: 5,
   /**
    * Structural estimate (see validate/structure.ts). Mass: grams per 1 stud × 1 stud
    * × 1 plate of part volume (a 2×4 brick ≈ 2.3 g); slopes are ~75% solid.
