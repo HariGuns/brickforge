@@ -174,6 +174,8 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     return await designRun(input, (e) => (e.type === "start" && (dir = e.debugDir), onEvent(e)), opts, budget);
   } catch (e) {
     if (!(e instanceof BudgetExceeded) || !dir) throw e;
+    // Calls already running finish first, so the progress line, the error and stopped.json share one total.
+    await budget.idle();
     const rounds = roundsIn(dir);
     const breakdown = costBreakdown(rounds, depthsIn(dir), [], { cap: e.cap, spent: budget.spent });
     let savedComponents = 0;
@@ -183,7 +185,7 @@ export async function generateDesign(input: GenerateInput, onEvent: (e: Generate
     console.log(`[generate] budget cap $${e.cap.toFixed(2)} reached: spent $${budget.spent.toFixed(2)}; ${e.next.scope} (~$${e.next.estimate.toFixed(2)}) didn't start. ${formatBreakdown(breakdown)}`);
     onEvent({ type: "budget", cap: e.cap, spent: budget.spent, next: e.next, resume, savedComponents });
     const err = new BudgetExceeded(e.cap, budget.spent, e.next);
-    err.message = `${e.message} Finished stages are saved${savedComponents ? ` (${savedComponents} valid sub-builds added to the component library)` : ""}. Resume with a higher cap: ${resume}`;
+    err.message = `${err.message} Finished stages are saved${savedComponents ? ` (${savedComponents} valid sub-builds added to the component library)` : ""}. Resume with a higher cap: ${resume}`;
     throw err;
   }
 }

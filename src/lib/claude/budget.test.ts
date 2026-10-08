@@ -28,7 +28,11 @@ describe("budget", () => {
     a.settle(0.05);
     c.settle(0.05);
     expect(b.spent).toBeCloseTo(0.1);
-    expect(() => b.reserve("sub:c", "subBuild")).not.toThrow();
+    // Settled calls free their reservation (on a budget that hasn't refused one).
+    const s = new Budget(0.3);
+    s.reserve("sub:a", "subBuild").settle(0.05);
+    s.reserve("sub:b", "subBuild").settle(0.05);
+    expect(() => s.reserve("sub:c", "subBuild")).not.toThrow();
     // Estimates grow with what calls really cost.
     const big = new Budget(null);
     big.reserve("assembly", "assembly").settle(2);
@@ -38,6 +42,22 @@ describe("budget", () => {
     const f = new Budget(0.2);
     f.reserve("x", "subBuild").release();
     expect(() => f.reserve("y", "subBuild")).not.toThrow();
+  });
+
+  it("stops for good once a call is refused, and waits for the calls still running", async () => {
+    const b = new Budget(0.3);
+    const running = b.reserve("sub:a", "subBuild");
+    b.reserve("sub:b", "subBuild").settle(0.1);
+    expect(() => b.reserve("assembly", "assembly")).toThrow(BudgetExceeded);
+    // A cheap call that would fit is refused too: nothing new starts after the stop.
+    expect(() => b.reserve("sub:c", "repair")).toThrow(BudgetExceeded);
+    let idle = false;
+    const done = b.idle().then(() => (idle = true));
+    await Promise.resolve();
+    expect(idle).toBe(false);
+    running.settle(0.15);
+    await done;
+    expect(b.spent).toBeCloseTo(0.25);
   });
 
   it("stops a tree run before the cap, saves what's valid, and resumes under a higher cap", async () => {
@@ -58,6 +78,10 @@ describe("budget", () => {
     expect(stop.spent).toBeCloseTo(spent, 6);
     const stopped = JSON.parse(fs.readFileSync(path.join(dir, "stopped.json"), "utf8"));
     expect(stopped).toMatchObject({ reason: "budget", cap });
+    // One total everywhere: the progress event, the error and stopped.json.
+    expect(err.spent).toBe(stop.spent);
+    expect(stopped.spent).toBe(stop.spent);
+    expect(err.message).toContain(`$${stop.spent.toFixed(2)} spent`);
     expect(stopped.breakdown.total).toBeCloseTo(spent, 3);
     // The valid sub-builds designed before the stop are in the library.
     expect(stop.savedComponents).toBeGreaterThan(0);

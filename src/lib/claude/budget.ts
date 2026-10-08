@@ -11,6 +11,10 @@ import type { Stage } from "../config";
  * expensive call of that stage seen so far in this run. A call can still cost
  * more than its estimate, so the total can end slightly over the cap; it's
  * reported as it is.
+ *
+ * Once one call is refused the budget is stopped: no later call starts either,
+ * and calls already running finish. idle() resolves when none are left, so the
+ * stop is reported with one final total (spent includes every call that ran).
  */
 
 /** Rough cost of one call per stage before any has been seen (USD, Opus 5.5, from real runs). */
@@ -41,7 +45,11 @@ export class BudgetExceeded extends Error {
 
 export class Budget {
   spent = 0;
+  /** The refusal that stopped the budget; every later reserve() throws too. */
+  stopped: BudgetExceeded | null = null;
   private reserved = 0;
+  private running = 0;
+  private waiting: (() => void)[] = [];
   private largest = new Map<Stage, number>();
 
   /** `spent` starts at what earlier rounds of the same model already cost (resume). */
@@ -59,20 +67,30 @@ export class Budget {
   /** Reserve a call's estimate, or throw BudgetExceeded if it would go over the cap. */
   reserve(scope: string, stage: Stage): { settle: (cost: number) => void; release: () => void } {
     const est = this.estimate(stage);
-    if (this.cap !== null && this.spent + this.reserved + est > this.cap) throw new BudgetExceeded(this.cap, this.spent, { scope, estimate: est });
+    if (this.stopped) throw new BudgetExceeded(this.stopped.cap, this.spent, this.stopped.next);
+    if (this.cap !== null && this.spent + this.reserved + est > this.cap) throw (this.stopped = new BudgetExceeded(this.cap, this.spent, { scope, estimate: est }));
     this.reserved += est;
+    this.running++;
     let open = true;
     const close = () => {
-      if (open) (open = false), (this.reserved -= est);
+      if (!open) return;
+      open = false;
+      this.reserved -= est;
+      if (--this.running === 0) this.waiting.splice(0).forEach((f) => f());
     };
     return {
       settle: (cost: number) => {
-        close();
         this.spent += cost;
+        close();
         this.largest.set(stage, Math.max(this.largest.get(stage) ?? 0, cost));
       },
       release: close,
     };
+  }
+
+  /** Resolves once no call is running (all settled or released). */
+  idle(): Promise<void> {
+    return this.running === 0 ? Promise.resolve() : new Promise((f) => this.waiting.push(f));
   }
 
   /** What's left under the cap (null = no cap). */
