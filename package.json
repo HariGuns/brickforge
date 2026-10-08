@@ -23,7 +23,8 @@
     "build-catalog": "tsx scripts/build-catalog.ts",
     "catalog-usage": "tsx scripts/catalog-usage.ts",
     "token-report": "tsx scripts/token-report.ts",
-    "seed-components": "tsx scripts/seed-components.ts"
+    "seed-components": "tsx scripts/seed-components.ts",
+    "check-components": "tsx scripts/check-components.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

@@ -21,7 +21,7 @@ for (let k = args.indexOf("--from"); k >= 0; k = args.indexOf("--from")) {
 const dir = CONFIG.componentsDir;
 for (const f of folders) {
   const r: SeedReport = seedLibrary({ dir, dryRun, ...f });
-  console.log(`${dryRun ? "[dry run] " : ""}${path.dirname(path.resolve(f.debugDir))}: ${r.runs} runs and ${r.builds} saved builds, ${r.found} sub-builds found, ${r.added} added, ${r.duplicates} duplicates, ${r.invalid} not valid on their own.`);
+  console.log(`${dryRun ? "[dry run] " : ""}${path.dirname(path.resolve(f.debugDir))}: ${r.runs} runs and ${r.builds} saved builds, ${r.found} sub-builds found, ${r.added} added, ${r.duplicates} duplicates, ${r.invalid} not valid on their own, ${r.rejected} failing when placed.`);
   for (const s of r.skipped) console.log(`  skipped ${s}`);
 }
 if (!dryRun) {

@@ -15,4 +15,5 @@ exports/
 /dist/
 /electron/build-info.json
 /components/
+/components-quarantine/
 /sim/

@@ -53,7 +53,11 @@ export function partMass(def: PartDef): number {
 
 const round = (n: number, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
 
-export function analyzeStructure(model: BrickModel, connections: Connection[], severity: Issue["severity"] = "warning"): StructureReport {
+/**
+ * `anchors`: parts that count as fixed ground (e.g. a virtual baseplate, see
+ * components/placement.ts). Without it, any part standing at y = 0 does.
+ */
+export function analyzeStructure(model: BrickModel, connections: Connection[], severity: Issue["severity"] = "warning", opts: { anchors?: Set<number> } = {}): StructureReport {
   const cfg = CONFIG.structure;
   const defs = model.parts.map((p) => getPart(p.part));
   const fps = model.parts.map((p, i) => (defs[i] ? footprint(p, defs[i]!) : null));
@@ -128,7 +132,7 @@ export function analyzeStructure(model: BrickModel, connections: Connection[], s
     const stack = [start];
     while (stack.length) {
       const k = stack.pop()!;
-      if (model.parts[k].y === 0 || below.has(k)) return { heldElsewhere: true, parts: seen };
+      if ((opts.anchors ? opts.anchors.has(k) : model.parts[k].y === 0) || below.has(k)) return { heldElsewhere: true, parts: seen };
       for (const c of adj.get(k) ?? []) {
         if (cut.has(c)) continue;
         const m = c.lower === k ? c.upper : c.lower;

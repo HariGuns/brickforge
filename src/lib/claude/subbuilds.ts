@@ -26,6 +26,7 @@ import { assemblyJsonSchema, assemblyPrompt, planJsonSchema, planPrompt, subBuil
 import { childPlanJsonSchema, childPlanPrompt, subAssemblyPrompt, type ChildPlan } from "../prompts/tree";
 import { checkChildPlan, checkTreePlan, isLibrary, PlanTree, type LibraryRef, type TreeNode } from "./tree";
 import { compileSubBuild } from "../design/compile";
+import { placementCheck } from "../components/placement";
 import { importComponent, libraryListing, loadLibrary, makeComponent, markReused, saveComponent, searchLibrary, type Library } from "../components/library";
 import { libraryId } from "./tree";
 import { seedRun } from "../components/seed";
@@ -34,7 +35,7 @@ import { costBreakdown, depthsIn, formatBreakdown, roundsIn } from "./breakdown"
 import { validate, type Issue } from "../validate/validator";
 import { buildSteps } from "../steps/steps";
 import { DebugRun } from "./debug";
-import { runLoop, type LoopResult, type RoundSummary } from "./loop";
+import { runLoop, type CheckResult, type LoopResult, type RoundSummary } from "./loop";
 import { loadCheckpoint, type Checkpoint, type StageCheckpoint } from "./checkpoint";
 import { formatUsage, sumUsage } from "./usage";
 import { getClient, invalidOutput, type GenerateEvent, type GenerateInput, type GenerateOptions, type GenerateResult } from "./generate";
@@ -147,6 +148,19 @@ export interface DesignOptions extends GenerateOptions {
   checkpoint?: Checkpoint;
   /** Component library folder (default CONFIG.componentsDir), or false for none. */
   library?: string | false;
+}
+
+/**
+ * A sub-build must also hold when placed on studs, as the assembly will place
+ * it (see components/placement.ts). Like other structural issues, what it finds
+ * blocks acceptance during repair rounds and is a warning after the last one.
+ * Sideways panels mount on side studs and aren't tested.
+ */
+function withPlacement(check: CheckResult, model: BrickModel, sideways: boolean, last: boolean): CheckResult {
+  if (sideways || !check.valid && check.errors.some((e) => e.code !== "WEAK_JOINT" && e.code !== "OVERSTRESSED")) return check;
+  const placed = placementCheck(model).errors;
+  if (!placed.length) return check;
+  return last ? { ...check, warnings: [...check.warnings, ...placed.map((e) => ({ ...e, severity: "warning" as const }))] } : { ...check, errors: [...check.errors, ...placed], valid: false };
 }
 
 /** A loop result rebuilt from an earlier run's saved rounds. */
@@ -376,7 +390,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
         containers: (m) => [{ id: scope, parts: m.parts }],
         check: (model, last) => {
           const v = validate(model, { grid: { x: node.w, z: node.d, y: node.h }, maxParts: Math.min(CONFIG.maxParts, Math.ceil(node.parts * 1.6) + 10), structure: last ? "warn" : "error" });
-          return { errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: model.parts.length };
+          return withPlacement({ errors: v.errors, warnings: v.warnings, valid: v.valid, partCount: model.parts.length }, model, !!node.sideways, last);
         },
       },
       first ? { ...ctx, onStarted: firstStarted } : ctx,
@@ -464,7 +478,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
             containers: (a) => [{ id: node.id, parts: a.parts, uses: a.uses }],
             check: (a, last) => {
               const c = compileSubBuild(designFor(a), node.id, { grid: { x: node.w, z: node.d, y: node.h }, structure: last ? "warn" : "error" });
-              return { errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces };
+              return withPlacement({ errors: c.errors, warnings: c.warnings, valid: !c.errors.length, partCount: c.stats.pieces }, c.model, !!node.sideways, last);
             },
           },
           ctx,
@@ -574,6 +588,7 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
         cost: costOf(sb.id),
         run: debug.dir.split(/[\\/]/).pop(),
         request,
+        rejected: (why) => console.log(`[generate] library: not saving ${sb.id}: ${why}`),
       });
       if (comp && saveComponent(lib, comp).added) added.push(comp.id);
     }

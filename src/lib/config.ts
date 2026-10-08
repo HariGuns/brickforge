@@ -161,6 +161,8 @@ export const CONFIG = {
   exportsDir: `${DATA}exports`,
   /** Component library: one JSON file per saved component (see components/library.ts). */
   componentsDir: `${DATA}components`,
+  /** Components kept out of the library (failed the placement check, or set aside by hand); planners never see them. */
+  quarantineDir: `${DATA}components-quarantine`,
 };
 
 /** Model and effort for a stage's round (round 0 = its first answer; later rounds are repairs). */

@@ -143,7 +143,11 @@ export class TownScript {
   private sizes = new Map<string, Size>();
   private layouts = new Map<string, { base: Placement[]; spots: Rect[]; w: number; d: number }>();
 
-  constructor(readonly root: Split = TOWN_SQUARE) {
+  /** `tall`: leaves planned 18 plates tall (room for weakFirst's column). */
+  constructor(
+    readonly root: Split = TOWN_SQUARE,
+    private tall = new Set<string>(),
+  ) {
     const walk = (n: SimNode) => {
       if (n !== root) this.byName.set(n.name, n);
       if (isSplit(n)) n.children.forEach(walk);
@@ -155,7 +159,7 @@ export class TownScript {
     const got = this.sizes.get(n.id);
     if (got) return got;
     let s: Size;
-    if (!isSplit(n)) s = { w: n.w, d: n.d, h: n.layers * 3, parts: n.layers };
+    if (!isSplit(n)) s = { w: n.w, d: n.d, h: this.tall.has(n.name) ? Math.max(18, n.layers * 3) : n.layers * 3, parts: this.tall.has(n.name) ? 5 : n.layers };
     else {
       const lay = this.layout(n);
       const kids = n.children.map((c) => this.size(c));
@@ -217,6 +221,11 @@ export class TownScript {
 export interface SimOptions {
   /** Names whose first answer is broken (a raised copy, or a leaf's top brick lifted off its studs), to exercise repairs. */
   failFirst?: string[];
+  /**
+   * 2×2 leaves whose first answer is a 1×1 column 15 plates tall: valid on its own, but a weak joint
+   * once placed on studs (the placement check). The repair keeps the column on a 2×2 brick.
+   */
+  weakFirst?: string[];
   /** Split sub-builds (or "Town square" for the main build) whose first repair deletes the copies of their first child; the next repair puts them back. */
   dropOnRepair?: string[];
   /** Pretend usage per call is this many times the default (default 1). */
@@ -247,7 +256,7 @@ const props = (p: Anthropic.MessageCreateParams) => ((p.output_config?.format?.s
 
 /** A client whose `messages.stream` answers like Claude would for the town square. */
 export function simulatedClient(o: SimOptions = {}): Pick<Anthropic, "messages"> & { requests: { kind: string; name: string }[] } {
-  const script = new TownScript();
+  const script = new TownScript(TOWN_SQUARE, new Set(o.weakFirst));
   const failed = new Set<string>();
   const requests: { kind: string; name: string }[] = [];
 
@@ -290,6 +299,10 @@ export function simulatedClient(o: SimOptions = {}): Pick<Anthropic, "messages">
     const name = quoted(/Design the sub-build "([^"]+)"/);
     const n = script.byName.get(name);
     if (!n || isSplit(n)) throw new Error(`Simulated Claude: no sub-build "${name}" to design directly.`);
+    if (o.weakFirst?.includes(n.name)) {
+      const column = (y0: number, k: number) => Array.from({ length: k }, (_, i) => pl("brick_1x1", n.color, 0, y0 + i * 3, 0));
+      return { kind: "leaf", name, json: { name: n.name, description: `${n.name} (simulated).`, parts: repair ? [pl("brick_2x2", n.color, 0, 0, 0), ...column(3, 4)] : column(0, 5) } };
+    }
     const parts = script.leafParts(n);
     const broken = !repair && o.failFirst?.includes(n.name) && !failed.has(n.name);
     if (broken) failed.add(n.name);

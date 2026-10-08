@@ -20,6 +20,8 @@ export interface SeedReport {
   added: number;
   duplicates: number;
   invalid: number;
+  /** Valid on their own but failing when placed on studs (see placement.ts). */
+  rejected: number;
   /** Why candidates were skipped, first few. */
   skipped: string[];
 }
@@ -117,7 +119,7 @@ export function seedLibrary(o: { dir?: string; debugDir?: string; buildsDir?: st
   const debugDir = o.debugDir ?? CONFIG.debugDir;
   const buildsDir = o.buildsDir ?? CONFIG.buildsDir;
   const lib = loadLibrary(o.dir ?? CONFIG.componentsDir);
-  const report: SeedReport = { runs: 0, builds: 0, found: 0, added: 0, duplicates: 0, invalid: 0, skipped: [] };
+  const report: SeedReport = { runs: 0, builds: 0, found: 0, added: 0, duplicates: 0, invalid: 0, rejected: 0, skipped: [] };
   const candidates: Candidate[] = [];
   for (const r of list(debugDir).sort()) {
     const dir = path.join(/*turbopackIgnore: true*/ debugDir, r);
@@ -133,10 +135,12 @@ export function seedLibrary(o: { dir?: string; debugDir?: string; buildsDir?: st
   }
   report.found = candidates.length;
   for (const c of candidates) {
-    const comp = makeComponent(c.subBuilds, c.root, c);
+    let why = "";
+    const comp = makeComponent(c.subBuilds, c.root, { ...c, rejected: (w) => (why = w) });
     if (!comp) {
-      report.invalid++;
-      if (report.skipped.length < 10) report.skipped.push(`${c.run ?? "build"}: ${c.root} isn't valid on its own`);
+      if (why) report.rejected++;
+      else report.invalid++;
+      if (report.skipped.length < 10) report.skipped.push(`${c.run ?? "build"}: ${c.root} ${why || "isn't valid on its own"}`);
       continue;
     }
     if (o.dryRun) {

@@ -9,6 +9,7 @@ import { surfaceMaps } from "../design/surface";
 import { getPart } from "../parts/library";
 import { COLOR_MAP } from "../parts/colors";
 import { seedLibrary } from "./seed";
+import { placementCheck } from "./placement";
 
 /**
  * Component library: every valid sub-build saved as a reusable component, with
@@ -100,7 +101,7 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(
 export function makeComponent(
   subBuilds: SubBuild[],
   root: string,
-  meta: { description?: string; context?: string[]; sideways?: boolean; cost?: number; run?: string; request?: string },
+  meta: { description?: string; context?: string[]; sideways?: boolean; cost?: number; run?: string; request?: string; rejected?: (why: string) => void },
 ): Component | null {
   const tree = subtreeOf(subBuilds, root);
   const me = tree.find((s) => s.id === root);
@@ -108,6 +109,14 @@ export function makeComponent(
   const design: BrickDesign = { name: me.name, description: "", subBuilds: tree, main: { parts: [], uses: [] } };
   const c = compileSubBuild(design, root, { structure: "warn" });
   if (c.errors.length || !c.model.parts.length) return null;
+  // Gate: it must also hold when placed on studs, not only standing on its own (see placement.ts).
+  if (!meta.sideways) {
+    const placed = placementCheck(c.model);
+    if (placed.errors.length) {
+      meta.rejected?.(`fails when placed: ${placed.errors.map((e) => e.code).join(", ")} (${placed.errors[0].message.slice(0, 160)})`);
+      return null;
+    }
+  }
   const maps = surfaceMaps(c.model);
   const depthOf = (n: { children: unknown[] }): number => 1 + Math.max(0, ...n.children.map((x) => depthOf(x as { children: unknown[] })));
   const hash = contentHash(tree, root);
