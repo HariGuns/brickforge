@@ -43,6 +43,8 @@ export const ComponentSchema = z.object({
   cost: z.number(),
   /** How many runs reused it. */
   reused: z.number(),
+  /** Set when a person fixed it by hand: which component it replaces, and what changed. */
+  handFixed: z.object({ from: z.string(), note: z.string(), at: z.string() }).optional(),
 });
 export type Component = z.infer<typeof ComponentSchema>;
 
