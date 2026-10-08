@@ -65,7 +65,7 @@ Right-click the menu entry for **Stop BrickForge**. The same actions from a term
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start the app |
-| `npm test` | All tests (227): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
+| `npm test` | All tests (230): validator, steps, manual, LDraw export and import, compiler, diffs, caching, every generator path with a fake Claude, sub-build trees, the component library and the budget cap with a simulated Claude, BrickLink IDs, and the regression snapshots |
 | `npm run gen "a red fire truck"` | Run the full generate → validate → repair loop from the CLI; writes `exports/*.ldr/.mpd` |
 | `npm run gen -- --image photo.jpg "extra instructions"` | Same, from a photo |
 | `npm run gen -- --base model.json "add a chimney"` | Edit an existing model (JSON) instead of building a new one |
@@ -182,6 +182,15 @@ The part target for Very high in tree mode is 3,000 (`CONFIG.tree.parts`). Every
 
 **Simulated Claude** (`src/lib/claude/simulated.ts`): answers every stage of a scripted town square (49 unique sub-builds, 255 copies, 3 levels) with made-up token usage, so trees, the library and the budget cap are tested without API calls. `npm run gen -- --simulate` runs it from the CLI.
 
+## Scenes on baseplates
+
+With `CONFIG.baseplates` on (the default; `BRICKFORGE_BASEPLATES=0` turns it off and leaves the prompts and schemas as before), the sub-build planner marks a model `scene: true` when it's laid out on the ground (a town square, a street, a park) and picks a `ground` colour. The assembly is then checked with baseplates the code lays under its footprint (`src/lib/parts/baseplates.ts`):
+- **One or more:** the smallest single baseplate that covers it, inside the build area. If none does, equal square tiles, each its own ground, joined only by parts that bridge a seam.
+- **Where they go:** after the assembly's own parts, so the part numbers Claude sees don't change, and never in Claude's own answer.
+- **What includes them:** the final design, the parts list, the BrickLink list, the exports, manual page 1 ("Baseplate", laid before the sub-builds), playback and the Showcase. Main-build pages show the baseplate as already in place.
+
+Single-pass (Standard) builds don't use scenes.
+
 ## Component library
 
 Every valid sub-build is saved as a **component** in `components/` (one JSON file each, gitignored; `src/lib/components/library.ts`):
@@ -200,7 +209,7 @@ Every valid sub-build is saved as a **component** in `components/` (one JSON fil
 
 **Seeding:** `npm run seed-components` adds the valid sub-builds of every run in `debug/` and every saved build (`--from ~/.config/BrickForge` adds another data folder too). The default library also seeds itself the first time it's used, which covers runs copied into the desktop app. Seeded from this repo and the desktop app's runs: 70 components (one Huracán wheel set isn't valid on its own).
 
-Simulated result: the town square, run twice with the same library. Run 1 made 66 calls (about $4.59 simulated) and saved 49 components. Run 2 reused all 6 top-level components (17 copies) with 2 calls (plan and main assembly, about $0.39 simulated), and produced the same 406 parts.
+Simulated result: the town square, run twice with the same library. Run 1 made 66 calls (about $4.59 simulated) and saved 49 components. Run 2 reused all 6 top-level components (17 copies) with 2 calls (plan and main assembly, about $0.39 simulated), and produced the same 406 parts (407 since scenes stand on a baseplate; cost unchanged, see the baseline history in `docs/live-test-tree.md`).
 
 ## Budget cap
 

@@ -1,5 +1,6 @@
 import type { Placement, Rot } from "../model/schema";
-import { PARTS } from "./library";
+import { footprint } from "../model/geometry";
+import { getPart, PARTS } from "./library";
 
 /** Baseplates in the catalog, smallest first: [w, d, id]. */
 export const BASEPLATES = PARTS.filter((p) => p.category === "baseplate")
@@ -11,6 +12,18 @@ export interface Rect {
   z0: number;
   w: number;
   d: number;
+}
+
+/** The ground footprint of a model's upright parts (baseplates and exact-frame parts left out), or null if it has none. */
+export function groundFootprint(parts: Placement[]): Rect | null {
+  let x0 = Infinity, z0 = Infinity, x1 = -Infinity, z1 = -Infinity;
+  for (const p of parts) {
+    const def = getPart(p.part);
+    if (!def || p.frame || def.category === "baseplate") continue;
+    const f = footprint(p, def);
+    x0 = Math.min(x0, f.x0); z0 = Math.min(z0, f.z0); x1 = Math.max(x1, f.x0 + f.sx); z1 = Math.max(z1, f.z0 + f.sz);
+  }
+  return x0 === Infinity ? null : { x0, z0, w: x1 - x0, d: z1 - z0 };
 }
 
 /**

@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { BrickModel } from "@/lib/model/schema";
 import type { BuildStep } from "@/lib/steps/steps";
-import { manualPages, type CalloutItem, type ManualPage } from "@/lib/manual/pages";
+import { manualPages, sectionTitle, type CalloutItem, type ManualPage } from "@/lib/manual/pages";
 import type { CopyItem, StepSection } from "@/lib/design/steps";
 import { peekStep, renderModelIcon, renderPartIcon, renderStep, STEP_SIZE, THUMB_SIZE, type PartIcon } from "./manual/stepRenderer";
 import { exportFileNames } from "@/lib/ldraw/export";
@@ -15,7 +15,7 @@ export const PAGE_RATIO = 1.42;
 /** Design reference width in px; page type is sized relative to it. */
 const DESIGN_W = 980;
 
-function useStepImage(model: BrickModel, steps: BuildStep[], n: number, size: { w: number; h: number }, priority: "high" | "low", enabled = true) {
+function useStepImage(model: BrickModel, steps: BuildStep[], n: number, size: { w: number; h: number }, priority: "high" | "low", enabled = true, base?: number[]) {
   const [state, setState] = useState<{ key: string; url: string } | null>(null);
   const key = `${n}|${size.w}`;
   // A cached render is used on the very first paint of a page, with no loading flash.
@@ -23,11 +23,11 @@ function useStepImage(model: BrickModel, steps: BuildStep[], n: number, size: { 
   useEffect(() => {
     if (!enabled || cached) return;
     let live = true;
-    renderStep(model, steps, n, size, priority).then((u) => live && setState({ key, url: u }), () => {});
+    renderStep(model, steps, n, size, priority, base).then((u) => live && setState({ key, url: u }), () => {});
     return () => {
       live = false;
     };
-  }, [model, steps, n, size, priority, enabled, cached, key]);
+  }, [model, steps, n, size, priority, enabled, cached, key, base]);
   return cached ?? (state?.key === key ? state.url : null);
 }
 
@@ -76,14 +76,16 @@ function CopyCallout({ item, model }: { item: CopyItem; model: BrickModel | unde
 
 function Page({ sections, modelName, page, total }: { sections: StepSection[]; modelName: string; page: ManualPage; total: number }) {
   const sec = sections[page.section];
-  const url = useStepImage(sec.model, sec.steps, page.local, STEP_SIZE, "high");
+  const url = useStepImage(sec.model, sec.steps, page.local, STEP_SIZE, "high", true, sec.base);
   const subModel = (id: string) => sections.find((x) => x.sub === id)?.model;
   return (
     <div className="man-page" data-screen-label="Manual page">
       {page.label && (
         <span className="man-tab">
           <I.Bricks size={14} />
-          {sec.sub ? (
+          {sec.kind === "baseplate" ? (
+            <b>Baseplate</b>
+          ) : sec.sub ? (
             <>
               <b>Sub-build</b>
               <span className="sep">·</span>
@@ -116,7 +118,7 @@ function Page({ sections, modelName, page, total }: { sections: StepSection[]; m
         <span>
           {modelName}
           <span className="sep">·</span>
-          {sec.sub ? `${sec.name} · step ${page.local} of ${page.localTotal}` : `${page.label ? "Main build · " : ""}Layer ${page.layer} of ${page.layers}`}
+          {sec.kind === "baseplate" ? "Baseplate · lay it first" : sec.sub ? `${sec.name} · step ${page.local} of ${page.localTotal}` : `${page.label ? "Main build · " : ""}Layer ${page.layer} of ${page.layers}`}
         </span>
         <span>
           <b>{page.n}</b> / {total}
@@ -132,7 +134,7 @@ function Page({ sections, modelName, page, total }: { sections: StepSection[]; m
  * for every page up front (a 2,000-part build has hundreds of pages, each a full
  * scene render).
  */
-function Thumb({ model, steps, local, n, current, ready, onPick }: { model: BrickModel; steps: BuildStep[]; local: number; n: number; current: boolean; ready: boolean; onPick: () => void }) {
+function Thumb({ model, steps, base, local, n, current, ready, onPick }: { model: BrickModel; steps: BuildStep[]; base?: number[]; local: number; n: number; current: boolean; ready: boolean; onPick: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [seen, setSeen] = useState(false);
   useEffect(() => {
@@ -142,7 +144,7 @@ function Thumb({ model, steps, local, n, current, ready, onPick }: { model: Bric
     io.observe(el);
     return () => io.disconnect();
   }, [seen]);
-  const url = useStepImage(model, steps, local, THUMB_SIZE, "low", ready && seen);
+  const url = useStepImage(model, steps, local, THUMB_SIZE, "low", ready && seen, base);
   return (
     <button ref={ref} className={`man-thumb ${current ? "on" : ""}`} onClick={onPick} aria-label={`Page ${n}`} aria-current={current ? "page" : undefined}>
       <span className="man-thumb-page">{url && <img src={url} alt="" />}</span>
@@ -183,7 +185,7 @@ export function ManualTab(props: { sections: StepSection[]; modelName: string; s
   // After the current page renders: prefetch its neighbours, then let the thumbnail strip fill in.
   useEffect(() => {
     let live = true;
-    const render = (p: ManualPage | undefined) => (p ? renderStep(sections[p.section].model, sections[p.section].steps, p.local) : Promise.resolve(""));
+    const render = (p: ManualPage | undefined) => (p ? renderStep(sections[p.section].model, sections[p.section].steps, p.local, undefined, undefined, sections[p.section].base) : Promise.resolve(""));
     render(pages[n - 1]).then(() => {
       if (!live) return;
       render(pages[n]).catch(() => {});
@@ -252,12 +254,12 @@ export function ManualTab(props: { sections: StepSection[]; modelName: string; s
           <select value={n} onChange={(e) => onStep(Number(e.target.value))}>
             {sections.length > 1
               ? sections.map((sec, si) => (
-                  <optgroup key={si} label={sec.sub ? `${sec.name}${sec.copies > 1 ? ` ×${sec.copies}` : ""}` : "Main build"}>
+                  <optgroup key={si} label={sec.sub ? `${sec.name}${sec.copies > 1 ? ` ×${sec.copies}` : ""}` : sectionTitle(sec)}>
                     {pages
                       .filter((p) => p.section === si)
                       .map((p) => (
                         <option key={p.n} value={p.n}>
-                          {p.n}. {sec.sub ? sec.name : "Main build"} · step {p.local}
+                          {p.n}. {sectionTitle(sec)} · step {p.local}
                         </option>
                       ))}
                   </optgroup>
@@ -301,7 +303,7 @@ export function ManualTab(props: { sections: StepSection[]; modelName: string; s
 
       <div className="man-thumbs" ref={stripRef} aria-label="Pages">
         {pages.map((p) => (
-          <Thumb key={p.n} model={sections[p.section].model} steps={sections[p.section].steps} local={p.local} n={p.n} current={p.n === n} ready={ready} onPick={() => onStep(p.n)} />
+          <Thumb key={p.n} model={sections[p.section].model} steps={sections[p.section].steps} base={sections[p.section].base} local={p.local} n={p.n} current={p.n === n} ready={ready} onPick={() => onStep(p.n)} />
         ))}
       </div>
     </div>

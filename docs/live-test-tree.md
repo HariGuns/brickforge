@@ -161,3 +161,13 @@ Run 1 again (same prompt, empty library, `--budget 10`). Log: `logs/live-tree-3.
 **Library afterwards:** 106 components (the 91 before plus 15 new), all passing the gate. 2 are in quarantine.
 
 **Total API spend since sub-builds were introduced:** $38.61 + $2.28 = **$40.89**.
+
+## Simulated baseline history
+
+The simulated town square (`npm run gen -- --simulate --detail very_high`) is the cost baseline. When the script or the pipeline changes what it builds, the new figures are recorded here next to the old ones.
+
+| Date | Change | Run 1 (empty library) | Run 2 (reusing it) | Parts |
+|---|---|---|---|---|
+| 2026-10-08 | Sub-build trees and the component library | $4.59, 66 calls | $0.39, 2 calls | 406 |
+| 2026-10-09 | Repairs may not delete; placement gate | $4.59 | $0.39 | 406 (unchanged) |
+| 2026-10-09 | Scenes on baseplates: the town square is a scene and stands on a 48×48 green baseplate (its 48×32 footprint; there's no 48×32 baseplate) | $4.59 | $0.39 | **407** (+ the baseplate) |

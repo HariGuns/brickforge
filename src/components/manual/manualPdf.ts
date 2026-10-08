@@ -91,7 +91,7 @@ export async function buildManualPdf(sections: StepSection[], modelName: string,
 
     // Sub-build tab above the panel
     if (page.label) {
-      const text = sec.sub ? `Sub-build  ·  ${sec.name}${sec.copies > 1 ? ` ×${sec.copies}` : ""}` : "Main build";
+      const text = sec.kind === "baseplate" ? "Baseplate" : sec.sub ? `Sub-build  ·  ${sec.name}${sec.copies > 1 ? ` ×${sec.copies}` : ""}` : "Main build";
       doc.setFont("helvetica", "bold");
       doc.setFontSize(13 * U * PT_PER_MM);
       const tw = doc.getTextWidth(text) + 8;
@@ -103,7 +103,7 @@ export async function buildManualPdf(sections: StepSection[], modelName: string,
     }
 
     // Render (drawn first so the callout and step number sit on top of it)
-    const url = await renderStep(sec.model, sec.steps, page.local);
+    const url = await renderStep(sec.model, sec.steps, page.local, undefined, undefined, sec.base);
     const area = { x: panel.x + panel.w * 0.27, y: panel.y + panel.h * 0.04, w: panel.w * 0.69, h: panel.h * 0.9 };
     const aspect = STEP_SIZE.w / STEP_SIZE.h;
     const iw = Math.min(area.w, area.h * aspect), ih = iw / aspect;
@@ -184,7 +184,7 @@ export async function buildManualPdf(sections: StepSection[], modelName: string,
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12 * U * PT_PER_MM);
     doc.setTextColor(FOOT);
-    doc.text(`${modelName}  ·  ${sec.sub ? `${sec.name} · step ${page.local} of ${page.localTotal}` : `${page.label ? "Main build · " : ""}Layer ${page.layer} of ${page.layers}`}`, panel.x + 1, fy);
+    doc.text(`${modelName}  ·  ${sec.kind === "baseplate" ? "Baseplate · lay it first" : sec.sub ? `${sec.name} · step ${page.local} of ${page.localTotal}` : `${page.label ? "Main build · " : ""}Layer ${page.layer} of ${page.layers}`}`, panel.x + 1, fy);
     const total = ` / ${pages.length}`;
     const totalW = doc.getTextWidth(total);
     doc.text(total, panel.x + panel.w - 1 - totalW, fy);

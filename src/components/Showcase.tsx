@@ -49,11 +49,11 @@ export function Showcase(props: { sections: StepSection[]; modelName: string; th
     return () => window.removeEventListener("keydown", onKey);
   }, [props]);
 
-  const visible = useMemo(() => new Set(sec.steps.slice(0, step).flatMap((s) => s.parts)), [sec, step]);
+  const visible = useMemo(() => new Set([...(sec.base ?? []), ...sec.steps.slice(0, step).flatMap((s) => s.parts)]), [sec, step]);
   const highlight = useMemo(() => new Set(step > 0 && !done ? sec.steps[step - 1].parts : []), [sec, step, done]);
   const globalStep = sections.slice(0, section).reduce((n, s) => n + s.steps.length, 0) + Math.min(step, sec.steps.length);
   const copies = sec.copies > 1 ? ` ×${sec.copies}` : "";
-  const title = done ? `${props.modelName} is complete` : sec.sub ? `Assembling ${sec.name}${copies}` : sections.length > 1 ? "Assembling the main build" : `Building ${sec.name}`;
+  const title = done ? `${props.modelName} is complete` : sec.kind === "baseplate" ? "Laying the baseplate" : sec.sub ? `Assembling ${sec.name}${copies}` : sections.length > 1 ? "Assembling the main build" : `Building ${sec.name}`;
   const current = sec.steps[step - 1];
   const addedCopies = current?.copies.map((c) => `${c.count}× ${c.name}`).join(", ");
 
@@ -68,7 +68,7 @@ export function Showcase(props: { sections: StepSection[]; modelName: string; th
       <div className="showcase-stage">
         <Viewer model={sec.model} visible={done ? undefined : visible} highlight={highlight} fitKey={`showcase-${section}`} spin theme={props.theme} />
         <div className="showcase-label">
-          <span className="showcase-kicker">{sec.sub ? `Sub-build ${sections.filter((s) => s.sub).indexOf(sec) + 1} of ${sections.filter((s) => s.sub).length}` : "Main build"}</span>
+          <span className="showcase-kicker">{sec.kind === "baseplate" ? "Baseplate" : sec.sub ? `Sub-build ${sections.filter((s) => s.sub).indexOf(sec) + 1} of ${sections.filter((s) => s.sub).length}` : "Main build"}</span>
           <b>{title}</b>
           {addedCopies && !done && <span className="showcase-sub">Adding {addedCopies}</span>}
         </div>
@@ -82,7 +82,7 @@ export function Showcase(props: { sections: StepSection[]; modelName: string; th
             <b>
               Step {globalStep} / {total}
             </b>
-            <span>{sec.sub ? `${sec.name} · step ${Math.min(step, sec.steps.length)} of ${sec.steps.length}` : `Main build · step ${Math.min(step, sec.steps.length)} of ${sec.steps.length}`}</span>
+            <span>{sec.kind === "baseplate" ? "Baseplate" : sec.sub ? `${sec.name} · step ${Math.min(step, sec.steps.length)} of ${sec.steps.length}` : `Main build · step ${Math.min(step, sec.steps.length)} of ${sec.steps.length}`}</span>
           </div>
           <div className="progress">
             <div style={{ width: `${(globalStep / Math.max(1, total)) * 100}%` }} />

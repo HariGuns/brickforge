@@ -57,14 +57,20 @@ export function flatSection(model: BrickModel, steps: BuildStep[]): StepSection 
   return { sub: null, name: model.name, copies: 1, model, steps: steps.map((s) => ({ ...s, ownParts: s.parts, copies: [] })) };
 }
 
+/** What a section is called in tabs and menus: the sub-build's name, "Baseplate" or "Main build". */
+export function sectionTitle(s: StepSection): string {
+  return s.sub ? s.name : s.kind === "baseplate" ? "Baseplate" : "Main build";
+}
+
 export function sectionLabel(s: StepSection, hasSubBuilds: boolean): string | null {
+  if (s.kind === "baseplate") return "Baseplate";
   if (s.sub) return `Sub-build · ${s.name}${s.copies > 1 ? ` ×${s.copies}` : ""}`;
   return hasSubBuilds ? "Main build" : null;
 }
 
 /** One instruction page per step, sub-builds first, then the main build. */
 export function manualPages(sections: StepSection[]): ManualPage[] {
-  const hasSubs = sections.some((s) => s.sub);
+  const hasSubs = sections.some((s) => s.sub || s.kind);
   const pages: ManualPage[] = [];
   sections.forEach((sec, si) => {
     const layerYs = [...new Set(sec.steps.map((s) => s.y))];

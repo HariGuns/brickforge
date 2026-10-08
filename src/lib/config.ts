@@ -106,6 +106,12 @@ export const CONFIG = {
    */
   sideways: { enabled: process.env.NEXT_PUBLIC_BRICKFORGE_SIDEWAYS !== "0" },
   /**
+   * Scenes on baseplates (sub-build path): the planner says whether the model is a
+   * scene (a town square, a street, a park) and the code lays baseplates under its
+   * footprint. BRICKFORGE_BASEPLATES=0 turns it off: prompts and schemas as before.
+   */
+  baseplates: { enabled: process.env.BRICKFORGE_BASEPLATES !== "0", colors: ["green", "light_gray", "dark_gray", "tan", "blue", "white"] },
+  /**
    * How parts and copies are written in Claude's answers and in listings:
    * "compact" strings ("brick_2x4 red 3 0 5 90") or "json" objects.
    */

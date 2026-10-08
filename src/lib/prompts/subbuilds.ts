@@ -41,6 +41,10 @@ export interface Plan {
   description: string;
   /** How the main build is laid out: base, where copies go, glue parts. */
   layout: string;
+  /** A scene on the ground (town square, street, park): it stands on baseplates (CONFIG.baseplates). */
+  scene?: boolean;
+  /** The baseplates' colour, for a scene. */
+  ground?: string;
   subBuilds: PlannedSubBuild[];
 }
 
@@ -80,7 +84,9 @@ For each unique sub-build give:
 
 Limits: at most ${s.maxUnique} unique sub-builds and ${s.maxCopies} copies in total; parts × copies over all sub-builds ≤ ${CONFIG.design.maxParts - 400}.${extras.tree ? `\n${treeText()}` : ""}${extras.library?.length ? `\n${libraryText(extras.library)}` : ""}
 
-Also give: name, description (of the finished model), and layout: a short plan of the main build (base size, where each copy goes and how it faces, what glue parts tie things together).`;
+Also give: name, description (of the finished model), and layout: a short plan of the main build (base size, where each copy goes and how it faces, what glue parts tie things together).${CONFIG.baseplates.enabled ? `
+
+And scene: true if the model is a scene laid out on the ground (a town square, a street, a park, a harbour, a farmyard), false for a freestanding object (a vehicle, a single building, a creature, a sculpture). A scene stands on a baseplate: the code lays the smallest one (16×16 up to 48×48 studs) under the whole main build, so plan the layout within 48 × 48 studs, and the main build needs no plates just to make a ground. Give ground: the baseplate's colour (${CONFIG.baseplates.colors.join(", ")}; green for grass, light_gray or dark_gray for paving, tan for sand). For an object, scene: false and ground: "green" (unused).` : ""}`;
 }
 
 /** How to split sub-builds (tree mode), for the plan and the child plans. */
@@ -105,6 +111,7 @@ export function planJsonSchema(extras: PlanExtras = {}): Record<string, unknown>
       name: { type: "string" },
       description: { type: "string" },
       layout: { type: "string" },
+      ...(CONFIG.baseplates.enabled ? { scene: { type: "boolean" }, ground: { type: "string", enum: CONFIG.baseplates.colors } } : {}),
       subBuilds: {
         type: "array",
         items: {
@@ -127,7 +134,7 @@ export function planJsonSchema(extras: PlanExtras = {}): Record<string, unknown>
         },
       },
     },
-    required: ["name", "description", "layout", "subBuilds"],
+    required: ["name", "description", "layout", "subBuilds", ...(CONFIG.baseplates.enabled ? ["scene", "ground"] : [])],
     additionalProperties: false,
   };
 }
@@ -202,7 +209,9 @@ Return the main build:
 - uses: the copies, each with sub, x, y, z, rot and mirror. (x, z) is where the min corner of the copy's (rotated) footprint goes; y is the height of the copy's bottom. A copy's cells rotate like a part's: at rot 90 a w × d footprint becomes d × w and its local cell (cx, cz) lands at (d-1-cz, cx) inside it; at rot 180 at (w-1-cx, d-1-cz); at rot 270 at (cz, w-1-cx).
 - mirror: true makes the copy the mirror image of the sub-build (left/right): it's flipped along the sub-build's own x axis (local cell (cx, cz) → (w-1-cx, cz)) before rot is applied, and handed parts are swapped automatically (wedge right ↔ left, wheels turn to face the other way). Use it for the opposite side of a symmetric subject; use mirror: false for plain copies. A few parts have no mirror image; the checker names them.
 
-Rules the compiler checks:
+${plan.scene && CONFIG.baseplates.enabled ? `This is a scene: it stands on a ${plan.ground ?? "green"} baseplate. The code lays the smallest baseplate (16×16 up to 48×48 studs) under your whole main build and keeps it there; don't add it yourself. Everything at y = 0 stands on its studs and is held by them, so copies and parts can go straight on the ground: no plates are needed just to make a ground, and areas that only touch through the baseplate still count as connected. Keep the whole scene within 48 × 48 studs. A tall thing on a single stud is still a weak joint on a baseplate.
+
+` : ""}Rules the compiler checks:
 - Each copy is placed as one piece: its underside cells (o) must sit on studs of the main build or another copy directly below it (its y = the top height there), or on the ground at y = 0.
 - Copies must not overlap each other or main parts, and two copies must not interlock (each resting on the other).
 - Everything together must be one connected structure, buildable bottom-up. Things only connect through studs.

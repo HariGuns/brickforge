@@ -228,14 +228,15 @@ function stepBox(ms: ModelScene, visible: Set<number>): THREE.Box3 {
  * faded, parts added in step n in full colour with orange outlines. The iso angle
  * is fixed; framing covers the full footprint and the height built so far.
  */
-export function renderStep(model: BrickModel, steps: BuildStep[], n: number, size: { w: number; h: number } = STEP_SIZE, priority: "high" | "low" = "high"): Promise<string> {
+/** `base`: parts already in place before the section's first step (a scene's baseplate). */
+export function renderStep(model: BrickModel, steps: BuildStep[], n: number, size: { w: number; h: number } = STEP_SIZE, priority: "high" | "low" = "high", base: number[] = []): Promise<string> {
   const rc = renderCache(model);
   const key = stepKey(n, size);
   let p = rc.cache.get(key);
   if (!p) {
     p = enqueue(async () => {
       const ms = await readyScene(model);
-      const placed = new Set(steps.slice(0, n - 1).flatMap((s) => s.parts));
+      const placed = new Set([...base, ...steps.slice(0, n - 1).flatMap((s) => s.parts)]);
       const fresh = new Set(steps[n - 1]?.parts ?? []);
       const visible = new Set<number>();
       model.parts.forEach((pl, i) => {

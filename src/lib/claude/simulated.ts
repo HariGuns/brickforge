@@ -272,7 +272,7 @@ export function simulatedClient(o: SimOptions = {}): Pick<Anthropic, "messages">
       return {
         kind: "plan",
         name: "plan",
-        json: { name: "Town square", description: "A simulated town square with houses, market stalls, a fountain, a clock tower and a plaza.", layout: "A grid of 16×16 base plates; everything stands on it.", subBuilds: script.root.children.map((c) => entryFor(c, lib)) },
+        json: { name: "Town square", description: "A simulated town square with houses, market stalls, a fountain, a clock tower and a plaza.", layout: "A grid of 16×16 base plates; everything stands on it.", ...("scene" in pr ? { scene: true, ground: "green" } : {}), subBuilds: script.root.children.map((c) => entryFor(c, lib)) },
       };
     }
     if ("children" in pr) {

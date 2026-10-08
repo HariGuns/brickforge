@@ -27,6 +27,8 @@ import { childPlanJsonSchema, childPlanPrompt, subAssemblyPrompt, type ChildPlan
 import { checkChildPlan, checkTreePlan, isLibrary, PlanTree, type LibraryRef, type TreeNode } from "./tree";
 import { compileSubBuild } from "../design/compile";
 import { placementCheck } from "../components/placement";
+import { baseplatesFor, groundFootprint } from "../parts/baseplates";
+import { getPart } from "../parts/library";
 import { importComponent, libraryListing, loadLibrary, makeComponent, markReused, saveComponent, searchLibrary, type Library } from "../components/library";
 import { libraryId } from "./tree";
 import { seedRun } from "../components/seed";
@@ -52,6 +54,8 @@ const PlanSchema = z.object({
   name: z.string(),
   description: z.string(),
   layout: z.string(),
+  scene: z.boolean().optional(),
+  ground: z.string().optional(),
   subBuilds: z.array(
     z.object({
       id: z.string(),
@@ -499,7 +503,14 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
     return model ? [{ id: sub.id, name: sub.name, copies: sub.copies, parts: model.parts.length, maps: surfaceMaps(model), sideways: CONFIG.sideways.enabled && node.sideways }] : [];
   });
   const aText = assemblyPrompt(request, plan, top);
-  const designOf = (a: Assembly): BrickDesign => ({ name: a.name, description: a.description, subBuilds, main: { parts: a.parts, uses: a.uses } });
+  // A scene stands on baseplates the code lays under its footprint, after the assembly's own parts
+  // (so part numbers in errors stay Claude's); the assembly's answer never holds them.
+  const onBaseplates = (d: BrickDesign): BrickDesign => {
+    if (!CONFIG.baseplates.enabled || !plan.scene) return d;
+    const fp = groundFootprint(compileDesign(d, { structure: "off" }).model.parts);
+    return fp ? { ...d, main: { ...d.main, parts: [...d.main.parts, ...baseplatesFor(fp, plan.ground ?? "green", CONFIG.design.grid)] } } : d;
+  };
+  const designOf = (a: Assembly): BrickDesign => onBaseplates({ name: a.name, description: a.description, subBuilds, main: { parts: a.parts, uses: a.uses } });
   const savedAssembly = cp?.assembly.valid ? AssemblySchema.safeParse(cp.assembly.valid) : null;
   if (cp && !savedAssembly?.success) earlierRounds.push(...cp.assembly.rounds);
   const assembly = savedAssembly?.success ? reusedLoop<Assembly>({ rounds: cp!.assembly.rounds, valid: savedAssembly.data }, savedAssembly.data, 0) : await runLoop<Assembly>(
@@ -533,6 +544,8 @@ async function designRun(input: GenerateInput, onEvent: (e: GenerateEvent) => vo
   // --- result -------------------------------------------------------------------------------
   const rounds = [...(photo?.rounds ?? []), ...earlierRounds, ...planLoop.rounds, ...childLoops.flatMap((s) => s.loop.rounds), ...subLoops.flatMap((s) => s.loop.rounds), ...asmLoops.flatMap((s) => s.loop.rounds), ...assembly.rounds];
   let design = a ? designOf(a) : null;
+  const laid = design?.main.parts.filter((p) => getPart(p.part)?.category === "baseplate") ?? [];
+  if (laid.length) console.log(`[generate] scene: on ${laid.map((p) => `a ${getPart(p.part)!.name} (${p.color})`).join(", ")}`);
   const repairRemovals = [...subLoops, ...asmLoops].flatMap((s) => s.loop.removals).concat(assembly.removals);
 
   // Photo builds: compare renders with the photo and refine the design (valid designs only).

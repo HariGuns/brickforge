@@ -31,8 +31,12 @@ export interface DesignStep extends BuildStep {
 export const variantKey = (sub: string, mirror: boolean) => (mirror ? `${sub}~m` : sub);
 
 export interface StepSection {
-  /** Sub-build id ("~m" suffix for its mirror image), or null for the main build. */
+  /** Sub-build id ("~m" suffix for its mirror image), or null for the main build (and the baseplate). */
   sub: string | null;
+  /** "baseplate": the scene's baseplate, laid first (manual page 1). */
+  kind?: "baseplate";
+  /** Parts already in place when the section starts (the baseplate, in the main build). */
+  base?: number[];
   /** "Pine tree" or the model's name for the main build. */
   name: string;
   /** Copies of this sub-build in the whole model (1 for the main build). */
@@ -134,12 +138,17 @@ export function designSteps(design: BrickDesign, compiled: CompileResult = compi
       sections.push({ sub: variantKey(id, mirror), name: `${info.name}${mirror ? " (mirrored)" : ""}`, copies, model: alone.model, steps: containerSteps(alone.model, alone, 0) });
     }
   }
-  const mainSteps = containerSteps(compiled.model, compiled, -1);
-  sections.push({ sub: null, name: design.name, copies: 1, model: compiled.model, steps: mainSteps });
+  // A scene's baseplate is laid first, on page 1, before the sub-builds; the main build then starts on it.
+  const baseplates = compiled.model.parts.flatMap((p, i) => (compiled.origin[i] === -1 && getPart(p.part)?.category === "baseplate" ? [i] : []));
+  const bpStep: DesignStep | null = baseplates.length ? { n: 0, y: 0, parts: baseplates, ownParts: baseplates, copies: [] } : null;
+  // Its own copy of the model: step renders are cached per model and step number.
+  if (bpStep) sections.unshift({ sub: null, kind: "baseplate", name: "Baseplate", copies: 1, model: { ...compiled.model }, steps: [bpStep] });
+  const mainSteps = containerSteps(compiled.model, compiled, -1).filter((st) => (st.parts = st.parts.filter((i) => !baseplates.includes(i)), (st.ownParts = st.ownParts.filter((i) => !baseplates.includes(i))), st.parts.length));
+  sections.push({ sub: null, name: design.name, copies: 1, model: compiled.model, steps: mainSteps, ...(baseplates.length ? { base: baseplates } : {}) });
 
   let n = 1;
   for (const s of sections) for (const st of s.steps) st.n = n++;
-  // Playback numbers the main steps on their own.
-  const playback = mainSteps.map((st, i) => ({ ...st, n: i + 1 }));
+  // Playback numbers the main steps on their own, starting with the baseplate.
+  const playback = [...(bpStep ? [bpStep] : []), ...mainSteps].map((st, i) => ({ ...st, n: i + 1 }));
   return { sections, mainSteps: playback, compiled };
 }
