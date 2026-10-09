@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { getPart, localSolids, localStuds, type PartDef } from "@/lib/parts/library";
+import { depthBelow, getPart, localSolids, localStuds, type PartDef } from "@/lib/parts/library";
 import { parseMesh } from "@/lib/parts/meshFormat";
 import { COLORS } from "@/lib/parts/colors";
 
@@ -127,6 +127,13 @@ function merge(pieces: G[]): G {
     if (!q.getAttribute("normal")) q.computeVertexNormals();
     return q;
   });
+  // Nothing to draw: an empty body (still mergeable with studs) rather than a crash.
+  if (!flat.length) {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute([], 3));
+    g.setAttribute("normal", new THREE.Float32BufferAttribute([], 3));
+    return g;
+  }
   return flat.length === 1 ? flat[0] : mergeGeometries(flat, false)!;
 }
 
@@ -191,12 +198,17 @@ function bodyGeometry(def: PartDef): THREE.BufferGeometry {
     }
     case "arch":
     case "box":
-    default:
-      g = merge(
-        localSolids(def).map(([x0, z0, x1, z1, y0, y1]) =>
-          box(x0 + GAP, y0 * PLATE_H, z0 + GAP, x1 - GAP, Math.min(y1 * PLATE_H, top), z1 - GAP),
-        ),
-      );
+    default: {
+      // A baseplate has no solids (its thin body lies under y = 0): show that body until the mesh loads.
+      const below = depthBelow(def);
+      g = below
+        ? merge([box(GAP, -below * PLATE_H, GAP, w - GAP, 0, d - GAP)])
+        : merge(
+            localSolids(def).map(([x0, z0, x1, z1, y0, y1]) =>
+              box(x0 + GAP, y0 * PLATE_H, z0 + GAP, x1 - GAP, Math.min(y1 * PLATE_H, top), z1 - GAP),
+            ),
+          );
+    }
   }
   g.translate(-w / 2, 0, -d / 2);
   bodyCache.set(def.id, g);
