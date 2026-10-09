@@ -5,8 +5,10 @@ const path = require("node:path");
 
 exports.default = async function afterPack(context) {
   const src = path.join(context.packager.projectDir, ".next-app", "standalone");
-  const dest = path.join(context.appOutDir, "resources", "server");
-  if (!fs.existsSync(path.join(src, "server.js"))) throw new Error("No standalone server. Run npm run appimage, which builds it first.");
+  // macOS keeps resources inside the .app bundle; Linux and Windows next to the executable.
+  const resources = context.electronPlatformName === "darwin" ? path.join(context.appOutDir, `${context.packager.appInfo.productFilename}.app`, "Contents", "Resources") : path.join(context.appOutDir, "resources");
+  const dest = path.join(resources, "server");
+  if (!fs.existsSync(path.join(src, "server.js"))) throw new Error("No standalone server. Run npm run dist (scripts/package-desktop.mjs), which builds it first.");
   fs.rmSync(dest, { recursive: true, force: true });
   fs.cpSync(src, dest, { recursive: true, filter: (f) => !path.basename(f).startsWith(".env") });
 };

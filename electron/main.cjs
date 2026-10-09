@@ -2,7 +2,9 @@
  * BrickForge desktop app: runs the Next.js standalone server on a free local
  * port with Electron's own Node, and shows it in a window. Closing the window
  * stops the server. Settings, builds, runs, exports and logs live in the user
- * data folder (~/.config/BrickForge); the API key is never bundled.
+ * data folder (Linux ~/.config/BrickForge, Windows %APPDATA%\BrickForge, macOS
+ * ~/Library/Application Support/BrickForge). The API key is never bundled: the
+ * welcome screen asks for it on first launch and keeps it in settings.json there.
  */
 const { app, BrowserWindow, Menu, dialog, shell } = require("electron");
 const { spawn } = require("node:child_process");
@@ -191,7 +193,7 @@ async function createWindow() {
 
 Menu.setApplicationMenu(
   Menu.buildFromTemplate([
-    { label: "File", submenu: [{ role: "quit" }] },
+    ...(process.platform === "darwin" ? [{ role: "appMenu" }] : [{ label: "File", submenu: [{ role: "quit" }] }]),
     { role: "editMenu" },
     { label: "View", submenu: [{ role: "reload" }, { role: "toggleDevTools" }, { type: "separator" }, { role: "resetZoom" }, { role: "zoomIn" }, { role: "zoomOut" }, { type: "separator" }, { role: "togglefullscreen" }] },
   ]),

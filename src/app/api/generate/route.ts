@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generateModel, type GenerateEvent, type ImageMediaType } from "@/lib/claude/generate";
 import { editDesign, generateDesign } from "@/lib/claude/subbuilds";
+import { simulatedClient } from "@/lib/claude/simulated";
 import { BrickDesignSchema as DesignSchema, type BrickDesign } from "@/lib/design/schema";
 import { toDetail } from "@/lib/detail";
 import { BrickModelSchema, type BrickModel } from "@/lib/model/schema";
@@ -75,7 +76,10 @@ export async function POST(req: Request) {
         }
       };
       try {
-        if (baseDesign) await editDesign({ text, image, baseDesign }, send, { signal: abort.signal, budget });
+        // BRICKFORGE_SIMULATE=1: the simulated Claude builds its scripted town square (tree mode,
+        // no API calls, no library reads or writes), for testing a build of the app without spending.
+        if (process.env.BRICKFORGE_SIMULATE === "1") await generateDesign({ text: text || "a town square", detail: "very_high", tree: true }, send, { signal: abort.signal, budget, client: simulatedClient({ delayMs: 20 }), library: false });
+        else if (baseDesign) await editDesign({ text, image, baseDesign }, send, { signal: abort.signal, budget });
         else await (pipeline === "subbuilds" ? generateDesign : generateModel)({ text, image, detail, base, ...(typeof body.tree === "boolean" ? { tree: body.tree } : {}) }, send, { signal: abort.signal, budget });
       } catch (err) {
         if (!abort.signal.aborted) {

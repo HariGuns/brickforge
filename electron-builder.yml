@@ -1,7 +1,9 @@
-# Desktop app (AppImage). Build with: npm run appimage
+# Desktop app for Linux, Windows and macOS. Build with: npm run dist (this platform),
+# npm run dist:linux | dist:win | dist:mac, or the release workflow on a version tag.
+# Unsigned: see "Desktop app" in the README for first-launch warnings.
 appId: app.brickforge
 productName: BrickForge
-copyright: BrickForge
+copyright: BrickForge contributors
 directories:
   app: electron
   output: dist
@@ -15,7 +17,7 @@ files:
 # The app itself has no dependencies; the server brings its own node_modules.
 npmRebuild: false
 nodeGypRebuild: false
-# The standalone server (.next-app/standalone) is copied to resources/server here.
+# The standalone server (.next-app/standalone) is copied into the app's resources here.
 afterPack: scripts/electron-after-pack.cjs
 linux:
   target: AppImage
@@ -28,4 +30,19 @@ linux:
     entry:
       Name: BrickForge
       StartupWMClass: BrickForge
+win:
+  icon: electron/icon.png
+  target: [nsis, portable]
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: BrickForge-Setup-${version}.exe
+portable:
+  artifactName: BrickForge-${version}-portable.exe
+mac:
+  icon: electron/icon.png
+  category: public.app-category.graphics-design
+  target: dmg
+  identity: null
+  artifactName: BrickForge-${version}-universal.dmg
 publish: null
