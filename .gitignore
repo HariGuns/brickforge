@@ -29,3 +29,7 @@ src/lib/bricklink/rebrickable.json
 
 # Desktop app: written at package time
 /electron/build-info.json
+
+# /brag launch-video output (rendered video, frames and scratch files)
+brag-output*/
+work/
