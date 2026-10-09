@@ -63,7 +63,7 @@ export default function Page() {
   const wsRef = useRef<Workspace | null>(null);
   const [manualStep, setManualStep] = useState(1);
   const [turns, setTurns] = useState<Turn[]>([]);
-  const [draft, setDraft] = useState<Draft>({ text: "", detail: "standard", pipeline: CONFIG.generator, budget: null, image: null });
+  const [draft, setDraft] = useState<Draft>({ text: "", detail: "standard", pipeline: CONFIG.generator, budget: CONFIG.defaultBudget, image: null }); // $5 cap by default, like the CLI
   const [running, setRunning] = useState(false);
   const [editing, setEditing] = useState(true);
   const [library, setLibrary] = useState<LibraryEntry[] | null>(null);

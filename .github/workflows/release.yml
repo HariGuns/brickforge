@@ -62,3 +62,5 @@ jobs:
         with:
           files: ${{ matrix.files }}
           draft: true
+          name: BrickForge ${{ github.ref_name }}
+          body_path: docs/releases/${{ github.ref_name }}.md

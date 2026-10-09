@@ -10,7 +10,7 @@ Claude (Anthropic's model) does the designing. BrickForge plans a large model as
 
 ## Inspiration
 
-This started from the Claude Opus 5.5 launch clip: [launch clip](LINK_TO_LAUNCH_CLIP) <!-- placeholder: add the link -->
+This started from the [Claude Opus 5.5 launch clip](https://www.youtube.com/watch?v=lCR9epzSNGc).
 
 ## Screenshots
 
@@ -33,8 +33,8 @@ Download BrickForge for your system from the [Releases](https://github.com/HariG
 
 | System | File |
 |---|---|
-| Windows | `BrickForge-Setup-<version>.exe` (installer) or `BrickForge-<version>-portable.exe` (no install) |
-| macOS (Apple silicon and Intel) | `BrickForge-<version>-universal.dmg` |
+| Windows | `BrickForge-<version>-portable.exe` (recommended for now; no install) or `BrickForge-Setup-<version>.exe` (installer, not yet tested) |
+| macOS (Apple silicon and Intel) | `BrickForge-<version>-universal.dmg` (not yet tested) |
 | Linux | `BrickForge-<version>-x86_64.AppImage` (`chmod +x` it, then run it) |
 
 **Your API key.** On first launch a welcome screen asks for an [Anthropic API key](https://console.anthropic.com/). BrickForge checks it with a free API call and stores it only on your computer, in the app's data folder (on Linux and macOS the file is readable only by you). It's sent only to Anthropic. Change it any time with the gear button. No build of the app contains a key: the packaging script refuses to package anything that looks like one.
@@ -50,7 +50,7 @@ Download BrickForge for your system from the [Releases](https://github.com/HariG
 - **macOS (Gatekeeper):** "BrickForge can't be opened because Apple cannot check it…". Open **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. Alternatively, Control-click the app in Finder → **Open** → **Open**. If macOS says the app is "damaged", run `xattr -dr com.apple.quarantine /Applications/BrickForge.app` in Terminal.
 - **Linux:** make the AppImage executable (`chmod +x BrickForge-*.AppImage`).
 
-**Spending cap.** Each model has a cost (see below). In the app, set a cap with the **Cap** menu under the chat box. A run stops before any call that would go over the cap, and can be resumed with a higher one.
+**Spending cap.** Each model has a cost (see below). The app caps every build at **$5** by default, like the CLI; change it with the **Cap** menu under the chat box (including No cap). A run stops before any call that would go over the cap, and can be resumed with a higher one.
 
 ### From source
 
@@ -166,7 +166,7 @@ Claude is told to put the parts back and fix the problem in place. Every removal
 - **Structure is an estimate, not physics:** weak joints and overhangs come from a mass-and-leverage estimate per joint. Balance, clutch strength and real loads aren't simulated.
 - **Baseplate sizing:** a scene stands on the smallest baseplate that covers its whole footprint, so a few stray parts near the edge can make it pick a much bigger baseplate than the scene needs.
 - **Parts:** no hinges, clips or pin-and-axle beams yet; slopes block their whole bounding box; parts can't hang from the underside of others.
-- **Desktop builds are unsigned** (see above). The Windows build was tested under Wine: the app, key setup and a simulated build work; the installer's silent mode wasn't confirmed there.
+- **Desktop builds are unsigned** (see above). The Windows portable .exe was tested under Wine (launch, key setup, a simulated build). The Windows installer and the macOS build haven't been tested yet: for Windows, use the portable .exe for now.
 
 More detail on all of this, with measurements, is in [docs/ENGINEERING.md](docs/ENGINEERING.md). The live test reports are in [docs/live-test-tree.md](docs/live-test-tree.md).
 
@@ -174,7 +174,7 @@ More detail on all of this, with measurements, is in [docs/ENGINEERING.md](docs/
 
 BrickForge was built with [Claude Code](https://www.anthropic.com/claude-code). I designed the system: the sub-build pipeline, the component library, the validator and repair rules, the testing approach and what to measure. Claude Code wrote the code under that direction, tested it against a simulated Claude first, and ran the live tests with a budget cap.
 
-Developing and testing the sub-build system took **$41.57** of API calls (from the run logs, 24 September to 9 October 2026), including every test run.
+The whole project took **$44.09** of API calls, from the run logs and including every test run. $41.57 of that was spent after sub-builds were introduced (24 September to 9 October 2026), developing and testing the sub-build system.
 
 ## Licence
 
