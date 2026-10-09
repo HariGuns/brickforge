@@ -37,7 +37,7 @@ const shadow = openShadow(ROOT, path.resolve("ldraw-lib/shadow"));
 /** Pin geometry per kind, in local units: where a pin leaves the body relative to the grid. */
 export const PIN_FRACTION: Record<PinKind, { out: number; y: number }> = {
   wpin: { out: 0.1, y: 0.375 }, // classic wheel pins: 2 LDU out from the side, 3 LDU above the plate's bottom
-  tpin: { out: 0, y: 0.75 }, // Technic pins: flush with the side, 6 LDU above a plate line
+  tpin: { out: 0, y: 0.75 }, // Large pins: flush with the side, 6 LDU above a plate line
 };
 
 /** Wheels: rim + tyre assemblies (LDraw "c01" files), by pin kind. */
@@ -45,9 +45,9 @@ const WHEELS: { file: string; kind: PinKind; name: string; tyre: string; rim: st
   { file: "4624c01.dat", kind: "wpin", name: "Wheel small (rim 6.4×8, tyre Ø14 mm)", rim: "4624", tyre: "3641" },
   { file: "50944c01.dat", kind: "wpin", name: "Wheel medium (5-spoke rim 6.4×11, tyre Ø17 mm)", rim: "50944", tyre: "51011" },
   { file: "11208c01.dat", kind: "wpin", name: "Wheel large (6-spoke rim 10×14, tyre Ø21 mm)", rim: "11208", tyre: "11209" },
-  { file: "42610c01.dat", kind: "tpin", name: "Wheel on Technic pin, small (rim 8×11.2, tyre Ø17 mm)", rim: "42610", tyre: "50951" },
-  { file: "56902c01.dat", kind: "tpin", name: "Wheel on Technic pin, medium (rim 8×18, tyre Ø24 mm)", rim: "56902", tyre: "56891" },
-  { file: "55981c01.dat", kind: "tpin", name: "Wheel on Technic pin, large (rim 14×18, tyre Ø30 mm)", rim: "55981", tyre: "58090" },
+  { file: "42610c01.dat", kind: "tpin", name: "Wheel on large pin, small (rim 8×11.2, tyre Ø17 mm)", rim: "42610", tyre: "50951" },
+  { file: "56902c01.dat", kind: "tpin", name: "Wheel on large pin, medium (rim 8×18, tyre Ø24 mm)", rim: "56902", tyre: "56891" },
+  { file: "55981c01.dat", kind: "tpin", name: "Wheel on large pin, large (rim 14×18, tyre Ø30 mm)", rim: "55981", tyre: "58090" },
 ];
 
 /**
@@ -64,7 +64,7 @@ const BASEPLATES: { file: string; w: number; d: number }[] = [
   { file: "4186.dat", w: 48, d: 48 },
 ];
 
-/** Parts we never want: prints, stickers, aliases, minifig/Duplo/other systems, moved or obsolete files. */
+/** Parts we never want: prints, stickers, aliases, figures and other construction systems, moved or obsolete files. */
 function excluded(file: string, title: string, lines: string[]): string | null {
   if (/^[~=_|]/.test(title)) return "alias, moved or shortcut";
   if (/p[0-9a-z]{2,4}\.dat$/i.test(file)) return "printed";
@@ -228,7 +228,7 @@ function buildWheel(spec: (typeof WHEELS)[number]): { entry: CatalogEntry; bin: 
     mass: r3(vox.filter(Boolean).length / vox.length),
     ldraw: { file: spec.file, yaw, origin },
     bricklink: [{ id: spec.rim }, { id: spec.tyre, color: 11 }],
-    hint: `mounts on a ${spec.kind === "wpin" ? "wheel pin (e.g. plate 2×2 with wheel pins, 4600)" : "Technic pin (e.g. brick 2×4 with pins, 6249)"}; rot 0 = hub facing -x (right-hand side), rot 180 for the left`,
+    hint: `mounts on a ${spec.kind === "wpin" ? "wheel pin (e.g. plate 2×2 with wheel pins, 4600)" : "large pin (e.g. brick 2×4 with pins, 6249)"}; rot 0 = hub facing -x (right-hand side), rot 180 for the left`,
   };
   const binTris: number[] = [];
   for (let i = 0; i < tris.length; i += 3) binTris.push(...toLocal(tris[i], tris[i + 1], tris[i + 2]).map((n, k) => n * (k === 1 ? 8 : 20)));

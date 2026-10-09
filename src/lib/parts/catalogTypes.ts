@@ -8,7 +8,7 @@ export type Dir = "+x" | "-x" | "+z" | "-z";
 
 /** A wheel pin on a holder, or a wheel's hub (hole). */
 export interface PinDef {
-  /** "wpin" = classic wheel pin (thin); "tpin" = Technic pin. A hub only fits pins of its kind. */
+  /** "wpin" = classic wheel pin (thin); "tpin" = large pin (the pin-and-axle system's). A hub only fits pins of its kind. */
   kind: PinKind;
   /** Point on the axis where the pin leaves the body / the hub's hole opens, local units: x/z studs from the min corner, y plates from the bottom. */
   at: [number, number, number];

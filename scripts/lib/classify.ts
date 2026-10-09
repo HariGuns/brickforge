@@ -68,7 +68,7 @@ const norm = (v: V): V => {
 const sig = (s: Snap) => `${s.kind}:${s.gender}:${s.secs.map((q) => `${q[0]}${q[1]}x${q[2]}`).join("|")}`;
 const lengthOf = (s: Snap) => s.secs.reduce((n, q) => n + q[2], 0);
 
-/** Pin kind of a horizontal male cylinder, or null. Wheel pins: radius 4, ~12 long. Technic pins: radius-8 collar, ~20 long. */
+/** Pin kind of a horizontal male cylinder, or null. Wheel pins: radius 4, ~12 long. Large pins: radius-8 collar, ~20 long. */
 function pinKind(s: Snap): PinKind | null {
   const r = s.secs[0]?.[1], len = lengthOf(s);
   if (near(r, 4, 0.01) && len >= 8 && len <= 13) return "wpin";

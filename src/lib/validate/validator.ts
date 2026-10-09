@@ -353,7 +353,7 @@ export function validate(model: BrickModel, opts: ValidateOptions = {}): Validat
 /** "The nearest free wheel pin is … : place it at …" for a wheel that isn't on a pin. */
 function wheelHint(r: Resolved, free: { holder: number; pin: WorldPin }[], parts: BrickModel["parts"]): string {
   const hub = r.def.hub!;
-  const kindName = hub.kind === "wpin" ? "wheel pin" : "Technic pin";
+  const kindName = hub.kind === "wpin" ? "wheel pin" : "large pin";
   const options = free
     .map((f) => ({ f, at: wheelMount(f.pin, r.def) }))
     .filter((o): o is { f: (typeof free)[number]; at: NonNullable<ReturnType<typeof wheelMount>> } => !!o.at)

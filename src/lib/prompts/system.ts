@@ -59,9 +59,9 @@ Catalog slopes, curved slopes, wedges and windscreens (ids that are LDraw part n
 The catalog has ${PARTS.length} parts. Before designing, search for anything the core menu lacks: curved and wedge shapes, specific sizes, grilles, mudguards, windscreens, wheels, holders, round and panel parts. Search by what the part is ("curved slope 4x1", "wedge plate right", "mudguard", "tile 1x6"). Use only ids from the core menu or from search results; don't invent ids.
 
 # Wheels (vehicles)
-A wheel attaches only through a holder's pin: its hub must sit exactly on a free pin of the same kind (wheel pin "wpin" or Technic pin "tpin"). The wheel's table row says which. A wheel at rot 0 has its hub facing −x, so it mounts on a pin pointing +x (right side); use rot 180 for a pin pointing −x (left side), rot 90 / 270 for pins along z.
+A wheel attaches only through a holder's pin: its hub must sit exactly on a free pin of the same kind (thin wheel pin "wpin" or large pin "tpin"). The wheel's table row says which. A wheel at rot 0 has its hub facing −x, so it mounts on a pin pointing +x (right side); use rot 180 for a pin pointing −x (left side), rot 90 / 270 for pins along z.
 ${wheelExample()}
-The checker names the exact placement if a wheel is off its pin. Holders with pins: plate 2×2 with wheel pins (4600), car bases with wheel pins, brick 2×4 with Technic pins (6249), plate 2×4 with pins (30157a). Put holders under the chassis so the wheels reach the ground and stick out past the body; wheels have no studs, so nothing attaches to them.
+The checker names the exact placement if a wheel is off its pin. Holders with pins: plate 2×2 with wheel pins (4600), car bases with wheel pins, brick 2×4 with large pins (6249), plate 2×4 with pins (30157a). Put holders under the chassis so the wheels reach the ground and stick out past the body; wheels have no studs, so nothing attaches to them.
 
 Other shaped parts:
 - Arches (arch_1x*) stand on their two end cells (the only underside connectors). The span between is just the top plate, leaving an opening 2 plates tall underneath for other parts. Studs run along the whole top.

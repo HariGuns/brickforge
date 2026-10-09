@@ -34,7 +34,7 @@ const CATEGORY_LABEL: Record<PartCategory, string> = {
   wheel: "Wheels",
   baseplate: "Baseplates",
   vehicle: "Vehicle parts",
-  technic: "Technic bricks",
+  technic: "Pin-and-axle parts",
   other: "Other",
 };
 
