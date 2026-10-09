@@ -101,6 +101,22 @@ const flags = { linux: ["--linux", "AppImage"], win: ["--win", "nsis", "portable
 const extra = target === "win" && process.platform !== "win32" && !hasWine() ? ["-c.win.signAndEditExecutable=false"] : [];
 run(path.join(ROOT, "node_modules", "electron-builder", "cli.js"), [...flags, ...extra, "--publish", "never"], { CSC_IDENTITY_AUTO_DISCOVERY: "false" });
 
+// No symbolic links in the packaged server: one would point at this machine's build folder.
+const links = [];
+const walkLinks = (d) => {
+  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+    const p = path.join(d, e.name);
+    if (e.isSymbolicLink()) links.push(`${path.relative(ROOT, p)} → ${fs.readlinkSync(p)}`);
+    else if (e.isDirectory()) walkLinks(p);
+  }
+};
+for (const e of fs.readdirSync(path.join(ROOT, "dist"), { withFileTypes: true })) if (e.isDirectory()) walkLinks(path.join(ROOT, "dist", e.name));
+const serverLinks = links.filter((l) => l.includes(`${path.sep}server${path.sep}`));
+if (serverLinks.length) {
+  console.error(`✗ Symbolic links in the packaged server (they'd point at this machine): ${serverLinks.slice(0, 3).join("; ")}. Not packaging.`);
+  process.exit(1);
+}
+
 // The unpacked app (before it's compressed into the AppImage / installer / dmg) gets the same check.
 refuseKeys(
   fs.readdirSync(path.join(ROOT, "dist"), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => path.join(ROOT, "dist", e.name)),

@@ -10,5 +10,8 @@ exports.default = async function afterPack(context) {
   const dest = path.join(resources, "server");
   if (!fs.existsSync(path.join(src, "server.js"))) throw new Error("No standalone server. Run npm run dist (scripts/package-desktop.mjs), which builds it first.");
   fs.rmSync(dest, { recursive: true, force: true });
-  fs.cpSync(src, dest, { recursive: true, filter: (f) => !path.basename(f).startsWith(".env") });
+  // dereference: Next links a hashed package name to the real package (.next-app/node_modules/<pkg>-<hash>).
+  // A copied link would point at this build machine's folder (broken on every other computer, and it
+  // breaks the macOS universal merge), so links are copied as the files they point to.
+  fs.cpSync(src, dest, { recursive: true, dereference: true, filter: (f) => !path.basename(f).startsWith(".env") });
 };
