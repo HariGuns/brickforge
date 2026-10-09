@@ -1,0 +1,120 @@
+{
+ "id": "lamp_post_7beabd",
+ "name": "Lamp Post",
+ "description": "A slim black street lamp on a small base, a tall post of round bricks and a lantern head with a trans_clear/yellow light.",
+ "tags": [
+  "lamp",
+  "post",
+  "slim",
+  "black",
+  "street",
+  "base",
+  "tall",
+  "round",
+  "brick",
+  "lantern",
+  "head",
+  "tran",
+  "clear",
+  "yellow",
+  "light",
+  "town"
+ ],
+ "size": {
+  "w": 1,
+  "d": 1,
+  "h": 11
+ },
+ "parts": 7,
+ "depth": 1,
+ "colors": [
+  "black",
+  "yellow",
+  "trans_clear"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "11"
+  ],
+  "bottom": [
+   "o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "lamp_post",
+ "subBuilds": [
+  {
+   "id": "lamp_post",
+   "name": "Lamp Post",
+   "parts": [
+    {
+     "part": "round_plate_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "yellow",
+     "x": 0,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "trans_clear",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "7beabd6a5f42",
+ "source": {
+  "run": "2026-10-08_19-21-20-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T19:25:36.212Z"
+ },
+ "cost": 0.0717,
+ "reused": 0
+}

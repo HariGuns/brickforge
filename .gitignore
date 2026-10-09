@@ -1,19 +1,31 @@
+# Dependencies and build output
 node_modules/
 .next/
-next-env.d.ts
+/.next-app/
+/dist/
+*.AppImage
+*.exe
+*.dmg
 *.tsbuildinfo
-.env*.local
-.env
+next-env.d.ts
+
+# Secrets: API keys live in .env.local (development) or the desktop app's settings, never in the repo
+.env*
+!.env.example
+
+# Local data: generation runs and their cost logs, exports, saved builds, logs, simulated runs
 debug/
-ldraw-lib/
 exports/
 /builds/
 /logs/
-
-# Desktop app build output
-/.next-app/
-/dist/
-/electron/build-info.json
-/components/
-/components-quarantine/
 /sim/
+ldraw-lib/
+
+# Component library: shipped. Quarantined components stay local.
+/components-quarantine/
+
+# Each user fetches this with their own Rebrickable key (npm run fetch-bricklink)
+src/lib/bricklink/rebrickable.json
+
+# Desktop app: written at package time
+/electron/build-info.json

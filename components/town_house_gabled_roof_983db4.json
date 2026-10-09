@@ -1,0 +1,504 @@
+{
+ "id": "town_house_gabled_roof_983db4",
+ "name": "Town House Gabled Roof",
+ "description": "Pitched 45-degree slope roof with its ridge running front to back, gables filled with stepped bricks and a capped ridge.",
+ "tags": [
+  "town",
+  "house",
+  "gabled",
+  "roof",
+  "pitched",
+  "degree",
+  "slope",
+  "ridge",
+  "running",
+  "front",
+  "back",
+  "gable",
+  "filled",
+  "stepped",
+  "brick",
+  "capped"
+ ],
+ "size": {
+  "w": 8,
+  "d": 8,
+  "h": 12
+ },
+ "parts": 53,
+ "depth": 1,
+ "colors": [
+  "dark_red",
+  "light_gray",
+  "white",
+  "trans_clear",
+  "dark_gray"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "3 6 9 12 12 9 6 3",
+   "3 6 9 12 12 9 6 3",
+   "3 6 9 12 12 9 6 3",
+   "3 6 9 12 12 9 6 3",
+   "3 6 9 12 12 9 6 3",
+   "3 6 9 12 12 9 6 3",
+   "3 6 9 12 12 9 6 3",
+   "3 6 9 12 12 9 6 3"
+  ],
+  "bottom": [
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "house_roof",
+ "subBuilds": [
+  {
+   "id": "house_roof",
+   "name": "Town House Gabled Roof",
+   "parts": [
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 0,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 0,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 0,
+     "z": 4,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 0,
+     "z": 6,
+     "rot": 270
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 2,
+     "y": 0,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 4,
+     "y": 0,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 0,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "light_gray",
+     "x": 2,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 5,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 2,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 7,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 3,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 5,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 7,
+     "rot": 270
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 3,
+     "y": 3,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 3,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 3,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 3,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 3,
+     "y": 3,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 4,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 3,
+     "y": 5,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 6,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 6,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 6,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 6,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 6,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 6,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 6,
+     "z": 4,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 6,
+     "z": 6,
+     "rot": 270
+    },
+    {
+     "part": "ridge45_2x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "ridge45_2x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 7,
+     "rot": 90
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "983db4ca0ba0",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.504Z"
+ },
+ "cost": 0.1253,
+ "reused": 0
+}

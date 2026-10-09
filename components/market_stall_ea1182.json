@@ -1,0 +1,576 @@
+{
+ "id": "market_stall_ea1182",
+ "name": "Market Stall",
+ "description": "A small wooden stall with a counter loaded with round-plate produce. It has four corner posts holding a red-and-white striped sloped canopy.",
+ "tags": [
+  "market",
+  "stall",
+  "wooden",
+  "counter",
+  "loaded",
+  "round",
+  "plate",
+  "produce",
+  "has",
+  "corner",
+  "post",
+  "holding",
+  "red",
+  "white",
+  "striped",
+  "sloped"
+ ],
+ "size": {
+  "w": 6,
+  "d": 4,
+  "h": 17
+ },
+ "parts": 62,
+ "depth": 1,
+ "colors": [
+  "reddish_brown",
+  "tan",
+  "red",
+  "orange",
+  "yellow",
+  "lime",
+  "green",
+  "dark_green",
+  "purple",
+  "white"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "17* 17* 17* 17* 17* 17*",
+   "17 17 17 17 17 17",
+   "14* 14* 14* 14* 14* 14*",
+   "14 14 14 14 14 14"
+  ],
+  "bottom": [
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o"
+  ],
+  "studsByHeight": [
+   "17: (0,0) (1,0) (2,0) (3,0) (4,0) (5,0)",
+   "14: (0,2) (1,2) (2,2) (3,2) (4,2) (5,2)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "market_stall",
+ "subBuilds": [
+  {
+   "id": "market_stall",
+   "name": "Market Stall",
+   "parts": [
+    {
+     "part": "plate_4x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 4,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 4,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "tan",
+     "x": 1,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "tan",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "tan",
+     "x": 5,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "orange",
+     "x": 2,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "yellow",
+     "x": 3,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "lime",
+     "x": 4,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 1,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 2,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "dark_green",
+     "x": 3,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "orange",
+     "x": 4,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 2,
+     "y": 6,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "orange",
+     "x": 4,
+     "y": 6,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "yellow",
+     "x": 0,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "lime",
+     "x": 0,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "purple",
+     "x": 5,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 5,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 7,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "tan",
+     "x": 1,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "purple",
+     "x": 1,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 3,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "orange",
+     "x": 4,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "purple",
+     "x": 1,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 3,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 11,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 2,
+     "y": 11,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 3,
+     "y": 11,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 4,
+     "y": 11,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 5,
+     "y": 11,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 1,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 2,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 3,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 4,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 5,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 1,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 2,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 3,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 4,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 5,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "ea1182c06e2b",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.498Z"
+ },
+ "cost": 0.1654,
+ "reused": 0
+}

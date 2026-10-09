@@ -1,0 +1,197 @@
+{
+ "id": "flared_wheel_arch_fender_6443f7",
+ "name": "Flared wheel-arch fender",
+ "description": "A red flared fender over one wheel, built from mudguard and curved slopes, with an open arch above the tyre and a smooth rounded top blending into the body sides.",
+ "tags": [
+  "flared",
+  "wheel",
+  "arch",
+  "fender",
+  "red",
+  "over",
+  "built",
+  "mudguard",
+  "curved",
+  "slope",
+  "open",
+  "above",
+  "tyre",
+  "smooth",
+  "rounded",
+  "top"
+ ],
+ "size": {
+  "w": 3,
+  "d": 8,
+  "h": 7
+ },
+ "parts": 15,
+ "depth": 1,
+ "colors": [
+  "red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "6* 7 7",
+   "6* 7 7",
+   "6* 7 7",
+   "6* 7 7",
+   "6* 7 7",
+   "6* 7 7",
+   "6* 7 7",
+   "6* 7 7"
+  ],
+  "bottom": [
+   "o o o",
+   "o o o",
+   ". . .",
+   ". . .",
+   ". . .",
+   ". . .",
+   "o o o",
+   "o o o"
+  ],
+  "studsByHeight": [
+   "6: (0,0) (0,1) (0,2) (0,3) (0,4) (0,5) (0,6) (0,7)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "fender_arch",
+ "subBuilds": [
+  {
+   "id": "fender_arch",
+   "name": "Flared wheel-arch fender",
+   "parts": [
+    {
+     "part": "plate_2x3",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x3",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x3",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x3",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x8",
+     "color": "red",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 3,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 4,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 5,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 6,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 7,
+     "rot": 270
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "6443f7a39a6c",
+ "source": {
+  "run": "2026-09-25_05-56-48-subbuilds-photo",
+  "at": "2026-09-25T13:53:23.402Z"
+ },
+ "cost": 0.0696,
+ "reused": 0
+}

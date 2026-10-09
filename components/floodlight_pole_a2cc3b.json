@@ -1,0 +1,179 @@
+{
+ "id": "floodlight_pole_a2cc3b",
+ "name": "Floodlight Pole",
+ "description": "A slim light-gray pole of stacked 1×1 round bricks on a 2×2 foot, topped with a small light bank of trans-clear tiles.",
+ "tags": [
+  "floodlight",
+  "pole",
+  "light",
+  "slim",
+  "gray",
+  "stacked",
+  "round",
+  "brick",
+  "foot",
+  "topped",
+  "bank",
+  "tran",
+  "clear",
+  "tile",
+  "hurac",
+  "circuit"
+ ],
+ "size": {
+  "w": 2,
+  "d": 2,
+  "h": 29
+ },
+ "parts": 14,
+ "depth": 1,
+ "colors": [
+  "light_gray",
+  "dark_gray",
+  "black",
+  "trans_clear"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "29 29",
+   "29 29"
+  ],
+  "bottom": [
+   "o o",
+   "o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "light_pole",
+ "subBuilds": [
+  {
+   "id": "light_pole",
+   "name": "Floodlight Pole",
+   "parts": [
+    {
+     "part": "plate_2x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "light_gray",
+     "x": 0,
+     "y": 20,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "light_gray",
+     "x": 0,
+     "y": 23,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 26,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 27,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "trans_clear",
+     "x": 0,
+     "y": 28,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "trans_clear",
+     "x": 0,
+     "y": 28,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "a2cc3b4c6587",
+ "source": {
+  "run": "2026-09-25_10-24-56-subbuilds-using-the-image-attached-can-y",
+  "request": "using the image attached can you create a small diarama which includes the car, the race track and the stands in the background.\n",
+  "at": "2026-09-25T13:53:23.505Z"
+ },
+ "cost": 0.0773,
+ "reused": 0
+}

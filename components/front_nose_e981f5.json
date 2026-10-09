@@ -1,0 +1,417 @@
+{
+ "id": "front_nose_e981f5",
+ "name": "Front nose",
+ "description": "A low wedge bonnet of red curved slopes. It has thin trans-clear headlights at the front corners, black lower intakes split by a central splitter, and red blades at the outer corners.",
+ "tags": [
+  "front",
+  "nose",
+  "low",
+  "wedge",
+  "bonnet",
+  "red",
+  "curved",
+  "slope",
+  "has",
+  "thin",
+  "tran",
+  "clear",
+  "headlight",
+  "corner",
+  "black",
+  "lower"
+ ],
+ "size": {
+  "w": 16,
+  "d": 9,
+  "h": 8
+ },
+ "parts": 42,
+ "depth": 1,
+ "colors": [
+  "red",
+  "black",
+  "trans_clear"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   ". . . 8* 8* 8* 8* 8* 8* 8* 8* 8* 8* . . .",
+   ". . . 8* 8* 8* 8* 8* 8* 8* 8* 8* 8* . . .",
+   ". . . 8 8 8 8 8 8 8 8 8 8 . . .",
+   ". . . 8 8 8 8 8 8 8 8 8 8 . . .",
+   ". . . 7 7 7 7 7 7 7 7 7 7 . . .",
+   "5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5",
+   "5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5",
+   "4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4",
+   "4 4 4 3 3 3 3 4 4 3 3 3 3 4 4 4"
+  ],
+  "bottom": [
+   ". . . o o o o o o o o o o . . .",
+   ". . . o o o o o o o o o o . . .",
+   ". . . o o o o o o o o o o . . .",
+   ". . . o o o o o o o o o o . . .",
+   ". . . o o o o o o o o o o . . .",
+   "o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o"
+  ],
+  "studsByHeight": [
+   "8: (3,0) (4,0) (5,0) (6,0) (7,0) (8,0) (9,0) (10,0) (11,0) (12,0) (3,1) (4,1) (5,1) (6,1) (7,1) (8,1) (9,1) (10,1) (11,1) (12,1)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "nose",
+ "subBuilds": [
+  {
+   "id": "nose",
+   "name": "Front nose",
+   "parts": [
+    {
+     "part": "3033",
+     "color": "red",
+     "x": 3,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3832",
+     "color": "red",
+     "x": 3,
+     "y": 0,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "4477",
+     "color": "black",
+     "x": 3,
+     "y": 0,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 1,
+     "y": 0,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 13,
+     "y": 0,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 15,
+     "y": 0,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "3832",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3832",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "4477",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "3029",
+     "color": "black",
+     "x": 2,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 14,
+     "y": 1,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "54200",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "trans_clear",
+     "x": 1,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 3,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 5,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "red",
+     "x": 7,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 9,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 11,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "trans_clear",
+     "x": 13,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "54200",
+     "color": "red",
+     "x": 15,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 2,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 4,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 6,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 8,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 10,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 12,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 14,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "2356",
+     "color": "red",
+     "x": 3,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 9,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 9,
+     "y": 2,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "6111",
+     "color": "red",
+     "x": 3,
+     "y": 2,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 3,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 5,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 7,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 9,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "24309",
+     "color": "red",
+     "x": 11,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 3,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 7,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 11,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "e981f52de5cf",
+ "source": {
+  "run": "2026-09-24_17-36-41-subbuilds-photo-medium",
+  "at": "2026-09-25T13:53:23.377Z"
+ },
+ "cost": 0.3269,
+ "reused": 0
+}

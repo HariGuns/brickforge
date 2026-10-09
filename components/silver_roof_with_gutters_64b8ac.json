@@ -1,0 +1,1160 @@
+{
+ "id": "silver_roof_with_gutters_64b8ac",
+ "name": "Silver roof with gutters",
+ "description": "The contrasting light_gray roof panel, narrower than the body, with rounded tile edges and gutter strips along both sides, which caps and ties the pillars together.",
+ "tags": [
+  "silver",
+  "roof",
+  "gutter",
+  "contrasting",
+  "light",
+  "gray",
+  "panel",
+  "narrower",
+  "than",
+  "body",
+  "rounded",
+  "tile",
+  "edge",
+  "strip",
+  "along",
+  "both"
+ ],
+ "size": {
+  "w": 18,
+  "d": 30,
+  "h": 4
+ },
+ "parts": 130,
+ "depth": 1,
+ "colors": [
+  "light_gray"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 3",
+   "3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3"
+  ],
+  "bottom": [
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "roof",
+ "subBuilds": [
+  {
+   "id": "roof",
+   "name": "Silver roof with gutters",
+   "parts": [
+    {
+     "part": "3028",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3028",
+     "color": "light_gray",
+     "x": 6,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3028",
+     "color": "light_gray",
+     "x": 12,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3028",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "3028",
+     "color": "light_gray",
+     "x": 6,
+     "y": 0,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "3028",
+     "color": "light_gray",
+     "x": 12,
+     "y": 0,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "3958",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 24,
+     "rot": 0
+    },
+    {
+     "part": "3958",
+     "color": "light_gray",
+     "x": 6,
+     "y": 0,
+     "z": 24,
+     "rot": 0
+    },
+    {
+     "part": "3958",
+     "color": "light_gray",
+     "x": 12,
+     "y": 0,
+     "z": 24,
+     "rot": 0
+    },
+    {
+     "part": "3029",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "light_gray",
+     "x": 5,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "light_gray",
+     "x": 9,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "light_gray",
+     "x": 13,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "light_gray",
+     "x": 5,
+     "y": 1,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "light_gray",
+     "x": 9,
+     "y": 1,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "light_gray",
+     "x": 13,
+     "y": 1,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x4",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 25,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "light_gray",
+     "x": 5,
+     "y": 1,
+     "z": 25,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "light_gray",
+     "x": 9,
+     "y": 1,
+     "z": 25,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "light_gray",
+     "x": 13,
+     "y": 1,
+     "z": 25,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 16,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x6",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 24,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "light_gray",
+     "x": 17,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "light_gray",
+     "x": 17,
+     "y": 1,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "light_gray",
+     "x": 17,
+     "y": 1,
+     "z": 16,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x6",
+     "color": "light_gray",
+     "x": 17,
+     "y": 1,
+     "z": 24,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 7,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 9,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 11,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 13,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 15,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 29,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 3,
+     "y": 1,
+     "z": 29,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 5,
+     "y": 1,
+     "z": 29,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 7,
+     "y": 1,
+     "z": 29,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 9,
+     "y": 1,
+     "z": 29,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 11,
+     "y": 1,
+     "z": 29,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 13,
+     "y": 1,
+     "z": 29,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 15,
+     "y": 1,
+     "z": 29,
+     "rot": 0
+    },
+    {
+     "part": "4162",
+     "color": "light_gray",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "4162",
+     "color": "light_gray",
+     "x": 0,
+     "y": 2,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "4162",
+     "color": "light_gray",
+     "x": 0,
+     "y": 2,
+     "z": 16,
+     "rot": 90
+    },
+    {
+     "part": "6636",
+     "color": "light_gray",
+     "x": 0,
+     "y": 2,
+     "z": 24,
+     "rot": 90
+    },
+    {
+     "part": "4162",
+     "color": "light_gray",
+     "x": 17,
+     "y": 2,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "4162",
+     "color": "light_gray",
+     "x": 17,
+     "y": 2,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "4162",
+     "color": "light_gray",
+     "x": 17,
+     "y": 2,
+     "z": 16,
+     "rot": 90
+    },
+    {
+     "part": "6636",
+     "color": "light_gray",
+     "x": 17,
+     "y": 2,
+     "z": 24,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 7,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 11,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 15,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 17,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 19,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 21,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 23,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 25,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 27,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 3,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 5,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 7,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 9,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 11,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 13,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 15,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 17,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 19,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 21,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 23,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 25,
+     "rot": 270
+    },
+    {
+     "part": "85984",
+     "color": "light_gray",
+     "x": 16,
+     "y": 2,
+     "z": 27,
+     "rot": 270
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 8,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 10,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 12,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 14,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 8,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 10,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 12,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 14,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 8,
+     "y": 2,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 10,
+     "y": 2,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 12,
+     "y": 2,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 14,
+     "y": 2,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 8,
+     "y": 2,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 10,
+     "y": 2,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 12,
+     "y": 2,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 14,
+     "y": 2,
+     "z": 13,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 17,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 17,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 17,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 8,
+     "y": 2,
+     "z": 17,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 10,
+     "y": 2,
+     "z": 17,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 12,
+     "y": 2,
+     "z": 17,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 14,
+     "y": 2,
+     "z": 17,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 21,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 21,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 21,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 8,
+     "y": 2,
+     "z": 21,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 10,
+     "y": 2,
+     "z": 21,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 12,
+     "y": 2,
+     "z": 21,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 14,
+     "y": 2,
+     "z": 21,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 25,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 25,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 25,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 8,
+     "y": 2,
+     "z": 25,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 10,
+     "y": 2,
+     "z": 25,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 12,
+     "y": 2,
+     "z": 25,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "light_gray",
+     "x": 14,
+     "y": 2,
+     "z": 25,
+     "rot": 90
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "64b8ac1642c1",
+ "source": {
+  "run": "2026-09-25_11-34-10-subbuilds-please-create-a-highly-detaile",
+  "request": "please create a highly detailed model of this Mini cooper.  Use as many bricks as you need and it has to be a minimum of 20 Cm long and scaled accordingly \n",
+  "at": "2026-09-25T13:53:23.553Z"
+ },
+ "cost": 0.1246,
+ "reused": 0
+}

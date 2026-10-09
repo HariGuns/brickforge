@@ -1,0 +1,340 @@
+{
+ "id": "tree_ee8234",
+ "name": "Tree",
+ "description": "A deciduous tree with a reddish_brown trunk on a small planter and a layered rounded green canopy of plates and round bricks.",
+ "tags": [
+  "tree",
+  "deciduou",
+  "reddish",
+  "brown",
+  "trunk",
+  "planter",
+  "layered",
+  "rounded",
+  "green",
+  "canopy",
+  "plate",
+  "round",
+  "brick",
+  "town",
+  "square",
+  "house"
+ ],
+ "size": {
+  "w": 3,
+  "d": 3,
+  "h": 17
+ },
+ "parts": 33,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "dark_tan",
+  "reddish_brown",
+  "dark_green",
+  "red",
+  "yellow",
+  "green",
+  "lime"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "14 16* 14",
+   "17* 17* 17*",
+   "14 16* 14"
+  ],
+  "bottom": [
+   "o o o",
+   "o o o",
+   "o o o"
+  ],
+  "studsByHeight": [
+   "17: (0,1) (1,1) (2,1)",
+   "16: (1,0) (1,2)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "tree",
+ "subBuilds": [
+  {
+   "id": "tree",
+   "name": "Tree",
+   "parts": [
+    {
+     "part": "plate_2x3",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_tan",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_tan",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_tan",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "dark_green",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_green",
+     "x": 2,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "yellow",
+     "x": 0,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x3",
+     "color": "dark_green",
+     "x": 0,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "green",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "green",
+     "x": 2,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "green",
+     "x": 1,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x3",
+     "color": "lime",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "lime",
+     "x": 0,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "lime",
+     "x": 0,
+     "y": 11,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "lime",
+     "x": 2,
+     "y": 11,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "lime",
+     "x": 1,
+     "y": 11,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "green",
+     "x": 0,
+     "y": 12,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "green",
+     "x": 1,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "green",
+     "x": 1,
+     "y": 12,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "54200",
+     "color": "green",
+     "x": 0,
+     "y": 12,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "54200",
+     "color": "green",
+     "x": 2,
+     "y": 12,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "54200",
+     "color": "green",
+     "x": 0,
+     "y": 12,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "54200",
+     "color": "green",
+     "x": 2,
+     "y": 12,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "lime",
+     "x": 1,
+     "y": 15,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 1,
+     "y": 16,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "lime",
+     "x": 0,
+     "y": 15,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "lime",
+     "x": 2,
+     "y": 15,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 0,
+     "y": 16,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 2,
+     "y": 16,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "ee82342a52de",
+ "source": {
+  "run": "2026-10-08_19-21-20-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T19:25:36.210Z"
+ },
+ "cost": 0.1699,
+ "reused": 0
+}

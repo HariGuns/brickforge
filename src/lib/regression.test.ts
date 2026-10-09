@@ -16,6 +16,7 @@ import { exportDesignMpd, exportLdr, exportMpd } from "./ldraw/export";
 import { importLdr } from "./ldraw/import";
 import { countParts } from "./model/stats";
 import { exportWantedList } from "./bricklink/wantedList";
+import { REBRICKABLE_LOADED } from "./bricklink/ids";
 import { compileDesign } from "./design/compile";
 import { designSteps } from "./design/steps";
 import { flatSection, manualPages } from "./manual/pages";
@@ -51,7 +52,6 @@ async function summary(model: BrickModel, design?: BrickDesign) {
     ldr: hash(ldr),
     mpd: hash(mpd),
     reimportSame: back.skipped.length === 0 && back.model.parts.map(key).sort().join() === model.parts.map(key).sort().join(),
-    bricklink: hash(exportWantedList(model)),
     compile: compiled ? { pieces: compiled.stats.pieces, unique: compiled.stats.uniqueSubBuilds, copies: compiled.stats.copies, errors: compiled.errors.length, warnings: compiled.warnings.length, sizeCm: compiled.stats.sizeCm } : null,
     render: hash(await renderModel(model, { azimuth: 35, elevation: 25 }, { width: 160, height: 100 })),
   };
@@ -65,5 +65,12 @@ describe("regression: saved builds behave exactly as before", () => {
       const model: BrickModel = design ? compileDesign(design).model : json;
       expect(await summary(model, design)).toMatchSnapshot();
     }, 60000);
+    // The wanted list's part numbers come from Rebrickable data, which each user fetches
+    // with their own key (npm run fetch-bricklink); without it this check is skipped.
+    it.skipIf(!REBRICKABLE_LOADED)(`${f}: BrickLink wanted list`, () => {
+      const json = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
+      const model: BrickModel = f.endsWith(".design.json") ? compileDesign(json).model : json;
+      expect(hash(exportWantedList(model))).toMatchSnapshot();
+    });
   }
 });

@@ -1,0 +1,719 @@
+{
+ "id": "passenger_carriage_91e3d9",
+ "name": "Passenger Carriage",
+ "description": "A matching passenger car: a dark gray chassis plate, dark red lower walls with a row of trans-clear windows and a yellow stripe, and door ends. A curved gray roof is made of 33-degree slopes and tiles.",
+ "tags": [
+  "passenger",
+  "carriage",
+  "matching",
+  "car",
+  "dark",
+  "gray",
+  "chassi",
+  "plate",
+  "red",
+  "lower",
+  "wall",
+  "row",
+  "tran",
+  "clear",
+  "window",
+  "yellow"
+ ],
+ "size": {
+  "w": 10,
+  "d": 6,
+  "h": 19
+ },
+ "parts": 80,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "dark_red",
+  "reddish_brown",
+  "tan",
+  "yellow",
+  "dark_tan",
+  "trans_clear",
+  "light_gray"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "17 17 17 17 17 17 17 17 17 17",
+   "17 17 17 17 17 17 17 17 17 17",
+   "18 18 18 19 19 18 18 19 19 18",
+   "18 18 18 19 19 18 18 19 19 18",
+   "17 17 17 17 17 17 17 17 17 17",
+   "17 17 17 17 17 17 17 17 17 17"
+  ],
+  "bottom": [
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "carriage",
+ "subBuilds": [
+  {
+   "id": "carriage",
+   "name": "Passenger Carriage",
+   "parts": [
+    {
+     "part": "plate_4x6",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x6",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "dark_gray",
+     "x": 8,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "dark_red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 6,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "dark_red",
+     "x": 4,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 9,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 9,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 9,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x8",
+     "color": "tan",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "reddish_brown",
+     "x": 6,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "reddish_brown",
+     "x": 8,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "yellow",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 4,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "yellow",
+     "x": 0,
+     "y": 4,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "yellow",
+     "x": 9,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "reddish_brown",
+     "x": 9,
+     "y": 4,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "yellow",
+     "x": 9,
+     "y": 4,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "yellow",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "yellow",
+     "x": 1,
+     "y": 4,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "dark_tan",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "dark_tan",
+     "x": 3,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "dark_tan",
+     "x": 6,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "dark_tan",
+     "x": 8,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "trans_clear",
+     "x": 1,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "trans_clear",
+     "x": 4,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "trans_clear",
+     "x": 7,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "trans_clear",
+     "x": 1,
+     "y": 5,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "trans_clear",
+     "x": 4,
+     "y": 5,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "trans_clear",
+     "x": 7,
+     "y": 5,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 3,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 6,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 3,
+     "y": 5,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 6,
+     "y": 5,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 5,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 5,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 9,
+     "y": 5,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "reddish_brown",
+     "x": 9,
+     "y": 5,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 9,
+     "y": 5,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 3,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 6,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 3,
+     "y": 8,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 6,
+     "y": 8,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 8,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 9,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 9,
+     "y": 8,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "dark_red",
+     "x": 4,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "dark_red",
+     "x": 0,
+     "y": 11,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 6,
+     "y": 11,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 11,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 9,
+     "y": 11,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "slope33_3x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "light_gray",
+     "x": 2,
+     "y": 14,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "light_gray",
+     "x": 6,
+     "y": 14,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "light_gray",
+     "x": 0,
+     "y": 14,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "light_gray",
+     "x": 4,
+     "y": 14,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x2",
+     "color": "light_gray",
+     "x": 8,
+     "y": 14,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 17,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "tile_2x2",
+     "color": "light_gray",
+     "x": 1,
+     "y": 17,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "light_gray",
+     "x": 3,
+     "y": 17,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "light_gray",
+     "x": 5,
+     "y": 17,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "light_gray",
+     "x": 7,
+     "y": 17,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "light_gray",
+     "x": 9,
+     "y": 17,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 18,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 18,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 18,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 18,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 7,
+     "y": 18,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 8,
+     "y": 18,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 7,
+     "y": 18,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 8,
+     "y": 18,
+     "z": 3,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "91e3d97eea7a",
+ "source": {
+  "run": "2026-09-24_06-00-32-subbuilds-a-steam-train-with-an-engine-a",
+  "request": "a steam train with an engine and three matching carriages on a track",
+  "at": "2026-09-25T13:53:23.285Z"
+ },
+ "cost": 0.2288,
+ "reused": 0
+}

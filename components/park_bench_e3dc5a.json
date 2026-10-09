@@ -1,0 +1,137 @@
+{
+ "id": "park_bench_e3dc5a",
+ "name": "Park Bench",
+ "description": "A small reddish_brown wooden bench with dark_gray legs and a backrest.",
+ "tags": [
+  "park",
+  "bench",
+  "reddish",
+  "brown",
+  "wooden",
+  "dark",
+  "gray",
+  "leg",
+  "backrest",
+  "village",
+  "square",
+  "house",
+  "tree",
+  "well"
+ ],
+ "size": {
+  "w": 4,
+  "d": 2,
+  "h": 6
+ },
+ "parts": 9,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "reddish_brown"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "6* 6* 6* 6*",
+   "4 4 4 4"
+  ],
+  "bottom": [
+   "o . . o",
+   "o . . o"
+  ],
+  "studsByHeight": [
+   "6: (0,0) (1,0) (2,0) (3,0)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "bench",
+ "subBuilds": [
+  {
+   "id": "bench",
+   "name": "Park Bench",
+   "parts": [
+    {
+     "part": "plate_1x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "e3dc5a1b80e4",
+ "source": {
+  "run": "2026-09-24_06-00-32-subbuilds-a-village-square-with-three-ho",
+  "request": "a village square with three houses, trees and a well",
+  "at": "2026-09-25T13:53:23.300Z"
+ },
+ "cost": 0.036,
+ "reused": 1
+}

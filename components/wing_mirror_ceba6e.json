@@ -1,0 +1,81 @@
+{
+ "id": "wing_mirror_ceba6e",
+ "name": "Wing mirror",
+ "description": "A small red wing mirror on a short black stalk, mounted at the base of the windscreen.",
+ "tags": [
+  "wing",
+  "mirror",
+  "red",
+  "short",
+  "black",
+  "stalk",
+  "mounted",
+  "base",
+  "windscreen",
+  "lamborghini",
+  "hurac"
+ ],
+ "size": {
+  "w": 2,
+  "d": 1,
+  "h": 3
+ },
+ "parts": 3,
+ "depth": 1,
+ "colors": [
+  "black",
+  "red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "3 3"
+  ],
+  "bottom": [
+   "o ."
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "mirror",
+ "subBuilds": [
+  {
+   "id": "mirror",
+   "name": "Wing mirror",
+   "parts": [
+    {
+     "part": "round_plate_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "ceba6ee58f35",
+ "source": {
+  "run": "2026-09-25_05-56-48-subbuilds-photo",
+  "at": "2026-09-25T13:53:23.403Z"
+ },
+ "cost": 0.0193,
+ "reused": 0
+}

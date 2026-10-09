@@ -1,0 +1,518 @@
+{
+ "id": "stone_well_2eff5a",
+ "name": "Stone Well",
+ "description": "A round light_gray stone well with a blue water tile center, two reddish_brown posts and a small red peaked roof over the opening.",
+ "tags": [
+  "stone",
+  "well",
+  "round",
+  "light",
+  "gray",
+  "blue",
+  "water",
+  "tile",
+  "center",
+  "reddish",
+  "brown",
+  "post",
+  "red",
+  "peaked",
+  "roof",
+  "over"
+ ],
+ "size": {
+  "w": 6,
+  "d": 6,
+  "h": 22
+ },
+ "parts": 55,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "blue",
+  "yellow",
+  "light_gray",
+  "reddish_brown",
+  "red",
+  "dark_red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "19 19 19 19 19 19",
+   "19 19 19 19 19 19",
+   "22 22 22 22 22 22",
+   "22 22 22 22 22 22",
+   "19 19 19 19 19 19",
+   "19 19 19 19 19 19"
+  ],
+  "bottom": [
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "well",
+ "subBuilds": [
+  {
+   "id": "well",
+   "name": "Stone Well",
+   "parts": [
+    {
+     "part": "plate_4x6",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x6",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "blue",
+     "x": 2,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "blue",
+     "x": 2,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "blue",
+     "x": 2,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "blue",
+     "x": 1,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x2",
+     "color": "blue",
+     "x": 4,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 5,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "light_gray",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 5,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "light_gray",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 4,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "light_gray",
+     "x": 3,
+     "y": 4,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 4,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "light_gray",
+     "x": 5,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_gray",
+     "x": 5,
+     "y": 4,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "light_gray",
+     "x": 1,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "light_gray",
+     "x": 4,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "light_gray",
+     "x": 1,
+     "y": 4,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "light_gray",
+     "x": 4,
+     "y": 4,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "light_gray",
+     "x": 0,
+     "y": 7,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "light_gray",
+     "x": 5,
+     "y": 7,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x4",
+     "color": "light_gray",
+     "x": 1,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "light_gray",
+     "x": 1,
+     "y": 7,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 7,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 7,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 4,
+     "y": 8,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 8,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 8,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 11,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 11,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 12,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 12,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 15,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 0,
+     "y": 16,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x2",
+     "color": "red",
+     "x": 4,
+     "y": 16,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 0,
+     "y": 16,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x2",
+     "color": "red",
+     "x": 4,
+     "y": 16,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 19,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 19,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 19,
+     "z": 2,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "2eff5ae957c2",
+ "source": {
+  "run": "2026-09-24_06-00-32-subbuilds-a-village-square-with-three-ho",
+  "request": "a village square with three houses, trees and a well",
+  "at": "2026-09-25T13:53:23.312Z"
+ },
+ "cost": 0.151,
+ "reused": 0
+}

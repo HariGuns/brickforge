@@ -1,0 +1,452 @@
+{
+ "id": "cab_forward_cabin_79f193",
+ "name": "Cab-forward cabin",
+ "description": "A low cabin with a steeply raked black windscreen, black side windows and a short red roof that peaks mid-car and flows down toward the rear deck.",
+ "tags": [
+  "cab",
+  "forward",
+  "cabin",
+  "low",
+  "steeply",
+  "raked",
+  "black",
+  "windscreen",
+  "side",
+  "window",
+  "short",
+  "red",
+  "roof",
+  "that",
+  "peak",
+  "mid"
+ ],
+ "size": {
+  "w": 12,
+  "d": 12,
+  "h": 13
+ },
+ "parts": 46,
+ "depth": 1,
+ "colors": [
+  "red",
+  "black"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "8 8 8 8 8 8 8 8 8 8 8 8",
+   "8 8 8 8 8 8 8 8 8 8 8 8",
+   "11 11 11 11 11 11 11 11 11 11 11 11",
+   "11 11 11 11 11 11 11 11 11 11 11 11",
+   "13 13 13 13 13 13 13 13 13 13 13 13",
+   "13 13 13 13 13 13 13 13 13 13 13 13",
+   "13 13 13 13 13 13 13 13 13 13 13 13",
+   "13 13 13 13 13 13 13 13 13 13 13 13",
+   "13 13 13 13 13 13 13 13 13 13 13 13",
+   "11 11 11 11 11 11 11 11 11 11 11 11",
+   "8 8 8 8 8 8 8 8 8 8 8 8",
+   "5 5 5 5 5 5 5 5 5 5 5 5"
+  ],
+  "bottom": [
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o",
+   "o o o o o o o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "cabin",
+ "subBuilds": [
+  {
+   "id": "cabin",
+   "name": "Cab-forward cabin",
+   "parts": [
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 4,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 8,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "6111",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "6111",
+     "color": "red",
+     "x": 11,
+     "y": 2,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "6111",
+     "color": "red",
+     "x": 1,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "6111",
+     "color": "black",
+     "x": 1,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "6111",
+     "color": "black",
+     "x": 1,
+     "y": 2,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "4445",
+     "color": "black",
+     "x": 1,
+     "y": 2,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "black",
+     "x": 9,
+     "y": 2,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 11,
+     "y": 2,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 4,
+     "y": 5,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 8,
+     "y": 5,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "black",
+     "x": 0,
+     "y": 5,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 5,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 11,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "black",
+     "x": 11,
+     "y": 5,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "black",
+     "x": 11,
+     "y": 5,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "6111",
+     "color": "black",
+     "x": 1,
+     "y": 5,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "4445",
+     "color": "black",
+     "x": 1,
+     "y": 5,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "black",
+     "x": 9,
+     "y": 5,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 11,
+     "y": 5,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 2,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 4,
+     "y": 8,
+     "z": 2,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 8,
+     "y": 8,
+     "z": 2,
+     "rot": 180
+    },
+    {
+     "part": "brick_1x3",
+     "color": "black",
+     "x": 0,
+     "y": 8,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "black",
+     "x": 11,
+     "y": 8,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "4445",
+     "color": "black",
+     "x": 1,
+     "y": 8,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "black",
+     "x": 9,
+     "y": 8,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 11,
+     "y": 8,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "60479",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "69729",
+     "color": "red",
+     "x": 0,
+     "y": 12,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "69729",
+     "color": "red",
+     "x": 6,
+     "y": 12,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "69729",
+     "color": "red",
+     "x": 0,
+     "y": 12,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "69729",
+     "color": "red",
+     "x": 6,
+     "y": 12,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "6636",
+     "color": "red",
+     "x": 0,
+     "y": 12,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "6636",
+     "color": "red",
+     "x": 6,
+     "y": 12,
+     "z": 8,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "79f193c01ac5",
+ "source": {
+  "run": "2026-09-25_05-56-48-subbuilds-photo",
+  "at": "2026-09-25T13:53:23.401Z"
+ },
+ "cost": 0.2232,
+ "reused": 0
+}

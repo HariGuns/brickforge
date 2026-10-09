@@ -1,0 +1,150 @@
+{
+ "id": "garden_fence_852af0",
+ "name": "Garden Fence",
+ "description": "A short white picket fence section on a plate strip with flowers at its foot.",
+ "tags": [
+  "garden",
+  "fence",
+  "run",
+  "short",
+  "white",
+  "picket",
+  "section",
+  "plate",
+  "strip",
+  "flower",
+  "foot",
+  "village",
+  "square",
+  "house",
+  "tree",
+  "well"
+ ],
+ "size": {
+  "w": 8,
+  "d": 1,
+  "h": 7
+ },
+ "parts": 10,
+ "depth": 1,
+ "colors": [
+  "green",
+  "red",
+  "white",
+  "yellow",
+  "pink",
+  "purple"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "3* 7* 4 4 4 4 7* 3*"
+  ],
+  "bottom": [
+   "o o o o o o o o"
+  ],
+  "studsByHeight": [
+   "7: (1,0) (6,0)",
+   "3: (0,0) (7,0)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "fence_run",
+ "subBuilds": [
+  {
+   "id": "fence_run",
+   "name": "Garden Fence",
+   "parts": [
+    {
+     "part": "plate_1x8",
+     "color": "green",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "fence_1x4x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 6,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 7,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "pink",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "purple",
+     "x": 7,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "white",
+     "x": 6,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "852af05f72b8",
+ "source": {
+  "run": "2026-09-24_06-00-32-subbuilds-a-village-square-with-three-ho",
+  "request": "a village square with three houses, trees and a well",
+  "at": "2026-09-25T13:53:23.300Z"
+ },
+ "cost": 0.0255,
+ "reused": 1
+}

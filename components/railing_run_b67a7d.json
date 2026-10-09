@@ -1,0 +1,145 @@
+{
+ "id": "railing_run_b67a7d",
+ "name": "Railing Run",
+ "description": "An 8-stud run of black fence railing standing on a 1-wide plate strip, with small posts at each end.",
+ "tags": [
+  "railing",
+  "run",
+  "stud",
+  "black",
+  "fence",
+  "standing",
+  "wide",
+  "plate",
+  "strip",
+  "post",
+  "each",
+  "end",
+  "town",
+  "square",
+  "house",
+  "market"
+ ],
+ "size": {
+  "w": 8,
+  "d": 1,
+  "h": 5
+ },
+ "parts": 10,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "black"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "5* 5 4 4 4 4 5 5*"
+  ],
+  "bottom": [
+   "o o o o o o o o"
+  ],
+  "studsByHeight": [
+   "5: (0,0) (7,0)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "railing_run",
+ "subBuilds": [
+  {
+   "id": "railing_run",
+   "name": "Railing Run",
+   "parts": [
+    {
+     "part": "plate_1x8",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "black",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "fence_1x4x1",
+     "color": "black",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "black",
+     "x": 6,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 7,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "black",
+     "x": 7,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 6,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "b67a7df8bfb6",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.501Z"
+ },
+ "cost": 0.0478,
+ "reused": 1
+}

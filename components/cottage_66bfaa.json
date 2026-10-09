@@ -1,0 +1,698 @@
+{
+ "id": "cottage_66bfaa",
+ "name": "Cottage",
+ "description": "A small gabled cottage about 10 studs wide with white brick walls, a front door, windows on the front and sides, a red sloped roof with ridge caps, filled gable ends and a chimney.",
+ "tags": [
+  "cottage",
+  "gabled",
+  "about",
+  "stud",
+  "wide",
+  "white",
+  "brick",
+  "wall",
+  "front",
+  "door",
+  "window",
+  "side",
+  "red",
+  "sloped",
+  "roof",
+  "ridge"
+ ],
+ "size": {
+  "w": 10,
+  "d": 10,
+  "h": 32
+ },
+ "parts": 76,
+ "depth": 1,
+ "colors": [
+  "light_gray",
+  "white",
+  "reddish_brown",
+  "tan",
+  "red",
+  "yellow",
+  "dark_gray"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "23 23 23 23 23 23 23 23 23 23",
+   "23* 23* 23* 23* 23* 23* 23* 23* 23* 23*",
+   "26 32* 32* 26 26 26 26 26 26 26",
+   "26* 32* 32* 26* 26* 26* 26* 26* 26* 26*",
+   "29 29 29 29 29 29 29 29 29 29",
+   "29 29 29 29 29 29 29 29 29 29",
+   "26* 26* 26* 26* 26* 26* 26* 26* 26* 26*",
+   "26 26 26 26 26 26 26 26 26 26",
+   "23* 23* 23* 23* 23* 23* 23* 23* 23* 23*",
+   "23 23 23 23 23 23 23 23 23 23"
+  ],
+  "bottom": [
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o",
+   "o o o o o o o o o o"
+  ],
+  "studsByHeight": [
+   "32: (1,2) (2,2) (1,3) (2,3)",
+   "26: (0,3) (3,3) (4,3) (5,3) (6,3) (7,3) (8,3) (9,3) (0,6) (1,6) (2,6) (3,6) (4,6) (5,6) (6,6) (7,6) (8,6) (9,6)",
+   "23: (0,1) (1,1) (2,1) (3,1) (4,1) (5,1) (6,1) (7,1) (8,1) (9,1) (0,8) (1,8) (2,8) (3,8) (4,8) (5,8) (6,8) (7,8) (8,8) (9,8)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "cottage",
+ "subBuilds": [
+  {
+   "id": "cottage",
+   "name": "Cottage",
+   "parts": [
+    {
+     "part": "3033",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3030",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 7,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "white",
+     "x": 6,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 9,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "door_1x4x6",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "tan",
+     "x": 3,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 2,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 7,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 8,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x8",
+     "color": "white",
+     "x": 9,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 4,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 7,
+     "y": 4,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x8",
+     "color": "white",
+     "x": 1,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 9,
+     "y": 7,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 9,
+     "y": 7,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 9,
+     "y": 7,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "white",
+     "x": 6,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 7,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "reddish_brown",
+     "x": 7,
+     "y": 7,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "reddish_brown",
+     "x": 9,
+     "y": 7,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "reddish_brown",
+     "x": 4,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 10,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 10,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 9,
+     "y": 10,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 9,
+     "y": 10,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 1,
+     "y": 10,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 6,
+     "y": 10,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 7,
+     "y": 13,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 9,
+     "y": 13,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "white",
+     "x": 6,
+     "y": 13,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 16,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x8",
+     "color": "white",
+     "x": 9,
+     "y": 16,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 16,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 7,
+     "y": 16,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x8",
+     "color": "white",
+     "x": 1,
+     "y": 16,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "3033",
+     "color": "white",
+     "x": 0,
+     "y": 19,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3030",
+     "color": "white",
+     "x": 0,
+     "y": 19,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 20,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 4,
+     "y": 20,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "red",
+     "x": 8,
+     "y": 20,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 20,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 4,
+     "y": 20,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "red",
+     "x": 8,
+     "y": 20,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 20,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 9,
+     "y": 20,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x6",
+     "color": "white",
+     "x": 4,
+     "y": 20,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 23,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 4,
+     "y": 23,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "red",
+     "x": 8,
+     "y": 23,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 23,
+     "z": 2,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 4,
+     "y": 23,
+     "z": 2,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "red",
+     "x": 8,
+     "y": 23,
+     "z": 2,
+     "rot": 180
+    },
+    {
+     "part": "brick_2x4",
+     "color": "white",
+     "x": 0,
+     "y": 23,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "white",
+     "x": 4,
+     "y": 23,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 8,
+     "y": 23,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 26,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 26,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "red",
+     "x": 4,
+     "y": 26,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "red",
+     "x": 6,
+     "y": 26,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "red",
+     "x": 8,
+     "y": 26,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 26,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 29,
+     "z": 2,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "66bfaa9f8871",
+ "source": {
+  "run": "2026-09-24_20-52-33-subbuilds-a-small-village-square-with-tw",
+  "request": "a small village square with two cottages, two pine trees and a well",
+  "at": "2026-09-25T13:53:23.393Z"
+ },
+ "cost": 0.2323,
+ "reused": 0
+}

@@ -1,0 +1,136 @@
+{
+ "id": "lamp_post_6e7e2b",
+ "name": "Lamp Post",
+ "description": "A black street lamp: a 2x2 round base and lower pole, a 1x1 round-brick upper pole and a lantern head with a trans-clear light and a cap.",
+ "tags": [
+  "lamp",
+  "post",
+  "slim",
+  "black",
+  "street",
+  "base",
+  "stacked",
+  "round",
+  "brick",
+  "pole",
+  "lantern",
+  "head",
+  "tran",
+  "clear",
+  "light",
+  "cap"
+ ],
+ "size": {
+  "w": 2,
+  "d": 2,
+  "h": 18
+ },
+ "parts": 8,
+ "depth": 1,
+ "colors": [
+  "black",
+  "trans_clear"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "18 7*",
+   "7* 7*"
+  ],
+  "bottom": [
+   "o o",
+   "o o"
+  ],
+  "studsByHeight": [
+   "7: (1,0) (0,1) (1,1)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "lamp_post",
+ "subBuilds": [
+  {
+   "id": "lamp_post",
+   "name": "Lamp Post",
+   "parts": [
+    {
+     "part": "round_plate_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "trans_clear",
+     "x": 0,
+     "y": 16,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "6e7e2b4ade09",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T19:21:01.464Z"
+ },
+ "cost": 0.059,
+ "reused": 0,
+ "handFixed": {
+  "from": "lamp_post_b0bf21",
+  "note": "Hand-fixed: the original pole was one 1×1×6 round brick (18 plates) on a single stud, a WEAK_JOINT once placed on studs. Lower half is now 2×2 (round plate + two round bricks), with 12 plates of 1×1 above; 18 plates tall instead of 20.",
+  "at": "2026-10-08T19:21:01.464Z"
+ }
+}

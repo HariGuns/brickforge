@@ -1,0 +1,383 @@
+{
+ "id": "stone_well_e12889",
+ "name": "Stone Well",
+ "description": "A round stone well with a light_gray and dark_gray stone ring, two reddish_brown wooden posts, a crossbar and a small pitched red roof, with a trans_blue water tile inside.",
+ "tags": [
+  "stone",
+  "well",
+  "round",
+  "light",
+  "gray",
+  "dark",
+  "ring",
+  "reddish",
+  "brown",
+  "wooden",
+  "post",
+  "crossbar",
+  "pitched",
+  "red",
+  "roof",
+  "tran"
+ ],
+ "size": {
+  "w": 6,
+  "d": 6,
+  "h": 23
+ },
+ "parts": 38,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "light_gray",
+  "trans_blue",
+  "reddish_brown",
+  "red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "1* 8 8 8 8 1*",
+   "20 20 20 20 20 20",
+   "23 23 23 23 23 23",
+   "23 23 23 23 23 23",
+   "20 20 20 20 20 20",
+   "1* 8 8 10* 8 1*"
+  ],
+  "bottom": [
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o"
+  ],
+  "studsByHeight": [
+   "10: (3,5)",
+   "1: (0,0) (5,0) (0,5) (5,5)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "well",
+ "subBuilds": [
+  {
+   "id": "well",
+   "name": "Stone Well",
+   "parts": [
+    {
+     "part": "3958",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_gray",
+     "x": 5,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x4",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 4,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 5,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x4",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "trans_blue",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "trans_blue",
+     "x": 3,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "trans_blue",
+     "x": 1,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "trans_blue",
+     "x": 3,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "light_gray",
+     "x": 1,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "light_gray",
+     "x": 1,
+     "y": 7,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 7,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "light_gray",
+     "x": 4,
+     "y": 7,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 7,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 5,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 5,
+     "y": 7,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 7,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 10,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 10,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 13,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 13,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 16,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "3038",
+     "color": "red",
+     "x": 0,
+     "y": 17,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "3038",
+     "color": "red",
+     "x": 3,
+     "y": 17,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "3038",
+     "color": "red",
+     "x": 0,
+     "y": 17,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "3038",
+     "color": "red",
+     "x": 3,
+     "y": 17,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 20,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 20,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "red",
+     "x": 4,
+     "y": 20,
+     "z": 2,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "e128896da7c9",
+ "source": {
+  "run": "2026-09-24_20-52-33-subbuilds-a-small-village-square-with-tw",
+  "request": "a small village square with two cottages, two pine trees and a well",
+  "at": "2026-09-25T13:53:23.395Z"
+ },
+ "cost": 0.083,
+ "reused": 0
+}

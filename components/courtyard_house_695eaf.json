@@ -1,0 +1,524 @@
+{
+ "id": "courtyard_house_695eaf",
+ "name": "Courtyard House",
+ "description": "A small 6×6 timber-framed house with tan walls, a reddish-brown door, a window and a pitched dark-red roof with filled gable ends.",
+ "tags": [
+  "courtyard",
+  "house",
+  "timber",
+  "framed",
+  "tan",
+  "wall",
+  "reddish",
+  "brown",
+  "door",
+  "window",
+  "pitched",
+  "dark",
+  "red",
+  "roof",
+  "filled",
+  "gable"
+ ],
+ "size": {
+  "w": 6,
+  "d": 6,
+  "h": 24
+ },
+ "parts": 56,
+ "depth": 1,
+ "colors": [
+  "light_gray",
+  "tan",
+  "reddish_brown",
+  "white",
+  "dark_red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "18 18 18 18 18 18",
+   "21 21 21 21 21 21",
+   "24 24 24 24 24 24",
+   "24 24 24 24 24 24",
+   "21 21 21 21 21 21",
+   "18 18 18 18 18 18"
+  ],
+  "bottom": [
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "house",
+ "subBuilds": [
+  {
+   "id": "house",
+   "name": "Courtyard House",
+   "parts": [
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "tan",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 0,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 2,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 4,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "tan",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "tan",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "tan",
+     "x": 5,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 5,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "tan",
+     "x": 5,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 0,
+     "y": 4,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 5,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 5,
+     "y": 4,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "tan",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "tan",
+     "x": 1,
+     "y": 4,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 2,
+     "y": 4,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "tan",
+     "x": 4,
+     "y": 4,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "reddish_brown",
+     "x": 5,
+     "y": 7,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "tan",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "tan",
+     "x": 5,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 8,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 2,
+     "y": 8,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 4,
+     "y": 8,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 2,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 4,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 4,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 0,
+     "y": 11,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 4,
+     "y": 11,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "tan",
+     "x": 0,
+     "y": 11,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "tan",
+     "x": 5,
+     "y": 11,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 14,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 14,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 15,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 15,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 15,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 15,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "tan",
+     "x": 0,
+     "y": 15,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "tan",
+     "x": 2,
+     "y": 15,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "tan",
+     "x": 4,
+     "y": 15,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 18,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 18,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 18,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 18,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 21,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 21,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 21,
+     "z": 2,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "695eaf1f25c1",
+ "source": {
+  "run": "2026-09-24_05-52-07-subbuilds-a-medieval-castle-with-four-co",
+  "request": "a medieval castle with four corner towers, walls and a gatehouse",
+  "at": "2026-09-25T13:53:23.251Z"
+ },
+ "cost": 0.2061,
+ "reused": 0
+}

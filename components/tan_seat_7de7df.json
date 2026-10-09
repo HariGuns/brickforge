@@ -1,0 +1,231 @@
+{
+ "id": "tan_seat_7de7df",
+ "name": "Tan seat",
+ "description": "A tan leather-look seat with a cushion and a tall backrest, visible through the windows: used as the two front buckets and as the two halves of the rear bench.",
+ "tags": [
+  "tan",
+  "seat",
+  "leather",
+  "look",
+  "cushion",
+  "tall",
+  "backrest",
+  "visible",
+  "through",
+  "window",
+  "used",
+  "front",
+  "bucket",
+  "halve",
+  "rear",
+  "bench"
+ ],
+ "size": {
+  "w": 4,
+  "d": 5,
+  "h": 14
+ },
+ "parts": 20,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "tan"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "14 14 14 14",
+   "12 12 12 12",
+   "7 6 6 7",
+   "7 6 6 7",
+   "7 7 7 7"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "seat",
+ "subBuilds": [
+  {
+   "id": "seat",
+   "name": "Tan seat",
+   "parts": [
+    {
+     "part": "plate_1x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "tan",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "tan",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "tan",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "tan",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "tan",
+     "x": 0,
+     "y": 4,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x3",
+     "color": "tan",
+     "x": 3,
+     "y": 4,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x3",
+     "color": "tan",
+     "x": 1,
+     "y": 4,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "tile_2x2",
+     "color": "tan",
+     "x": 1,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "tan",
+     "x": 1,
+     "y": 5,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "54200",
+     "color": "tan",
+     "x": 0,
+     "y": 5,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "54200",
+     "color": "tan",
+     "x": 3,
+     "y": 5,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "tan",
+     "x": 0,
+     "y": 5,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "tan",
+     "x": 3,
+     "y": 5,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "brick_2x4",
+     "color": "tan",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "tan",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "tan",
+     "x": 0,
+     "y": 10,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "tan",
+     "x": 2,
+     "y": 10,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "tan",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "7de7dfaf1579",
+ "source": {
+  "run": "2026-09-25_11-34-10-subbuilds-please-create-a-highly-detaile",
+  "request": "please create a highly detailed model of this Mini cooper.  Use as many bricks as you need and it has to be a minimum of 20 Cm long and scaled accordingly \n",
+  "at": "2026-09-25T13:53:23.553Z"
+ },
+ "cost": 0.0717,
+ "reused": 0
+}

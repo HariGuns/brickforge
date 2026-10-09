@@ -7,13 +7,27 @@
  */
 
 import { getPart } from "../parts/library";
-import rebrickable from "./rebrickable.json";
+import rebrickableJson from "./rebrickable.json";
+
+/** What scripts/fetch-bricklink.ts writes (an empty stub until it has run: scripts/ensure-rebrickable.mjs). */
+export interface RebrickableData {
+  generated: string | null;
+  colors: Record<string, number>;
+  parts: Record<string, string>;
+  unmatched: { ldraw: string; usedBy: string[]; reason: string }[];
+  coreTableMissing: string[];
+  coreTableRenamed: Record<string, string>;
+}
+export const REBRICKABLE = rebrickableJson as unknown as RebrickableData;
+/** False until `npm run fetch-bricklink` has run with a Rebrickable key: catalog parts then keep their LDraw numbers. */
+export const REBRICKABLE_LOADED = Object.keys(REBRICKABLE.parts ?? {}).length > 0;
 
 /**
  * LDraw file (no .dat) → BrickLink part number, from Rebrickable's external IDs
  * (scripts/fetch-bricklink.ts writes rebrickable.json; rerun it after rebuilding the catalog).
+ * Not in the repo: each user fetches it with their own Rebrickable key.
  */
-const RB_PARTS: Record<string, string> = rebrickable.parts;
+const RB_PARTS: Record<string, string> = REBRICKABLE.parts ?? {};
 const blOf = (ldraw: string) => RB_PARTS[ldraw.toLowerCase()];
 
 
@@ -85,7 +99,7 @@ export const BRICKLINK_PARTS: Record<string, BrickLinkItem[]> = {
  * without one): their LDraw number is used as a best guess, flagged here.
  * Core parts are covered by the hand-made table above.
  */
-export const UNCONFIRMED_BRICKLINK: ReadonlySet<string> = new Set(rebrickable.unmatched.flatMap((u) => u.usedBy).filter((id) => !BRICKLINK_PARTS[id]));
+export const UNCONFIRMED_BRICKLINK: ReadonlySet<string> = new Set((REBRICKABLE.unmatched ?? []).flatMap((u) => u.usedBy).filter((id) => !BRICKLINK_PARTS[id]));
 
 /**
  * BrickLink items for any part: the table above for core parts; for catalog

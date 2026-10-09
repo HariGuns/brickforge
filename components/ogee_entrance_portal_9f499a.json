@@ -1,0 +1,458 @@
+{
+ "id": "ogee_entrance_portal_9f499a",
+ "name": "Ogee entrance portal",
+ "description": "The main entrance: a cusped, pointed ogee arch in red/white built from arch bricks and slopes, with a white inscription band. It frames an orange and reddish-brown lattice door and lower wooden doors.",
+ "tags": [
+  "ogee",
+  "entrance",
+  "portal",
+  "arch",
+  "main",
+  "cusped",
+  "pointed",
+  "red",
+  "white",
+  "built",
+  "brick",
+  "slope",
+  "inscription",
+  "band",
+  "frame",
+  "orange"
+ ],
+ "size": {
+  "w": 6,
+  "d": 3,
+  "h": 30
+ },
+ "parts": 48,
+ "depth": 1,
+ "colors": [
+  "white",
+  "dark_gray",
+  "red",
+  "reddish_brown",
+  "orange",
+  "yellow"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "26 29 29* 29* 29 26",
+   "26 29 30* 30* 29 26",
+   "26 29 29* 29* 29 26"
+  ],
+  "bottom": [
+   "o o o o o o",
+   "o o o o o o",
+   "o o o o o o"
+  ],
+  "studsByHeight": [
+   "30: (2,1) (3,1)",
+   "29: (2,0) (3,0) (2,2) (3,2)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "entrance_arch",
+ "subBuilds": [
+  {
+   "id": "entrance_arch",
+   "name": "Ogee entrance portal",
+   "parts": [
+    {
+     "part": "plate_2x6",
+     "color": "white",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 0,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 5,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 5,
+     "y": 7,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "white",
+     "x": 5,
+     "y": 10,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "orange",
+     "x": 1,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "fence_1x4x1",
+     "color": "orange",
+     "x": 1,
+     "y": 11,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 5,
+     "y": 13,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "orange",
+     "x": 1,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "fence_1x4x1",
+     "color": "orange",
+     "x": 1,
+     "y": 15,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 16,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 5,
+     "y": 16,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x6",
+     "color": "red",
+     "x": 0,
+     "y": 16,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 19,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x6",
+     "color": "white",
+     "x": 0,
+     "y": 19,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 0,
+     "y": 20,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 0,
+     "y": 20,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 20,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x3",
+     "color": "white",
+     "x": 2,
+     "y": 23,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 0,
+     "y": 23,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 0,
+     "y": 23,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 0,
+     "y": 23,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 4,
+     "y": 23,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 4,
+     "y": 23,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 4,
+     "y": 23,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 1,
+     "y": 26,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 1,
+     "y": 26,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 1,
+     "y": 26,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 3,
+     "y": 26,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "red",
+     "x": 3,
+     "y": 26,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "white",
+     "x": 3,
+     "y": 26,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "plate_1x2",
+     "color": "yellow",
+     "x": 2,
+     "y": 29,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "9f499a897355",
+ "source": {
+  "run": "2026-09-25_10-41-25-subbuilds-please-design-me-a-model-of-th",
+  "request": "please design me a model of the red mosque found in pettah, Colombo, Sri lanka, use up to 2000 bricks and get as detailed as you possibly can ",
+  "at": "2026-09-25T13:53:23.519Z"
+ },
+ "cost": 0.1063,
+ "reused": 0
+}

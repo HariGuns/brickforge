@@ -1,0 +1,156 @@
+{
+ "id": "lamp_post_795896",
+ "name": "Lamp Post",
+ "description": "A black street lamp on a 2x2 foot with a slim round-brick pole and a yellow lantern top.",
+ "tags": [
+  "lamp",
+  "post",
+  "black",
+  "street",
+  "foot",
+  "slim",
+  "round",
+  "brick",
+  "pole",
+  "yellow",
+  "lantern",
+  "top",
+  "village",
+  "square",
+  "house",
+  "tree"
+ ],
+ "size": {
+  "w": 2,
+  "d": 2,
+  "h": 19
+ },
+ "parts": 11,
+ "depth": 1,
+ "colors": [
+  "black",
+  "yellow"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "19* 16*",
+   "16* 16*"
+  ],
+  "bottom": [
+   "o o",
+   "o o"
+  ],
+  "studsByHeight": [
+   "19: (0,0)",
+   "16: (1,0) (0,1) (1,1)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "lamp_post",
+ "subBuilds": [
+  {
+   "id": "lamp_post",
+   "name": "Lamp Post",
+   "parts": [
+    {
+     "part": "plate_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 1,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "black",
+     "x": 1,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "yellow",
+     "x": 0,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "black",
+     "x": 0,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 16,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "7958962cfc6c",
+ "source": {
+  "run": "2026-09-24_06-00-32-subbuilds-a-village-square-with-three-ho",
+  "request": "a village square with three houses, trees and a well",
+  "at": "2026-09-25T13:53:23.309Z"
+ },
+ "cost": 0.0564,
+ "reused": 1
+}

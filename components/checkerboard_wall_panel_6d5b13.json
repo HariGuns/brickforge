@@ -1,0 +1,381 @@
+{
+ "id": "checkerboard_wall_panel_6d5b13",
+ "name": "Checkerboard wall panel",
+ "description": "A sideways façade panel of red and white 1×1 tiles/plates in a checkerboard. It is framed by thin red/white banding and clips onto side studs of the hall front.",
+ "tags": [
+  "checkerboard",
+  "wall",
+  "panel",
+  "checker",
+  "sideway",
+  "ade",
+  "red",
+  "white",
+  "tile",
+  "plate",
+  "framed",
+  "thin",
+  "banding",
+  "clip",
+  "onto",
+  "side"
+ ],
+ "size": {
+  "w": 4,
+  "d": 12,
+  "h": 2
+ },
+ "parts": 37,
+ "depth": 1,
+ "colors": [
+  "red",
+  "white"
+ ],
+ "sideways": true,
+ "connections": {
+  "top": [
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "checker_panel",
+ "subBuilds": [
+  {
+   "id": "checker_panel",
+   "name": "Checkerboard wall panel",
+   "parts": [
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 3,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 3,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 3,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 3,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 11,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "6d5b13df2a0e",
+ "source": {
+  "run": "2026-09-25_10-41-25-subbuilds-please-design-me-a-model-of-th",
+  "request": "please design me a model of the red mosque found in pettah, Colombo, Sri lanka, use up to 2000 bricks and get as detailed as you possibly can ",
+  "at": "2026-09-25T13:53:23.516Z"
+ },
+ "cost": 0.0377,
+ "reused": 0
+}

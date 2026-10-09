@@ -1,0 +1,321 @@
+{
+ "id": "stone_well_2e4ce3",
+ "name": "Stone Well",
+ "description": "A 4×4 round gray stone well with a blue water tile, two wooden posts and a small peaked roof.",
+ "tags": [
+  "stone",
+  "well",
+  "round",
+  "gray",
+  "blue",
+  "water",
+  "tile",
+  "wooden",
+  "post",
+  "peaked",
+  "roof",
+  "stonewatch",
+  "castle",
+  "medieval",
+  "corner",
+  "tower"
+ ],
+ "size": {
+  "w": 4,
+  "d": 4,
+  "h": 18
+ },
+ "parts": 31,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "light_gray",
+  "trans_blue",
+  "reddish_brown",
+  "yellow",
+  "dark_red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "15 15 15 15",
+   "18 18 18 18",
+   "18 18 18 18",
+   "15 15 15 15"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "well",
+ "subBuilds": [
+  {
+   "id": "well",
+   "name": "Stone Well",
+   "parts": [
+    {
+     "part": "plate_4x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "light_gray",
+     "x": 2,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "light_gray",
+     "x": 3,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "tile_2x2",
+     "color": "trans_blue",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "light_gray",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "light_gray",
+     "x": 3,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "light_gray",
+     "x": 0,
+     "y": 4,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "light_gray",
+     "x": 3,
+     "y": 4,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "light_gray",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "light_gray",
+     "x": 1,
+     "y": 4,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "light_gray",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "light_gray",
+     "x": 3,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x2",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 0,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 8,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 8,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 11,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 12,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 12,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 15,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 15,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "2e4ce343efbb",
+ "source": {
+  "run": "2026-09-24_05-52-07-subbuilds-a-medieval-castle-with-four-co",
+  "request": "a medieval castle with four corner towers, walls and a gatehouse",
+  "at": "2026-09-25T13:53:23.262Z"
+ },
+ "cost": 0.1011,
+ "reused": 0
+}

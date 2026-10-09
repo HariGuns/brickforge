@@ -1,0 +1,146 @@
+{
+ "id": "side_air_intake_panel_d11bf5",
+ "name": "Side air-intake panel",
+ "description": "A sideways red door-side panel with a big black triangular air intake at the rear, just ahead of the rear wheel, giving the flank its signature scoop.",
+ "tags": [
+  "side",
+  "air",
+  "intake",
+  "panel",
+  "sideway",
+  "red",
+  "door",
+  "black",
+  "triangular",
+  "rear",
+  "just",
+  "ahead",
+  "wheel",
+  "giving",
+  "flank",
+  "signature"
+ ],
+ "size": {
+  "w": 8,
+  "d": 3,
+  "h": 2
+ },
+ "parts": 10,
+ "depth": 1,
+ "colors": [
+  "red",
+  "black"
+ ],
+ "sideways": true,
+ "connections": {
+  "top": [
+   "2 2 2 2 2 2 2 2",
+   "2 2 2 2 2 2 2 2",
+   "2 2 2 2 2 2 2 2"
+  ],
+  "bottom": [
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "side_intake",
+ "subBuilds": [
+  {
+   "id": "side_intake",
+   "name": "Side air-intake panel",
+   "parts": [
+    {
+     "part": "plate_1x8",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x8",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 4,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "14719",
+     "color": "black",
+     "x": 6,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 7,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "black",
+     "x": 4,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "d11bf5cd2eb4",
+ "source": {
+  "run": "2026-09-25_05-56-48-subbuilds-photo",
+  "at": "2026-09-25T13:53:23.408Z"
+ },
+ "cost": 0.044,
+ "reused": 0
+}

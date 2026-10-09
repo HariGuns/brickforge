@@ -1,0 +1,635 @@
+{
+ "id": "fountain_d7ecd9",
+ "name": "Fountain",
+ "description": "A round, stepped stone fountain basin with a trans-blue water surface. A central pedestal rises to a small bowl with a trans-clear water jet on top.",
+ "tags": [
+  "fountain",
+  "round",
+  "stepped",
+  "stone",
+  "basin",
+  "tran",
+  "blue",
+  "water",
+  "surface",
+  "central",
+  "pedestal",
+  "rise",
+  "bowl",
+  "clear",
+  "jet",
+  "top"
+ ],
+ "size": {
+  "w": 8,
+  "d": 8,
+  "h": 12
+ },
+ "parts": 69,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "light_gray",
+  "blue",
+  "trans_blue",
+  "white",
+  "trans_clear"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   ". . 6 6 6 6 . .",
+   ". 9* 5 5 5 5 9* .",
+   "6 5 11 11 11 11 5 6",
+   "6 5 11 12 12 11 5 6",
+   "6 5 11 12 12 11 5 6",
+   "6 5 11 11 11 11 5 6",
+   ". 9* 5 5 5 5 9* .",
+   ". . 6 6 6 6 . ."
+  ],
+  "bottom": [
+   ". . o o o o . .",
+   ". o o o o o o .",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   ". o o o o o o .",
+   ". . o o o o . ."
+  ],
+  "studsByHeight": [
+   "9: (1,1) (6,1) (1,6) (6,6)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "fountain",
+ "subBuilds": [
+  {
+   "id": "fountain",
+   "name": "Fountain",
+   "parts": [
+    {
+     "part": "plate_4x8",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 0,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 0,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "light_gray",
+     "x": 7,
+     "y": 1,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x6",
+     "color": "light_gray",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x6",
+     "color": "light_gray",
+     "x": 6,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x8",
+     "color": "light_gray",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x8",
+     "color": "light_gray",
+     "x": 4,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 0,
+     "y": 2,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 7,
+     "y": 2,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "light_gray",
+     "x": 1,
+     "y": 2,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "light_gray",
+     "x": 6,
+     "y": 2,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "blue",
+     "x": 2,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "blue",
+     "x": 1,
+     "y": 2,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "blue",
+     "x": 1,
+     "y": 2,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "blue",
+     "x": 5,
+     "y": 2,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "blue",
+     "x": 1,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "blue",
+     "x": 2,
+     "y": 2,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "light_gray",
+     "x": 3,
+     "y": 2,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "blue",
+     "x": 1,
+     "y": 3,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "blue",
+     "x": 6,
+     "y": 3,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x6",
+     "color": "blue",
+     "x": 2,
+     "y": 3,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x6",
+     "color": "blue",
+     "x": 5,
+     "y": 3,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x2",
+     "color": "blue",
+     "x": 3,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "blue",
+     "x": 3,
+     "y": 3,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "trans_blue",
+     "x": 2,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "trans_blue",
+     "x": 2,
+     "y": 4,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "6636",
+     "color": "trans_blue",
+     "x": 1,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "6636",
+     "color": "trans_blue",
+     "x": 1,
+     "y": 4,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "trans_blue",
+     "x": 1,
+     "y": 4,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "trans_blue",
+     "x": 5,
+     "y": 4,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 5,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 5,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 7,
+     "y": 5,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "white",
+     "x": 6,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 5,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "white",
+     "x": 6,
+     "y": 5,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "light_gray",
+     "x": 3,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "light_gray",
+     "x": 1,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "light_gray",
+     "x": 6,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "light_gray",
+     "x": 1,
+     "y": 6,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "light_gray",
+     "x": 6,
+     "y": 6,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "light_gray",
+     "x": 2,
+     "y": 8,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "light_gray",
+     "x": 2,
+     "y": 9,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "light_gray",
+     "x": 2,
+     "y": 9,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "light_gray",
+     "x": 2,
+     "y": 9,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "light_gray",
+     "x": 5,
+     "y": 9,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "trans_blue",
+     "x": 3,
+     "y": 9,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 10,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 10,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 2,
+     "y": 10,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 5,
+     "y": 10,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 10,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "trans_clear",
+     "x": 4,
+     "y": 10,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 10,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "trans_clear",
+     "x": 4,
+     "y": 10,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 11,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "trans_clear",
+     "x": 4,
+     "y": 11,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 11,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "trans_clear",
+     "x": 4,
+     "y": 11,
+     "z": 4,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "d7ecd95b71a8",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.499Z"
+ },
+ "cost": 0.2638,
+ "reused": 0
+}

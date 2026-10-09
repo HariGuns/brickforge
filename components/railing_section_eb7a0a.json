@@ -1,0 +1,78 @@
+{
+ "id": "railing_section_eb7a0a",
+ "name": "Railing Section",
+ "description": "A 4-stud black lattice fence run on a plate footing that edges the square.",
+ "tags": [
+  "railing",
+  "section",
+  "stud",
+  "black",
+  "lattice",
+  "fence",
+  "run",
+  "plate",
+  "footing",
+  "that",
+  "edge",
+  "square",
+  "town",
+  "house",
+  "market",
+  "stall"
+ ],
+ "size": {
+  "w": 4,
+  "d": 1,
+  "h": 4
+ },
+ "parts": 2,
+ "depth": 1,
+ "colors": [
+  "black"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "4 4 4 4"
+  ],
+  "bottom": [
+   "o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "railing",
+ "subBuilds": [
+  {
+   "id": "railing",
+   "name": "Railing Section",
+   "parts": [
+    {
+     "part": "plate_1x4",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "fence_1x4x1",
+     "color": "black",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "eb7a0ac4a063",
+ "source": {
+  "run": "2026-10-08_19-21-20-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T19:25:36.212Z"
+ },
+ "cost": 0.0162,
+ "reused": 0
+}

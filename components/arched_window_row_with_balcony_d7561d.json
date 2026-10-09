@@ -1,0 +1,267 @@
+{
+ "id": "arched_window_row_with_balcony_d7561d",
+ "name": "Arched window row with balcony",
+ "description": "A row of three small arched dark_gray windows in striped frames over a projecting white-railed balcony. A dark_red cornice underside sits below it.",
+ "tags": [
+  "arched",
+  "window",
+  "row",
+  "balcony",
+  "dark",
+  "gray",
+  "striped",
+  "frame",
+  "over",
+  "projecting",
+  "white",
+  "railed",
+  "red",
+  "cornice",
+  "underside",
+  "sit"
+ ],
+ "size": {
+  "w": 6,
+  "d": 2,
+  "h": 12
+ },
+ "parts": 25,
+ "depth": 1,
+ "colors": [
+  "dark_red",
+  "white",
+  "red",
+  "dark_gray"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "12 12 12 12 12 12",
+   "11 11 11 11 11 11"
+  ],
+  "bottom": [
+   "o o o o o o",
+   "o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "window_row",
+ "subBuilds": [
+  {
+   "id": "window_row",
+   "name": "Arched window row with balcony",
+   "parts": [
+    {
+     "part": "plate_2x6",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 4,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "fence_1x4x1",
+     "color": "white",
+     "x": 1,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "white",
+     "x": 5,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 5,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "red",
+     "x": 4,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "37352",
+     "color": "white",
+     "x": 0,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "37352",
+     "color": "white",
+     "x": 2,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "37352",
+     "color": "white",
+     "x": 4,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "red",
+     "x": 4,
+     "y": 9,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "d7561d7eae8a",
+ "source": {
+  "run": "2026-09-25_10-41-25-subbuilds-please-design-me-a-model-of-th",
+  "request": "please design me a model of the red mosque found in pettah, Colombo, Sri lanka, use up to 2000 bricks and get as detailed as you possibly can ",
+  "at": "2026-09-25T13:53:23.527Z"
+ },
+ "cost": 0.0967,
+ "reused": 0
+}

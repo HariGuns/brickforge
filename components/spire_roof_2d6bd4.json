@@ -1,0 +1,207 @@
+{
+ "id": "spire_roof_2d6bd4",
+ "name": "Spire Roof",
+ "description": "Pointed dark_gray spire of stepped slopes tapering to a cone and a gold finial, crowning the tower as the tallest point of the square.",
+ "tags": [
+  "spire",
+  "roof",
+  "pointed",
+  "dark",
+  "gray",
+  "stepped",
+  "slope",
+  "tapering",
+  "cone",
+  "gold",
+  "finial",
+  "crowning",
+  "tower",
+  "tallest",
+  "point",
+  "square"
+ ],
+ "size": {
+  "w": 4,
+  "d": 4,
+  "h": 11
+ },
+ "parts": 17,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "yellow"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "4* 4 4 4*",
+   "4 11 11 4",
+   "4 11 11 4",
+   "4* 4 4 4*"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [
+   "4: (0,0) (3,0) (0,3) (3,3)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "spire",
+ "subBuilds": [
+  {
+   "id": "spire",
+   "name": "Spire Roof",
+   "parts": [
+    {
+     "part": "plate_4x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "yellow",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "yellow",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "yellow",
+     "x": 0,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "yellow",
+     "x": 3,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "54200",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "54200",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 2,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "54200",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 2,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "54200",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 2,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "yellow",
+     "x": 1,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "cone_2x2x2",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "2d6bd40d15da",
+ "source": {
+  "run": "2026-10-08_19-21-20-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T19:25:36.227Z"
+ },
+ "cost": 0.1493,
+ "reused": 0
+}

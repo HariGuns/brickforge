@@ -1,0 +1,257 @@
+{
+ "id": "flower_bed_0d2548",
+ "name": "Flower Bed",
+ "description": "A raised rectangular bed with a dark-tan brick border filled with reddish-brown soil plates and colourful flower plates and small green leaves.",
+ "tags": [
+  "flower",
+  "bed",
+  "raised",
+  "rectangular",
+  "dark",
+  "tan",
+  "brick",
+  "border",
+  "filled",
+  "reddish",
+  "brown",
+  "soil",
+  "plate",
+  "colourful",
+  "green",
+  "leave"
+ ],
+ "size": {
+  "w": 4,
+  "d": 3,
+  "h": 5
+ },
+ "parts": 23,
+ "depth": 1,
+ "colors": [
+  "reddish_brown",
+  "dark_tan",
+  "green",
+  "red",
+  "pink",
+  "yellow"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "5 5* 5* 5",
+   "5* 5* 5* 5*",
+   "5 5 5 5"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [
+   "5: (1,0) (2,0) (0,1) (1,1) (2,1) (3,1)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "flower_bed",
+ "subBuilds": [
+  {
+   "id": "flower_bed",
+   "name": "Flower Bed",
+   "parts": [
+    {
+     "part": "plate_2x3",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x3",
+     "color": "reddish_brown",
+     "x": 2,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_tan",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_tan",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_tan",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_tan",
+     "x": 2,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_tan",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_tan",
+     "x": 3,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "reddish_brown",
+     "x": 2,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 1,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 2,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "pink",
+     "x": 2,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_tan",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_tan",
+     "x": 3,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_tan",
+     "x": 0,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_tan",
+     "x": 3,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "green",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "dark_tan",
+     "x": 1,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 3,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "0d25485e4434",
+ "source": {
+  "run": "2026-10-08_19-52-47-subbuilds-a-park-with-a-pond-a-bench-and",
+  "request": "a park with a pond, a bench and two trees",
+  "at": "2026-10-08T19:56:22.780Z"
+ },
+ "cost": 0.0752,
+ "reused": 0
+}

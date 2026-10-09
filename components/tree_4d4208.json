@@ -1,0 +1,261 @@
+{
+ "id": "tree_4d4208",
+ "name": "Tree",
+ "description": "A 4×4 tree with a reddish-brown round-brick trunk and a layered green and dark-green plate canopy.",
+ "tags": [
+  "tree",
+  "reddish",
+  "brown",
+  "round",
+  "brick",
+  "trunk",
+  "layered",
+  "green",
+  "dark",
+  "plate",
+  "canopy",
+  "stonewatch",
+  "castle",
+  "medieval",
+  "corner",
+  "tower"
+ ],
+ "size": {
+  "w": 4,
+  "d": 4,
+  "h": 19
+ },
+ "parts": 23,
+ "depth": 1,
+ "colors": [
+  "green",
+  "yellow",
+  "red",
+  "white",
+  "dark_green",
+  "reddish_brown"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "14* 14* 14* 14*",
+   "14* 19* 18* 14*",
+   "14* 18* 18* 14*",
+   "14* 14* 14* 14*"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [
+   "19: (1,1)",
+   "18: (2,1) (1,2) (2,2)",
+   "14: (0,0) (1,0) (2,0) (3,0) (0,1) (3,1) (0,2) (3,2) (0,3) (1,3) (2,3) (3,3)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "tree",
+ "subBuilds": [
+  {
+   "id": "tree",
+   "name": "Tree",
+   "parts": [
+    {
+     "part": "plate_4x4",
+     "color": "green",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "yellow",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_green",
+     "x": 3,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "green",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "dark_green",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "green",
+     "x": 0,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "green",
+     "x": 1,
+     "y": 13,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_green",
+     "x": 1,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_green",
+     "x": 1,
+     "y": 13,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_green",
+     "x": 0,
+     "y": 13,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_green",
+     "x": 3,
+     "y": 13,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 13,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "green",
+     "x": 3,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "green",
+     "x": 0,
+     "y": 13,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "dark_green",
+     "x": 1,
+     "y": 16,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "green",
+     "x": 1,
+     "y": 17,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "dark_green",
+     "x": 1,
+     "y": 18,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "4d42085324c9",
+ "source": {
+  "run": "2026-09-24_05-52-07-subbuilds-a-medieval-castle-with-four-co",
+  "request": "a medieval castle with four corner towers, walls and a gatehouse",
+  "at": "2026-09-25T13:53:23.260Z"
+ },
+ "cost": 0.0533,
+ "reused": 0
+}

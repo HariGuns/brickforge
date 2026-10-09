@@ -1,0 +1,834 @@
+{
+ "id": "rear_engine_deck_and_tail_f7718f",
+ "name": "Rear engine deck and tail",
+ "description": "A long red rear deck sloping down from the roof to a squared-off tail, with black louvres, a black diffuser, dark red taillights and a black exhaust area.",
+ "tags": [
+  "rear",
+  "engine",
+  "deck",
+  "tail",
+  "long",
+  "red",
+  "sloping",
+  "down",
+  "roof",
+  "squared",
+  "off",
+  "black",
+  "louvre",
+  "diffuser",
+  "dark",
+  "taillight"
+ ],
+ "size": {
+  "w": 14,
+  "d": 13,
+  "h": 12
+ },
+ "parts": 93,
+ "depth": 1,
+ "colors": [
+  "red",
+  "black",
+  "dark_gray",
+  "dark_red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "2 2 2 2 2 5 2 2 5 2 2 2 2 2",
+   "12 12 12 12 12 12 12 12 12 12 12 12 12 12",
+   "12 12 12 12 12 12 12 12 12 12 12 12 12 12",
+   "12* 12* 12* 12* 12* 12* 12* 12* 12* 12* 12* 12* 12* 12*",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12",
+   "12 12 12 12 11 11 11 11 11 11 12 12 12 12"
+  ],
+  "bottom": [
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o"
+  ],
+  "studsByHeight": [
+   "12: (0,3) (1,3) (2,3) (3,3) (4,3) (5,3) (6,3) (7,3) (8,3) (9,3) (10,3) (11,3) (12,3) (13,3)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "rear_deck",
+ "subBuilds": [
+  {
+   "id": "rear_deck",
+   "name": "Rear engine deck and tail",
+   "parts": [
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 12,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 2,
+     "y": 0,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 12,
+     "y": 0,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "60479",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 12,
+     "y": 0,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 4,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 8,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "2445",
+     "color": "red",
+     "x": 12,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 10,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 12,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 4,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "dark_gray",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "black",
+     "x": 6,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_1x1",
+     "color": "dark_gray",
+     "x": 8,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 9,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "black",
+     "x": 4,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "red",
+     "x": 10,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "6111",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "6111",
+     "color": "red",
+     "x": 13,
+     "y": 2,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x8",
+     "color": "red",
+     "x": 6,
+     "y": 2,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "black",
+     "x": 5,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "black",
+     "x": 8,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "dark_red",
+     "x": 2,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "red",
+     "x": 5,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x3",
+     "color": "dark_red",
+     "x": 9,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 12,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "6111",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "6111",
+     "color": "red",
+     "x": 13,
+     "y": 5,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x8",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 8,
+     "y": 5,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 4,
+     "y": 8,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "3029",
+     "color": "red",
+     "x": 8,
+     "y": 8,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "2445",
+     "color": "red",
+     "x": 12,
+     "y": 8,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "slope33_3x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 6,
+     "y": 9,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 10,
+     "y": 9,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "plate_4x8",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x8",
+     "color": "red",
+     "x": 10,
+     "y": 9,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 10,
+     "y": 9,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "black",
+     "x": 4,
+     "y": 9,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "black",
+     "x": 4,
+     "y": 9,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "black",
+     "x": 4,
+     "y": 9,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x8",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 10,
+     "y": 10,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x8",
+     "color": "red",
+     "x": 10,
+     "y": 10,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 10,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 8,
+     "y": 10,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 10,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 8,
+     "y": 10,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 10,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 8,
+     "y": 10,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 10,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 8,
+     "y": 10,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 10,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 8,
+     "y": 10,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 10,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 8,
+     "y": 10,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 10,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 8,
+     "y": 10,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 11,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 6,
+     "y": 10,
+     "z": 11,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 8,
+     "y": 10,
+     "z": 11,
+     "rot": 0
+    },
+    {
+     "part": "6636",
+     "color": "black",
+     "x": 4,
+     "y": 10,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 2,
+     "y": 11,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 2,
+     "y": 11,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 10,
+     "y": 11,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 12,
+     "y": 11,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 10,
+     "y": 11,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 12,
+     "y": 11,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x4",
+     "color": "red",
+     "x": 10,
+     "y": 11,
+     "z": 12,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "f7718f5dbe49",
+ "source": {
+  "run": "2026-09-25_05-56-48-subbuilds-photo",
+  "at": "2026-09-25T13:53:23.407Z"
+ },
+ "cost": 0.1758,
+ "reused": 0
+}

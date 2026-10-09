@@ -1,0 +1,356 @@
+{
+ "id": "banded_giant_column_3830ac",
+ "name": "Banded giant column",
+ "description": "A massive 2×2 round column with alternating red and white 1-plate bands, a flared capital and a base.",
+ "tags": [
+  "banded",
+  "giant",
+  "column",
+  "massive",
+  "round",
+  "alternating",
+  "red",
+  "white",
+  "plate",
+  "band",
+  "flared",
+  "capital",
+  "base",
+  "jami",
+  "alfar",
+  "mosque"
+ ],
+ "size": {
+  "w": 2,
+  "d": 2,
+  "h": 36
+ },
+ "parts": 36,
+ "depth": 1,
+ "colors": [
+  "dark_red",
+  "white",
+  "red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "36* 36*",
+   "36* 36*"
+  ],
+  "bottom": [
+   "o o",
+   "o o"
+  ],
+  "studsByHeight": [
+   "36: (0,0) (1,0) (0,1) (1,1)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "banded_column",
+ "subBuilds": [
+  {
+   "id": "banded_column",
+   "name": "Banded giant column",
+   "parts": [
+    {
+     "part": "plate_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 16,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 19,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 20,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 21,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 22,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 23,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 24,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 25,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 26,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 27,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 28,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 29,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 30,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 31,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 32,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 33,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 34,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 35,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "3830ac8119b3",
+ "source": {
+  "run": "2026-09-25_10-41-25-subbuilds-please-design-me-a-model-of-th",
+  "request": "please design me a model of the red mosque found in pettah, Colombo, Sri lanka, use up to 2000 bricks and get as detailed as you possibly can ",
+  "at": "2026-09-25T13:53:23.513Z"
+ },
+ "cost": 0.0332,
+ "reused": 0
+}

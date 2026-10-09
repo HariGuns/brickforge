@@ -1,0 +1,954 @@
+{
+ "id": "lamborghini_hurac_n_lp580_2_44c309",
+ "name": "Lamborghini Huracán LP580-2",
+ "description": "The low, wide red wedge-shaped supercar: a pointed nose with trans-clear headlights, black front intakes and splitter, a raked black windscreen flowing into a single-arc roof, triangular side intakes, red mirrors and large dark wheels filling open arches, with no rear wing.",
+ "tags": [
+  "lamborghini",
+  "hurac",
+  "car",
+  "low",
+  "wide",
+  "red",
+  "wedge",
+  "shaped",
+  "supercar",
+  "pointed",
+  "nose",
+  "tran",
+  "clear",
+  "headlight",
+  "black",
+  "front"
+ ],
+ "size": {
+  "w": 8,
+  "d": 20,
+  "h": 13
+ },
+ "parts": 106,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "black",
+  "red",
+  "trans_clear",
+  "dark_red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "11 11 10 10 10 10 11 11",
+   "11 11 10 10 10 10 11 11",
+   "11 11 12 12 12 12 11 11",
+   "11 11 13 13 13 13 11 11",
+   "11 11 13 13 13 13 11 11",
+   "11 11 13 13 13 13 11 11",
+   "11 11 13 13 13 13 11 11",
+   "11 11 13 13 13 13 11 11",
+   "11 11 13 13* 13* 13 11 11",
+   "11 11 13 13 13 13 11 11",
+   "11 11 13 13 13 13 11 11",
+   "11 11 13 13 13 13 11 11",
+   "13 11 12 12 12 12 11 13",
+   "11 11 11 11 11 11 11 11",
+   "11 11 11 11 11 11 11 11",
+   "11 11 11 11 11 11 11 11",
+   "11 11 11 11 11 11 11 11",
+   "11 11 11 11 11 11 11 11",
+   "11 11 11 11 11 11 11 11",
+   "10 10 10 10 10 10 10 10"
+  ],
+  "bottom": [
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". o o . . o o .",
+   ". o o . . o o .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". o o . . o o .",
+   ". o o . . o o .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . .",
+   ". . . . . . . ."
+  ],
+  "studsByHeight": [
+   "13: (3,8) (4,8)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "car",
+ "subBuilds": [
+  {
+   "id": "car",
+   "name": "Lamborghini Huracán LP580-2",
+   "parts": [
+    {
+     "part": "4600",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 3,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "4600",
+     "color": "dark_gray",
+     "x": 5,
+     "y": 3,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "4600",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 3,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "4600",
+     "color": "dark_gray",
+     "x": 5,
+     "y": 3,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "50944c01",
+     "color": "black",
+     "x": 7,
+     "y": 0,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "50944c01",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 2,
+     "rot": 180
+    },
+    {
+     "part": "50944c01",
+     "color": "black",
+     "x": 7,
+     "y": 0,
+     "z": 13,
+     "rot": 0
+    },
+    {
+     "part": "50944c01",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 13,
+     "rot": 180
+    },
+    {
+     "part": "3028",
+     "color": "black",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3036",
+     "color": "black",
+     "x": 1,
+     "y": 4,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 0,
+     "y": 5,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 0,
+     "y": 6,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 0,
+     "y": 7,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 0,
+     "y": 6,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 0,
+     "y": 7,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 6,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 0,
+     "y": 7,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 11,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 1,
+     "y": 5,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 18,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "black",
+     "x": 0,
+     "y": 5,
+     "z": 19,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 6,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 6,
+     "y": 5,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 6,
+     "y": 6,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 6,
+     "y": 7,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 5,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 6,
+     "y": 6,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 6,
+     "y": 7,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 5,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 6,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "black",
+     "x": 6,
+     "y": 7,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 5,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 5,
+     "z": 11,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 6,
+     "y": 5,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 5,
+     "z": 18,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "black",
+     "x": 6,
+     "y": 5,
+     "z": 19,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "black",
+     "x": 2,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x8",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x8",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x8",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 5,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x8",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 5,
+     "z": 9,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 5,
+     "z": 17,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 5,
+     "z": 18,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "black",
+     "x": 2,
+     "y": 5,
+     "z": 19,
+     "rot": 0
+    },
+    {
+     "part": "3028",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "2445",
+     "color": "red",
+     "x": 6,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "3036",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x8",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x8",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 14,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "trans_clear",
+     "x": 0,
+     "y": 9,
+     "z": 18,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 19,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x8",
+     "color": "red",
+     "x": 6,
+     "y": 9,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "red",
+     "x": 6,
+     "y": 9,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 6,
+     "y": 9,
+     "z": 14,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "trans_clear",
+     "x": 6,
+     "y": 9,
+     "z": 18,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 9,
+     "z": 19,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "black",
+     "x": 2,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x4",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 2,
+     "rot": 180
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "18973",
+     "color": "black",
+     "x": 2,
+     "y": 9,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 18,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "red",
+     "x": 4,
+     "y": 9,
+     "z": 18,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 2,
+     "y": 9,
+     "z": 19,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 9,
+     "z": 19,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "tile_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 10,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 13,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 14,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 10,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 6,
+     "y": 10,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "tile_2x2",
+     "color": "red",
+     "x": 6,
+     "y": 10,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 6,
+     "y": 10,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 7,
+     "y": 10,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "red",
+     "x": 6,
+     "y": 10,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 6,
+     "y": 10,
+     "z": 13,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 6,
+     "y": 10,
+     "z": 14,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 2,
+     "y": 10,
+     "z": 14,
+     "rot": 90
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 4,
+     "y": 10,
+     "z": 14,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x4",
+     "color": "red",
+     "x": 2,
+     "y": 12,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 2,
+     "y": 12,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 12,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 2,
+     "y": 12,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 4,
+     "y": 12,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 2,
+     "y": 12,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "black",
+     "x": 1,
+     "y": 0,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "black",
+     "x": 5,
+     "y": 0,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "black",
+     "x": 1,
+     "y": 0,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "black",
+     "x": 5,
+     "y": 0,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "54200",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 12,
+     "rot": 90
+    },
+    {
+     "part": "54200",
+     "color": "red",
+     "x": 7,
+     "y": 11,
+     "z": 12,
+     "rot": 270
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "44c3099af5a2",
+ "source": {
+  "run": "2026-09-25_10-24-56-subbuilds-using-the-image-attached-can-y",
+  "request": "using the image attached can you create a small diarama which includes the car, the race track and the stands in the background.\n",
+  "at": "2026-09-25T13:53:23.509Z"
+ },
+ "cost": 0.6168,
+ "reused": 0
+}

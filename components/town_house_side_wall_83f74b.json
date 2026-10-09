@@ -1,0 +1,227 @@
+{
+ "id": "town_house_side_wall_83f74b",
+ "name": "Town House Side Wall",
+ "description": "Five-stud side wall between back and front, with a small window on the upper storey, used mirrored on both sides.",
+ "tags": [
+  "town",
+  "house",
+  "side",
+  "wall",
+  "stud",
+  "between",
+  "back",
+  "front",
+  "window",
+  "upper",
+  "storey",
+  "used",
+  "mirrored",
+  "both",
+  "square",
+  "market"
+ ],
+ "size": {
+  "w": 1,
+  "d": 5,
+  "h": 21
+ },
+ "parts": 19,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "red",
+  "white",
+  "trans_clear"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "21*",
+   "21*",
+   "21*",
+   "21*",
+   "21*"
+  ],
+  "bottom": [
+   "o",
+   "o",
+   "o",
+   "o",
+   "o"
+  ],
+  "studsByHeight": [
+   "21: (0,0) (0,1) (0,2) (0,3) (0,4)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "house_side_wall",
+ "subBuilds": [
+  {
+   "id": "house_side_wall",
+   "name": "Town House Side Wall",
+   "parts": [
+    {
+     "part": "plate_1x3",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 0,
+     "y": 7,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 10,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "trans_clear",
+     "x": 0,
+     "y": 11,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 14,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 18,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 0,
+     "y": 18,
+     "z": 2,
+     "rot": 90
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "83f74b3ca2f5",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.503Z"
+ },
+ "cost": 0.0526,
+ "reused": 0
+}

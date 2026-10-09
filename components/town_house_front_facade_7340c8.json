@@ -1,0 +1,327 @@
+{
+ "id": "town_house_front_facade_7340c8",
+ "name": "Town House Front Facade",
+ "description": "Colourful 8-wide front wall with a door and step at ground floor, windows on the upper storeys and a contrasting floor band.",
+ "tags": [
+  "town",
+  "house",
+  "front",
+  "facade",
+  "colourful",
+  "wide",
+  "wall",
+  "door",
+  "step",
+  "ground",
+  "floor",
+  "window",
+  "upper",
+  "storey",
+  "contrasting",
+  "band"
+ ],
+ "size": {
+  "w": 8,
+  "d": 2,
+  "h": 21
+ },
+ "parts": 32,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "light_gray",
+  "white",
+  "medium_azure",
+  "dark_green"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "21* 21* 21* 21* 21* 21* 21* 21*",
+   "14* 14* 14* 14* 14* 14* 14* 14*"
+  ],
+  "bottom": [
+   "o o o o o o o o",
+   "o o o o o o o o"
+  ],
+  "studsByHeight": [
+   "21: (0,0) (1,0) (2,0) (3,0) (4,0) (5,0) (6,0) (7,0)",
+   "14: (0,1) (1,1) (2,1) (3,1) (4,1) (5,1) (6,1) (7,1)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "house_front_facade",
+ "subBuilds": [
+  {
+   "id": "house_front_facade",
+   "name": "Town House Front Facade",
+   "parts": [
+    {
+     "part": "plate_2x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "light_gray",
+     "x": 4,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "63864",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 7,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "medium_azure",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3579",
+     "color": "dark_green",
+     "x": 4,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 7,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 7,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 7,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "medium_azure",
+     "x": 1,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 7,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x8",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 1,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 5,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 7,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 0,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 7,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 20,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "7340c8b91c58",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.502Z"
+ },
+ "cost": 0.1765,
+ "reused": 0
+}

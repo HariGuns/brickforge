@@ -1,0 +1,389 @@
+{
+ "id": "market_stall_348413",
+ "name": "Market Stall",
+ "description": "A small wooden stall with a counter of produce (round plates and flowers), four posts and a striped red-and-white sloped canopy.",
+ "tags": [
+  "market",
+  "stall",
+  "wooden",
+  "counter",
+  "produce",
+  "round",
+  "plate",
+  "flower",
+  "post",
+  "striped",
+  "red",
+  "white",
+  "sloped",
+  "canopy",
+  "town",
+  "square"
+ ],
+ "size": {
+  "w": 4,
+  "d": 3,
+  "h": 15
+ },
+ "parts": 39,
+ "depth": 1,
+ "colors": [
+  "reddish_brown",
+  "tan",
+  "dark_tan",
+  "green",
+  "lime",
+  "pink",
+  "yellow",
+  "red",
+  "orange",
+  "white"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "15* 15* 15* 15*",
+   "15 15 15 15",
+   "14 14 14 14"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [
+   "15: (0,0) (1,0) (2,0) (3,0)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "market_stall",
+ "subBuilds": [
+  {
+   "id": "market_stall",
+   "name": "Market Stall",
+   "parts": [
+    {
+     "part": "plate_2x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 0,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "tan",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_tan",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "tan",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "tan",
+     "x": 3,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 2,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "lime",
+     "x": 3,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "pink",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "yellow",
+     "x": 2,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "tan",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 6,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "orange",
+     "x": 2,
+     "y": 6,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 1,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "lime",
+     "x": 2,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 7,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 7,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 10,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x3",
+     "color": "white",
+     "x": 3,
+     "y": 11,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 11,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "4286",
+     "color": "red",
+     "x": 0,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "4286",
+     "color": "white",
+     "x": 1,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "4286",
+     "color": "red",
+     "x": 2,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "4286",
+     "color": "white",
+     "x": 3,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "348413a42959",
+ "source": {
+  "run": "2026-10-08_19-21-20-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T19:25:36.205Z"
+ },
+ "cost": 0.1383,
+ "reused": 0
+}

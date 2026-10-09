@@ -1,0 +1,193 @@
+{
+ "id": "ground_railing_kiosk_d802be",
+ "name": "Ground railing kiosk",
+ "description": "A small striped pedestal kiosk with a white-and-red base and a red onion cap. It sits on a round plate with a cone tip and lines the front railing.",
+ "tags": [
+  "ground",
+  "railing",
+  "kiosk",
+  "pinnacle",
+  "striped",
+  "pedestal",
+  "white",
+  "red",
+  "base",
+  "onion",
+  "cap",
+  "sit",
+  "round",
+  "plate",
+  "cone",
+  "tip"
+ ],
+ "size": {
+  "w": 2,
+  "d": 2,
+  "h": 14
+ },
+ "parts": 16,
+ "depth": 1,
+ "colors": [
+  "white",
+  "red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "14 14",
+   "14 14"
+  ],
+  "bottom": [
+   "o o",
+   "o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "kiosk_pinnacle",
+ "subBuilds": [
+  {
+   "id": "kiosk_pinnacle",
+   "name": "Ground railing kiosk",
+   "parts": [
+    {
+     "part": "plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "cone_2x2x2",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "d802be290cba",
+ "source": {
+  "run": "2026-09-25_10-41-25-subbuilds-please-design-me-a-model-of-th",
+  "request": "please design me a model of the red mosque found in pettah, Colombo, Sri lanka, use up to 2000 bricks and get as detailed as you possibly can ",
+  "at": "2026-09-25T13:53:23.520Z"
+ },
+ "cost": 0.0333,
+ "reused": 0
+}

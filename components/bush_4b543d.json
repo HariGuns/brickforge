@@ -1,0 +1,149 @@
+{
+ "id": "bush_4b543d",
+ "name": "Bush",
+ "description": "A small rounded green shrub of stacked green and dark-green round plates and bricks on a 2×2 plate, with a couple of tiny flowers.",
+ "tags": [
+  "bush",
+  "rounded",
+  "green",
+  "shrub",
+  "stacked",
+  "dark",
+  "round",
+  "plate",
+  "brick",
+  "couple",
+  "flower",
+  "pond",
+  "park",
+  "bench",
+  "tree"
+ ],
+ "size": {
+  "w": 2,
+  "d": 2,
+  "h": 7
+ },
+ "parts": 10,
+ "depth": 1,
+ "colors": [
+  "green",
+  "dark_green",
+  "pink",
+  "yellow"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "7* 6*",
+   "7* 7*"
+  ],
+  "bottom": [
+   "o o",
+   "o o"
+  ],
+  "studsByHeight": [
+   "7: (0,0) (0,1) (1,1)",
+   "6: (1,0)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "bush",
+ "subBuilds": [
+  {
+   "id": "bush",
+   "name": "Bush",
+   "parts": [
+    {
+     "part": "plate_2x2",
+     "color": "green",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_brick_2x2",
+     "color": "dark_green",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "green",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "pink",
+     "x": 1,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "dark_green",
+     "x": 0,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "dark_green",
+     "x": 0,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "yellow",
+     "x": 1,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "green",
+     "x": 0,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "4b543d07830e",
+ "source": {
+  "run": "2026-10-08_19-52-47-subbuilds-a-park-with-a-pond-a-bench-and",
+  "request": "a park with a pond, a bench and two trees",
+  "at": "2026-10-08T19:56:22.782Z"
+ },
+ "cost": 0.0232,
+ "reused": 0
+}

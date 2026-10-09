@@ -1,0 +1,90 @@
+{
+ "id": "window_flower_box_dbae9a",
+ "name": "Window Flower Box",
+ "description": "A tiny reddish-brown planter strip with flower plates that sits under a window.",
+ "tags": [
+  "window",
+  "flower",
+  "box",
+  "reddish",
+  "brown",
+  "planter",
+  "strip",
+  "plate",
+  "that",
+  "sit",
+  "under",
+  "town",
+  "house",
+  "square",
+  "market",
+  "stall"
+ ],
+ "size": {
+  "w": 2,
+  "d": 1,
+  "h": 2
+ },
+ "parts": 3,
+ "depth": 1,
+ "colors": [
+  "reddish_brown",
+  "red",
+  "yellow"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "2* 2*"
+  ],
+  "bottom": [
+   "o o"
+  ],
+  "studsByHeight": [
+   "2: (0,0) (1,0)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "window_box",
+ "subBuilds": [
+  {
+   "id": "window_box",
+   "name": "Window Flower Box",
+   "parts": [
+    {
+     "part": "plate_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "yellow",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "dbae9ac42355",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.504Z"
+ },
+ "cost": 0.0155,
+ "reused": 0
+}

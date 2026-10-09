@@ -1,0 +1,475 @@
+{
+ "id": "flanking_domed_turret_15f3e8",
+ "name": "Flanking domed turret",
+ "description": "A small chhatri-style turret with a striped balustrade base, arched openings, and a red/white onion dome of round plates with a cone finial.",
+ "tags": [
+  "flanking",
+  "domed",
+  "turret",
+  "corner",
+  "chhatri",
+  "style",
+  "striped",
+  "balustrade",
+  "base",
+  "arched",
+  "opening",
+  "red",
+  "white",
+  "onion",
+  "dome",
+  "round"
+ ],
+ "size": {
+  "w": 4,
+  "d": 4,
+  "h": 18
+ },
+ "parts": 50,
+ "depth": 1,
+ "colors": [
+  "white",
+  "red",
+  "dark_red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "17* 14* 14* 17*",
+   "14* 18* 15* 14*",
+   "14* 15* 15* 14*",
+   "17* 14* 14* 17*"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [
+   "18: (1,1)",
+   "17: (0,0) (3,0) (0,3) (3,3)",
+   "15: (2,1) (1,2) (2,2)",
+   "14: (1,0) (2,0) (0,1) (3,1) (0,2) (3,2) (1,3) (2,3)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "corner_turret",
+ "subBuilds": [
+  {
+   "id": "corner_turret",
+   "name": "Flanking domed turret",
+   "parts": [
+    {
+     "part": "plate_4x4",
+     "color": "white",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 2,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 2,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 3,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 3,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 3,
+     "y": 3,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 4,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "white",
+     "x": 3,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 6,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "white",
+     "x": 3,
+     "y": 6,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 7,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 7,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 8,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 8,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 12,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 12,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 12,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 13,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 13,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "round_plate_2x2",
+     "color": "red",
+     "x": 1,
+     "y": 14,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 14,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 14,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "white",
+     "x": 1,
+     "y": 15,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "15f3e87627ba",
+ "source": {
+  "run": "2026-09-25_10-41-25-subbuilds-please-design-me-a-model-of-th",
+  "request": "please design me a model of the red mosque found in pettah, Colombo, Sri lanka, use up to 2000 bricks and get as detailed as you possibly can ",
+  "at": "2026-09-25T13:53:23.518Z"
+ },
+ "cost": 0.1236,
+ "reused": 0
+}

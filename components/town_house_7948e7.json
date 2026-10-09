@@ -1,0 +1,1408 @@
+{
+ "id": "town_house_7948e7",
+ "name": "Town House",
+ "description": "A three-storey narrow gabled town house. It has a colourful brick facade with windows, a front door with a step, a pitched slope roof with filled gables, and a chimney.",
+ "tags": [
+  "town",
+  "house",
+  "storey",
+  "narrow",
+  "gabled",
+  "has",
+  "colourful",
+  "brick",
+  "facade",
+  "window",
+  "front",
+  "door",
+  "step",
+  "pitched",
+  "slope",
+  "roof"
+ ],
+ "size": {
+  "w": 8,
+  "d": 8,
+  "h": 35
+ },
+ "parts": 179,
+ "depth": 2,
+ "colors": [
+  "dark_gray",
+  "white",
+  "dark_red",
+  "red",
+  "trans_clear",
+  "light_gray",
+  "medium_azure",
+  "dark_green",
+  "reddish_brown",
+  "yellow",
+  "black"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "26 29 32 35 35 32 29 26",
+   "26 29 32 35 35 32 29 26",
+   "26 29 32 35 35 32 29 26",
+   "26 29 32 35 35 32 29 26",
+   "26 29 32 35 35 32 29 26",
+   "26 29 32 35 35 32 29 26",
+   "26 29 32 35 35 32 29 26",
+   "26 29 32 35 35 32 29 26"
+  ],
+  "bottom": [
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o",
+   "o o o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "town_house",
+ "subBuilds": [
+  {
+   "id": "town_house",
+   "name": "Town House",
+   "parts": [
+    {
+     "part": "3036",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x8",
+     "color": "dark_gray",
+     "x": 6,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "41539",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 22,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": [
+    {
+     "sub": "house_back_wall",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "sub": "house_side_wall",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "sub": "house_side_wall",
+     "x": 7,
+     "y": 1,
+     "z": 1,
+     "rot": 0,
+     "mirror": true
+    },
+    {
+     "sub": "house_front_facade",
+     "x": 0,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "sub": "window_box",
+     "x": 0,
+     "y": 15,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "sub": "window_box",
+     "x": 2,
+     "y": 15,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "sub": "window_box",
+     "x": 4,
+     "y": 15,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "sub": "window_box",
+     "x": 6,
+     "y": 15,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "sub": "house_roof",
+     "x": 0,
+     "y": 23,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "sub": "house_chimney",
+     "x": 5,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    }
+   ]
+  },
+  {
+   "id": "house_back_wall",
+   "name": "Town House Back Wall",
+   "parts": [
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 7,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 2,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 3,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 7,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 2,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 3,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 0,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 7,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "house_side_wall",
+   "name": "Town House Side Wall",
+   "parts": [
+    {
+     "part": "plate_1x3",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 0,
+     "y": 7,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x3",
+     "color": "white",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 10,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "trans_clear",
+     "x": 0,
+     "y": 11,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 11,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 14,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 18,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x3",
+     "color": "red",
+     "x": 0,
+     "y": 18,
+     "z": 2,
+     "rot": 90
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "house_front_facade",
+   "name": "Town House Front Facade",
+   "parts": [
+    {
+     "part": "plate_2x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "dark_gray",
+     "x": 4,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "light_gray",
+     "x": 4,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "63864",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 7,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "medium_azure",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3579",
+     "color": "dark_green",
+     "x": 4,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 7,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 7,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 7,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 0,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "medium_azure",
+     "x": 1,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 7,
+     "y": 10,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x8",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 1,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 5,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "white",
+     "x": 7,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 0,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "medium_azure",
+     "x": 3,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "medium_azure",
+     "x": 7,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 20,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "window_box",
+   "name": "Window Flower Box",
+   "parts": [
+    {
+     "part": "plate_1x2",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1_tabs",
+     "color": "yellow",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "house_roof",
+   "name": "Town House Gabled Roof",
+   "parts": [
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 0,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 0,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 0,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 0,
+     "z": 4,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 0,
+     "z": 6,
+     "rot": 270
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 2,
+     "y": 0,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 4,
+     "y": 0,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 0,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "light_gray",
+     "x": 2,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "white",
+     "x": 5,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 2,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 4,
+     "y": 2,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "white",
+     "x": 2,
+     "y": 2,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "dark_red",
+     "x": 1,
+     "y": 3,
+     "z": 7,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 3,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 5,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 3,
+     "z": 7,
+     "rot": 270
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 3,
+     "y": 3,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 3,
+     "y": 4,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "light_gray",
+     "x": 3,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 3,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 3,
+     "y": 3,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "trans_clear",
+     "x": 3,
+     "y": 4,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 3,
+     "y": 5,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 6,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 6,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 6,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 2,
+     "y": 6,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 6,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 6,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 6,
+     "z": 4,
+     "rot": 270
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_red",
+     "x": 4,
+     "y": 6,
+     "z": 6,
+     "rot": 270
+    },
+    {
+     "part": "ridge45_2x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "ridge45_2x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "ridge45_2x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 9,
+     "z": 7,
+     "rot": 90
+    }
+   ],
+   "uses": []
+  },
+  {
+   "id": "house_chimney",
+   "name": "Chimney",
+   "parts": [
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "black",
+     "x": 1,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "7948e79e6bcc",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.513Z"
+ },
+ "cost": 0.7299,
+ "reused": 2
+}

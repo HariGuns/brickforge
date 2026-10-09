@@ -1,0 +1,153 @@
+{
+ "id": "park_bench_fa3c0e",
+ "name": "Park Bench",
+ "description": "A short park bench with a reddish-brown tile seat and backrest on dark-gray legs.",
+ "tags": [
+  "park",
+  "bench",
+  "short",
+  "reddish",
+  "brown",
+  "tile",
+  "seat",
+  "backrest",
+  "dark",
+  "gray",
+  "leg",
+  "town",
+  "square",
+  "house",
+  "market",
+  "stall"
+ ],
+ "size": {
+  "w": 4,
+  "d": 2,
+  "h": 5
+ },
+ "parts": 11,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "reddish_brown"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "5 5 5 5",
+   "4 3 3 4"
+  ],
+  "bottom": [
+   "o . . o",
+   "o . . o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "bench",
+ "subBuilds": [
+  {
+   "id": "bench",
+   "name": "Park Bench",
+   "parts": [
+    {
+     "part": "plate_1x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "dark_gray",
+     "x": 3,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "fa3c0e0b1ac1",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.501Z"
+ },
+ "cost": 0.0362,
+ "reused": 1
+}

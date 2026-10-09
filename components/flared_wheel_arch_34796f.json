@@ -1,0 +1,288 @@
+{
+ "id": "flared_wheel_arch_34796f",
+ "name": "Flared wheel arch",
+ "description": "A red flared arch built from curved slopes and mudguard pieces that bulges out over the top and front/back of a wheel, leaving the wheel opening clear and standing half a stud proud of the flank.",
+ "tags": [
+  "flared",
+  "wheel",
+  "arch",
+  "red",
+  "built",
+  "curved",
+  "slope",
+  "mudguard",
+  "that",
+  "bulge",
+  "out",
+  "over",
+  "top",
+  "front",
+  "back",
+  "leaving"
+ ],
+ "size": {
+  "w": 4,
+  "d": 10,
+  "h": 10
+ },
+ "parts": 26,
+ "depth": 1,
+ "colors": [
+  "red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "10 10 10 10",
+   "10 10 10 10",
+   "10 10 10 10",
+   "10 10 10 10",
+   "10 10 10 10",
+   "10 10 10 10",
+   "10 10 10 10",
+   "10 10 10 10",
+   "10 10 10 10",
+   "10 10 10 10"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o . .",
+   "o o . .",
+   "o o . .",
+   "o o . .",
+   "o o . .",
+   "o o . .",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "wheel_arch",
+ "subBuilds": [
+  {
+   "id": "wheel_arch",
+   "name": "Flared wheel arch",
+   "parts": [
+    {
+     "part": "3832",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 0,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x6",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "3030",
+     "color": "red",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x6",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "tile_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 8,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 3,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 4,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 5,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 6,
+     "rot": 270
+    },
+    {
+     "part": "11477",
+     "color": "red",
+     "x": 2,
+     "y": 8,
+     "z": 7,
+     "rot": 270
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "34796fdc2afd",
+ "source": {
+  "run": "2026-09-25_11-34-10-subbuilds-please-create-a-highly-detaile",
+  "request": "please create a highly detailed model of this Mini cooper.  Use as many bricks as you need and it has to be a minimum of 20 Cm long and scaled accordingly \n",
+  "at": "2026-09-25T13:53:23.556Z"
+ },
+ "cost": 0.0881,
+ "reused": 0
+}

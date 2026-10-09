@@ -1,0 +1,162 @@
+{
+ "id": "trackside_barrier_8135d8",
+ "name": "Trackside Barrier",
+ "description": "A light-gray barrier wall topped with white lattice fencing, separating the grass from the grandstands.",
+ "tags": [
+  "trackside",
+  "barrier",
+  "run",
+  "light",
+  "gray",
+  "wall",
+  "topped",
+  "white",
+  "lattice",
+  "fencing",
+  "separating",
+  "grass",
+  "grandstand",
+  "hurac",
+  "circuit",
+  "diorama"
+ ],
+ "size": {
+  "w": 8,
+  "d": 2,
+  "h": 6
+ },
+ "parts": 12,
+ "depth": 1,
+ "colors": [
+  "light_gray",
+  "white",
+  "red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "6 6 6 6 6 6 6 6",
+   "5 5 5 5 5 5 5 5"
+  ],
+  "bottom": [
+   "o o o o o o o o",
+   "o o o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "barrier_run",
+ "subBuilds": [
+  {
+   "id": "barrier_run",
+   "name": "Trackside Barrier",
+   "parts": [
+    {
+     "part": "plate_2x4",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "light_gray",
+     "x": 4,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "light_gray",
+     "x": 4,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "fence_1x4x1",
+     "color": "white",
+     "x": 0,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "fence_1x4x1",
+     "color": "white",
+     "x": 4,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 2,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 4,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 6,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "8135d88e787b",
+ "source": {
+  "run": "2026-09-25_10-24-56-subbuilds-using-the-image-attached-can-y",
+  "request": "using the image attached can you create a small diarama which includes the car, the race track and the stands in the background.\n",
+  "at": "2026-09-25T13:53:23.499Z"
+ },
+ "cost": 0.0312,
+ "reused": 0
+}

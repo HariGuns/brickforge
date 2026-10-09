@@ -1,0 +1,151 @@
+{
+ "id": "wheel_axle_set_8c7d5f",
+ "name": "Wheel axle set",
+ "description": "An axle beam made of pin bricks, with a large black Technic-pin wheel on each end. It is 16 studs across so the wheels sit flush with the body sides and reach the ground.",
+ "tags": [
+  "wheel",
+  "axle",
+  "set",
+  "beam",
+  "made",
+  "pin",
+  "brick",
+  "black",
+  "technic",
+  "each",
+  "end",
+  "stud",
+  "across",
+  "sit",
+  "flush",
+  "body"
+ ],
+ "size": {
+  "w": 16,
+  "d": 4,
+  "h": 10
+ },
+ "parts": 10,
+ "depth": 1,
+ "colors": [
+  "dark_gray",
+  "light_gray",
+  "black"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "9 9 . . . . . . . . . . . . 9 9",
+   "10 10 7* 7* 7* 7* 7* 7* 7* 7* 7* 7* 7* 7* 10 10",
+   "10 10 7* 7* 7* 7* 7* 7* 7* 7* 7* 7* 7* 7* 10 10",
+   "9 9 . . . . . . . . . . . . 9 9"
+  ],
+  "bottom": [
+   ". . . . . . . . . . . . . . . .",
+   ". . o o o o o o o o o o o o . .",
+   ". . o o o o o o o o o o o o . .",
+   ". . . . . . . . . . . . . . . ."
+  ],
+  "studsByHeight": [
+   "7: (2,1) (3,1) (4,1) (5,1) (6,1) (7,1) (8,1) (9,1) (10,1) (11,1) (12,1) (13,1) (2,2) (3,2) (4,2) (5,2) (6,2) (7,2) (8,2) (9,2) (10,2) (11,2) (12,2) (13,2)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "axle_set",
+ "subBuilds": [
+  {
+   "id": "axle_set",
+   "name": "Wheel axle set",
+   "parts": [
+    {
+     "part": "brick_2x6",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x6",
+     "color": "dark_gray",
+     "x": 8,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "6249",
+     "color": "light_gray",
+     "x": 2,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "dark_gray",
+     "x": 6,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "6249",
+     "color": "light_gray",
+     "x": 10,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x8",
+     "color": "black",
+     "x": 4,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "black",
+     "x": 2,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "black",
+     "x": 12,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "55981c01",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "55981c01",
+     "color": "black",
+     "x": 14,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "8c7d5f54154c",
+ "source": {
+  "run": "2026-09-24_17-36-41-subbuilds-photo-medium",
+  "at": "2026-09-25T13:53:23.369Z"
+ },
+ "cost": 0.0759,
+ "reused": 0
+}

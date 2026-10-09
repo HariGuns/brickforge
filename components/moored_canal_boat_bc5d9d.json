@@ -1,0 +1,349 @@
+{
+ "id": "moored_canal_boat_bc5d9d",
+ "name": "Moored Canal Boat",
+ "description": "A small open wooden canal boat with a tapered bow and stern made of wedge and slope parts, a reddish-brown hull with a white stripe, and seats and a small cabin inside.",
+ "tags": [
+  "moored",
+  "canal",
+  "boat",
+  "open",
+  "wooden",
+  "tapered",
+  "bow",
+  "stern",
+  "made",
+  "wedge",
+  "slope",
+  "reddish",
+  "brown",
+  "hull",
+  "white",
+  "stripe"
+ ],
+ "size": {
+  "w": 4,
+  "d": 10,
+  "h": 8
+ },
+ "parts": 33,
+ "depth": 1,
+ "colors": [
+  "reddish_brown",
+  "tan",
+  "white",
+  "trans_clear"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   ". 5 5 .",
+   "7 7 7 7",
+   "7 3 3 7",
+   "7 6 6 7",
+   "7 3 3 7",
+   "7 8 8 7",
+   "7 8* 8* 7",
+   "7 8* 8* 7",
+   "7 7 7 7",
+   ". 5 5 ."
+  ],
+  "bottom": [
+   ". o o .",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   ". o o ."
+  ],
+  "studsByHeight": [
+   "8: (1,6) (2,6) (1,7) (2,7)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "moored_boat",
+ "subBuilds": [
+  {
+   "id": "moored_boat",
+   "name": "Moored Canal Boat",
+   "parts": [
+    {
+     "part": "plate_4x8",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 0,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 0,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "3832",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 2,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x6",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 2,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 2,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 2,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 2,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "tan",
+     "x": 1,
+     "y": 2,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "tan",
+     "x": 1,
+     "y": 2,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "tan",
+     "x": 1,
+     "y": 2,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x3",
+     "color": "white",
+     "x": 1,
+     "y": 2,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 3,
+     "y": 5,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 5,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "tan",
+     "x": 1,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "trans_clear",
+     "x": 1,
+     "y": 5,
+     "z": 5,
+     "rot": 180
+    },
+    {
+     "part": "brick_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 5,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "6636",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 6,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "6636",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 6,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "reddish_brown",
+     "x": 0,
+     "y": 6,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "reddish_brown",
+     "x": 3,
+     "y": 6,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "reddish_brown",
+     "x": 1,
+     "y": 6,
+     "z": 8,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "bc5d9ddac6fd",
+ "source": {
+  "run": "2026-10-08_18-47-55-subbuilds-a-canal-street-with-narrow-tow",
+  "request": "a canal street with narrow town houses, a stone bridge, moored boats, lamp posts, railings and trees",
+  "at": "2026-10-08T18:54:37.761Z"
+ },
+ "cost": 0.0892,
+ "reused": 0
+}

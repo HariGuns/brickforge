@@ -1,0 +1,150 @@
+{
+ "id": "striped_kerb_segment_e67107",
+ "name": "Striped Kerb Segment",
+ "description": "A flat 2×8 kerb strip of alternating red and white tiles on a plate, laid along the inside of the bend.",
+ "tags": [
+  "striped",
+  "kerb",
+  "segment",
+  "flat",
+  "strip",
+  "alternating",
+  "red",
+  "white",
+  "tile",
+  "plate",
+  "laid",
+  "along",
+  "inside",
+  "bend",
+  "hurac",
+  "circuit"
+ ],
+ "size": {
+  "w": 2,
+  "d": 8,
+  "h": 2
+ },
+ "parts": 9,
+ "depth": 1,
+ "colors": [
+  "light_gray",
+  "red",
+  "white"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "2 2",
+   "2 2",
+   "2 2",
+   "2 2",
+   "2 2",
+   "2 2",
+   "2 2",
+   "2 2"
+  ],
+  "bottom": [
+   "o o",
+   "o o",
+   "o o",
+   "o o",
+   "o o",
+   "o o",
+   "o o",
+   "o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "kerb_segment",
+ "subBuilds": [
+  {
+   "id": "kerb_segment",
+   "name": "Striped Kerb Segment",
+   "parts": [
+    {
+     "part": "plate_2x8",
+     "color": "light_gray",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 7,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "e6710793dd05",
+ "source": {
+  "run": "2026-09-25_10-24-56-subbuilds-using-the-image-attached-can-y",
+  "request": "using the image attached can you create a small diarama which includes the car, the race track and the stands in the background.\n",
+  "at": "2026-09-25T13:53:23.505Z"
+ },
+ "cost": 0.0173,
+ "reused": 0
+}

@@ -1,0 +1,154 @@
+{
+ "id": "chimney_4d5cba",
+ "name": "Chimney",
+ "description": "Small brick chimney with a cap that stands on the roof slope's studs.",
+ "tags": [
+  "chimney",
+  "house",
+  "brick",
+  "cap",
+  "that",
+  "stand",
+  "roof",
+  "slope",
+  "stud",
+  "town",
+  "square",
+  "market",
+  "stall",
+  "fountain",
+  "clock",
+  "tower"
+ ],
+ "size": {
+  "w": 2,
+  "d": 2,
+  "h": 7
+ },
+ "parts": 11,
+ "depth": 1,
+ "colors": [
+  "red",
+  "dark_gray",
+  "black"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "7 7",
+   "7 7"
+  ],
+  "bottom": [
+   "o o",
+   "o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "house_chimney",
+ "subBuilds": [
+  {
+   "id": "house_chimney",
+   "name": "Chimney",
+   "parts": [
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 3,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 1,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "dark_gray",
+     "x": 0,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "black",
+     "x": 1,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "4d5cba3c7f09",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.504Z"
+ },
+ "cost": 0.0302,
+ "reused": 0
+}

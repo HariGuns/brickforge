@@ -1,0 +1,528 @@
+{
+ "id": "front_nose_6b2744",
+ "name": "Front nose",
+ "description": "A low wedge bonnet of red curved slopes. It has thin trans-clear headlights at the front corners, black lower intakes split by a central splitter, and red blades at the outer corners.",
+ "tags": [
+  "front",
+  "nose",
+  "low",
+  "wedge",
+  "bonnet",
+  "red",
+  "curved",
+  "slope",
+  "has",
+  "thin",
+  "tran",
+  "clear",
+  "headlight",
+  "corner",
+  "black",
+  "lower"
+ ],
+ "size": {
+  "w": 16,
+  "d": 9,
+  "h": 8
+ },
+ "parts": 56,
+ "depth": 1,
+ "colors": [
+  "red",
+  "black",
+  "dark_gray",
+  "trans_clear"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   ". . . 8 8 8 8 8 8 8 8 8 8 . . .",
+   ". . . 8 8 8 8 8 8 8 8 8 8 . . .",
+   ". . . 8 8 8 8 8 8 8 8 8 8 . . .",
+   ". . . 7 7 7 7 7 7 7 7 7 7 . . .",
+   ". . . 7 7 7 7 7 7 7 7 7 7 . . .",
+   "3 5 5 5 5 5 5 5 5 5 5 5 5 5 5 3",
+   "3 5 5 5 5 5 5 5 5 5 5 5 5 5 5 3",
+   "3 4 5 5 5 5 5 5 5 5 5 5 5 5 4 3",
+   "3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 3"
+  ],
+  "bottom": [
+   ". . . o o o o o o o o o o . . .",
+   ". . . o o o o o o o o o o . . .",
+   ". . . o o o o o o o o o o . . .",
+   ". . . o o o o o o o o o o . . .",
+   ". . . o o o o o o o o o o . . .",
+   "o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o",
+   "o o o o o o o o o o o o o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "nose",
+ "subBuilds": [
+  {
+   "id": "nose",
+   "name": "Front nose",
+   "parts": [
+    {
+     "part": "3033",
+     "color": "red",
+     "x": 3,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x8",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x8",
+     "color": "red",
+     "x": 8,
+     "y": 0,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x3",
+     "color": "red",
+     "x": 13,
+     "y": 0,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x6",
+     "color": "black",
+     "x": 10,
+     "y": 0,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "dark_gray",
+     "x": 6,
+     "y": 0,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "3030",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3030",
+     "color": "red",
+     "x": 3,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x3",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_2x4",
+     "color": "red",
+     "x": 14,
+     "y": 1,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x3",
+     "color": "red",
+     "x": 13,
+     "y": 1,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "plate_1x4",
+     "color": "black",
+     "x": 2,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "black",
+     "x": 6,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x2",
+     "color": "red",
+     "x": 7,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x1",
+     "color": "black",
+     "x": 9,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x4",
+     "color": "black",
+     "x": 10,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "93606",
+     "color": "red",
+     "x": 2,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "93606",
+     "color": "red",
+     "x": 4,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "93606",
+     "color": "red",
+     "x": 6,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "93606",
+     "color": "red",
+     "x": 8,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "93606",
+     "color": "red",
+     "x": 10,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "93606",
+     "color": "red",
+     "x": 12,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "41769b",
+     "color": "red",
+     "x": 0,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "41770b",
+     "color": "red",
+     "x": 14,
+     "y": 2,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 3,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 7,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 9,
+     "y": 2,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 3,
+     "y": 2,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x6",
+     "color": "red",
+     "x": 5,
+     "y": 2,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 11,
+     "y": 2,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 3,
+     "y": 2,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x6",
+     "color": "red",
+     "x": 5,
+     "y": 2,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "red",
+     "x": 11,
+     "y": 2,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "85984",
+     "color": "red",
+     "x": 1,
+     "y": 3,
+     "z": 5,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x2",
+     "color": "trans_clear",
+     "x": 1,
+     "y": 3,
+     "z": 7,
+     "rot": 90
+    },
+    {
+     "part": "85984",
+     "color": "red",
+     "x": 14,
+     "y": 3,
+     "z": 5,
+     "rot": 270
+    },
+    {
+     "part": "tile_1x2",
+     "color": "trans_clear",
+     "x": 14,
+     "y": 3,
+     "z": 7,
+     "rot": 90
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 3,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 5,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 7,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 9,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "15068",
+     "color": "red",
+     "x": 11,
+     "y": 5,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "3832",
+     "color": "red",
+     "x": 3,
+     "y": 5,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "4477",
+     "color": "red",
+     "x": 3,
+     "y": 5,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "4477",
+     "color": "red",
+     "x": 3,
+     "y": 6,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "3832",
+     "color": "red",
+     "x": 3,
+     "y": 6,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 3,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 5,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 7,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 9,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "2412b",
+     "color": "black",
+     "x": 11,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 3,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "69729",
+     "color": "red",
+     "x": 7,
+     "y": 7,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "6b27442d802d",
+ "source": {
+  "run": "2026-09-24_17-36-41-subbuilds-photo",
+  "at": "2026-09-25T13:53:23.352Z"
+ },
+ "cost": 0.4953,
+ "reused": 0
+}

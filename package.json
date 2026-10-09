@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/ensure-rebrickable.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

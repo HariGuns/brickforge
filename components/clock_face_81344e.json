@@ -1,0 +1,173 @@
+{
+ "id": "clock_face_81344e",
+ "name": "Clock Face",
+ "description": "A round white clock dial with black hour marks and hands on a dark frame, mounted sideways on each face of the tower.",
+ "tags": [
+  "clock",
+  "face",
+  "round",
+  "white",
+  "dial",
+  "black",
+  "hour",
+  "mark",
+  "hand",
+  "dark",
+  "frame",
+  "mounted",
+  "sideway",
+  "each",
+  "tower",
+  "town"
+ ],
+ "size": {
+  "w": 4,
+  "d": 4,
+  "h": 2
+ },
+ "parts": 13,
+ "depth": 1,
+ "colors": [
+  "black",
+  "white"
+ ],
+ "sideways": true,
+ "connections": {
+  "top": [
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2",
+   "2 2 2 2"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "clock_face",
+ "subBuilds": [
+  {
+   "id": "clock_face",
+   "name": "Clock Face",
+   "parts": [
+    {
+     "part": "plate_4x4",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 0,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 3,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 1,
+     "y": 1,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x2",
+     "color": "white",
+     "x": 3,
+     "y": 1,
+     "z": 1,
+     "rot": 90
+    },
+    {
+     "part": "round_tile_1x1",
+     "color": "black",
+     "x": 1,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 2,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "black",
+     "x": 1,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x1",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "81344e1a7d55",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.508Z"
+ },
+ "cost": 0.0429,
+ "reused": 0
+}

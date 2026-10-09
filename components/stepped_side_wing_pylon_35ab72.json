@@ -1,0 +1,1477 @@
+{
+ "id": "stepped_side_wing_pylon_35ab72",
+ "name": "Stepped side wing pylon",
+ "description": "A tall, narrow side wing with a stepped, sloping front edge. It has alternating 1-plate red/white bands on its edges, checker infill, and rows of small arched niches down its face; it is mirrored for the opposite side.",
+ "tags": [
+  "stepped",
+  "side",
+  "wing",
+  "pylon",
+  "tall",
+  "narrow",
+  "sloping",
+  "front",
+  "edge",
+  "has",
+  "alternating",
+  "plate",
+  "red",
+  "white",
+  "band",
+  "checker"
+ ],
+ "size": {
+  "w": 4,
+  "d": 16,
+  "h": 53
+ },
+ "parts": 172,
+ "depth": 1,
+ "colors": [
+  "red",
+  "white",
+  "dark_red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "53 53 53 53",
+   "53 53 53 53",
+   "53 53 53 53",
+   "53 53 53 53",
+   "45 45 45 45",
+   "47* 44* 44* 47*",
+   "44 44 44 44",
+   "44 44 44 44",
+   "33 33 33 33",
+   "35* 32* 32* 35*",
+   "32 32 32 32",
+   "32 32 32 32",
+   "21 21 21 21",
+   "23* 20* 20* 23*",
+   "20 20 20 20",
+   "20 20 20 20"
+  ],
+  "bottom": [
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o",
+   "o o o o"
+  ],
+  "studsByHeight": [
+   "47: (0,5) (3,5)",
+   "44: (1,5) (2,5)",
+   "35: (0,9) (3,9)",
+   "32: (1,9) (2,9)",
+   "23: (0,13) (3,13)",
+   "20: (1,13) (2,13)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "side_wing",
+ "subBuilds": [
+  {
+   "id": "side_wing",
+   "name": "Stepped side wing pylon",
+   "parts": [
+    {
+     "part": "plate_4x6",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x4",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "red",
+     "x": 0,
+     "y": 0,
+     "z": 10,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 1,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 1,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 1,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 1,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x4",
+     "color": "white",
+     "x": 0,
+     "y": 4,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 4,
+     "z": 10,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 5,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 5,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 5,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 5,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 5,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 5,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 5,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 5,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 5,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 5,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 5,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 5,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 5,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 5,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 5,
+     "z": 15,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x4",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "red",
+     "x": 0,
+     "y": 8,
+     "z": 10,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 9,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 9,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 9,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 9,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 9,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 9,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 9,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 9,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 9,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 12,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x4",
+     "color": "white",
+     "x": 0,
+     "y": 12,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 12,
+     "z": 10,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 13,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 13,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 13,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 13,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 13,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 13,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 13,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 13,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 13,
+     "z": 8,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 13,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 13,
+     "z": 14,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 13,
+     "z": 15,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "red",
+     "x": 0,
+     "y": 16,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x4",
+     "color": "red",
+     "x": 0,
+     "y": 16,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "red",
+     "x": 0,
+     "y": 16,
+     "z": 10,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 17,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 17,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 17,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 17,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 17,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 17,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 17,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 17,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 17,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 0,
+     "y": 17,
+     "z": 13,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 20,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 20,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 20,
+     "z": 12,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 20,
+     "z": 13,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 20,
+     "z": 13,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 21,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 21,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 21,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 21,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 21,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 21,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 21,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 21,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 21,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 21,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 21,
+     "z": 11,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "red",
+     "x": 0,
+     "y": 24,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x6",
+     "color": "red",
+     "x": 0,
+     "y": 24,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 25,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 25,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 25,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 25,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 25,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 25,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 25,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 25,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 25,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 25,
+     "z": 10,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 25,
+     "z": 11,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 28,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "plate_4x6",
+     "color": "white",
+     "x": 0,
+     "y": 28,
+     "z": 6,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 29,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 29,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 29,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 29,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 29,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 29,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 29,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 29,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 29,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 0,
+     "y": 29,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x8",
+     "color": "red",
+     "x": 0,
+     "y": 32,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 32,
+     "z": 8,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 32,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 32,
+     "z": 9,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 33,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 33,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 33,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 33,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 33,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 33,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 33,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x8",
+     "color": "white",
+     "x": 0,
+     "y": 36,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 37,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 3,
+     "y": 37,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 1,
+     "y": 37,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 2,
+     "y": 37,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 37,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 37,
+     "z": 6,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 37,
+     "z": 7,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x8",
+     "color": "red",
+     "x": 0,
+     "y": 40,
+     "z": 0,
+     "rot": 90
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 41,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 41,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 41,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 41,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 41,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "slope33_3x4",
+     "color": "red",
+     "x": 0,
+     "y": 41,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "white",
+     "x": 0,
+     "y": 44,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "tile_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 44,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 0,
+     "y": 44,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "cone_1x1",
+     "color": "red",
+     "x": 3,
+     "y": 44,
+     "z": 5,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x4",
+     "color": "red",
+     "x": 0,
+     "y": 45,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x4",
+     "color": "dark_red",
+     "x": 0,
+     "y": 45,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "arch_1x4",
+     "color": "white",
+     "x": 0,
+     "y": 45,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "plate_4x4",
+     "color": "red",
+     "x": 0,
+     "y": 48,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 0,
+     "y": 49,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 0,
+     "y": 49,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "red",
+     "x": 2,
+     "y": 49,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "white",
+     "x": 2,
+     "y": 49,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "white",
+     "x": 0,
+     "y": 52,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "87079",
+     "color": "red",
+     "x": 0,
+     "y": 52,
+     "z": 2,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "35ab72a5c92e",
+ "source": {
+  "run": "2026-09-25_10-41-25-subbuilds-please-design-me-a-model-of-th",
+  "request": "please design me a model of the red mosque found in pettah, Colombo, Sri lanka, use up to 2000 bricks and get as detailed as you possibly can ",
+  "at": "2026-09-25T13:53:23.526Z"
+ },
+ "cost": 0.3357,
+ "reused": 0
+}

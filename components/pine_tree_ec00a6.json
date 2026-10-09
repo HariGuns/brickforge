@@ -1,0 +1,292 @@
+{
+ "id": "pine_tree_ec00a6",
+ "name": "Pine Tree",
+ "description": "A tall conical pine tree with a reddish_brown trunk and stacked, shrinking dark_green plate and slope tiers tapering to a cone at the top.",
+ "tags": [
+  "pine",
+  "tree",
+  "tall",
+  "conical",
+  "reddish",
+  "brown",
+  "trunk",
+  "stacked",
+  "shrinking",
+  "dark",
+  "green",
+  "plate",
+  "slope",
+  "tier",
+  "tapering",
+  "cone"
+ ],
+ "size": {
+  "w": 6,
+  "d": 6,
+  "h": 28
+ },
+ "parts": 27,
+ "depth": 1,
+ "colors": [
+  "green",
+  "red",
+  "yellow",
+  "reddish_brown",
+  "dark_green"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "11 11 11 11 11 11",
+   "11 19 19 19 19 11",
+   "11 19 28 28 19 11",
+   "11 19 28 28 19 11",
+   "11 19 19 19 19 11",
+   "11 11 11 11 11 11"
+  ],
+  "bottom": [
+   ". . . . . .",
+   ". o o o o .",
+   ". o o o o .",
+   ". o o o o .",
+   ". o o o o .",
+   ". . . . . ."
+  ],
+  "studsByHeight": [],
+  "sideStuds": 0
+ },
+ "root": "pine_tree",
+ "subBuilds": [
+  {
+   "id": "pine_tree",
+   "name": "Pine Tree",
+   "parts": [
+    {
+     "part": "plate_4x4",
+     "color": "green",
+     "x": 1,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "red",
+     "x": 1,
+     "y": 1,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "flower_1x1",
+     "color": "yellow",
+     "x": 4,
+     "y": 1,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "reddish_brown",
+     "x": 2,
+     "y": 1,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "reddish_brown",
+     "x": 2,
+     "y": 4,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "3958",
+     "color": "dark_green",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x2",
+     "color": "dark_green",
+     "x": 2,
+     "y": 8,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_green",
+     "x": 2,
+     "y": 8,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_green",
+     "x": 2,
+     "y": 8,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_green",
+     "x": 0,
+     "y": 8,
+     "z": 2,
+     "rot": 90
+    },
+    {
+     "part": "slope45_2x2",
+     "color": "dark_green",
+     "x": 4,
+     "y": 8,
+     "z": 2,
+     "rot": 270
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 4,
+     "y": 8,
+     "z": 4,
+     "rot": 0
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 0,
+     "y": 8,
+     "z": 4,
+     "rot": 90
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 4,
+     "y": 8,
+     "z": 0,
+     "rot": 270
+    },
+    {
+     "part": "plate_4x4",
+     "color": "dark_green",
+     "x": 1,
+     "y": 11,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 3,
+     "y": 12,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 1,
+     "y": 12,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 1,
+     "y": 12,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 3,
+     "y": 12,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "plate_4x4",
+     "color": "dark_green",
+     "x": 1,
+     "y": 15,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 3,
+     "y": 16,
+     "z": 3,
+     "rot": 0
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 1,
+     "y": 16,
+     "z": 3,
+     "rot": 90
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 1,
+     "y": 16,
+     "z": 1,
+     "rot": 180
+    },
+    {
+     "part": "3045",
+     "color": "dark_green",
+     "x": 3,
+     "y": 16,
+     "z": 1,
+     "rot": 270
+    },
+    {
+     "part": "brick_2x2",
+     "color": "dark_green",
+     "x": 2,
+     "y": 19,
+     "z": 2,
+     "rot": 0
+    },
+    {
+     "part": "cone_2x2x2",
+     "color": "dark_green",
+     "x": 2,
+     "y": 22,
+     "z": 2,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "ec00a6cfbded",
+ "source": {
+  "run": "2026-09-24_20-52-33-subbuilds-a-small-village-square-with-tw",
+  "request": "a small village square with two cottages, two pine trees and a well",
+  "at": "2026-09-25T13:53:23.394Z"
+ },
+ "cost": 0.0623,
+ "reused": 0
+}

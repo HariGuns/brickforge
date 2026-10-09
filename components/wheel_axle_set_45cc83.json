@@ -1,0 +1,151 @@
+{
+ "id": "wheel_axle_set_45cc83",
+ "name": "Wheel axle set",
+ "description": "A black holder beam, a brick with Technic pins or a 4600 plate, with two large dark multi-spoke wheels, one on each end, spanning the full car width.",
+ "tags": [
+  "wheel",
+  "axle",
+  "set",
+  "black",
+  "holder",
+  "beam",
+  "brick",
+  "technic",
+  "pin",
+  "plate",
+  "dark",
+  "multi",
+  "spoke",
+  "each",
+  "end",
+  "spanning"
+ ],
+ "size": {
+  "w": 16,
+  "d": 4,
+  "h": 7
+ },
+ "parts": 10,
+ "depth": 1,
+ "colors": [
+  "black",
+  "dark_gray"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "5 6 . . . . . . . . . . . . 6 5",
+   "7 7 5* 5* 4* 5* 5* 5* 5* 5* 5* 4* 5* 5* 7 7",
+   "7 7 5* 5* 4* 5* 5* 5* 5* 5* 5* 4* 5* 5* 7 7",
+   "5 6 . . . . . . . . . . . . 6 5"
+  ],
+  "bottom": [
+   ". . . . . . . . . . . . . . . .",
+   ". . o o o o o o o o o o o o . .",
+   ". . o o o o o o o o o o o o . .",
+   ". . . . . . . . . . . . . . . ."
+  ],
+  "studsByHeight": [
+   "5: (2,1) (3,1) (5,1) (6,1) (7,1) (8,1) (9,1) (10,1) (12,1) (13,1) (2,2) (3,2) (5,2) (6,2) (7,2) (8,2) (9,2) (10,2) (12,2) (13,2)",
+   "4: (4,1) (11,1) (4,2) (11,2)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "wheel_axle",
+ "subBuilds": [
+  {
+   "id": "wheel_axle",
+   "name": "Wheel axle set",
+   "parts": [
+    {
+     "part": "brick_2x6",
+     "color": "black",
+     "x": 2,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "brick_2x6",
+     "color": "black",
+     "x": 8,
+     "y": 0,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "4600",
+     "color": "black",
+     "x": 2,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "4600",
+     "color": "black",
+     "x": 12,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x8",
+     "color": "black",
+     "x": 4,
+     "y": 3,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "11208c01",
+     "color": "black",
+     "x": 14,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "11208c01",
+     "color": "black",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 180
+    },
+    {
+     "part": "plate_2x6",
+     "color": "dark_gray",
+     "x": 5,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "dark_gray",
+     "x": 2,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    },
+    {
+     "part": "plate_2x2",
+     "color": "dark_gray",
+     "x": 12,
+     "y": 4,
+     "z": 1,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "45cc83c1425d",
+ "source": {
+  "run": "2026-09-25_05-56-48-subbuilds-photo",
+  "at": "2026-09-25T13:53:23.408Z"
+ },
+ "cost": 0.1332,
+ "reused": 0
+}

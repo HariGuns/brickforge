@@ -1,0 +1,305 @@
+{
+ "id": "town_house_back_wall_12696a",
+ "name": "Town House Back Wall",
+ "description": "Plain 8-wide back wall in the facade colour with one window per storey.",
+ "tags": [
+  "town",
+  "house",
+  "back",
+  "wall",
+  "plain",
+  "wide",
+  "facade",
+  "colour",
+  "window",
+  "per",
+  "storey",
+  "square",
+  "market",
+  "stall",
+  "fountain",
+  "clock"
+ ],
+ "size": {
+  "w": 8,
+  "d": 1,
+  "h": 21
+ },
+ "parts": 30,
+ "depth": 1,
+ "colors": [
+  "white",
+  "dark_red"
+ ],
+ "sideways": false,
+ "connections": {
+  "top": [
+   "21* 21* 21* 21* 21* 21* 21* 21*"
+  ],
+  "bottom": [
+   "o o o o o o o o"
+  ],
+  "studsByHeight": [
+   "21: (0,0) (1,0) (2,0) (3,0) (4,0) (5,0) (6,0) (7,0)"
+  ],
+  "sideStuds": 0
+ },
+ "root": "house_back_wall",
+ "subBuilds": [
+  {
+   "id": "house_back_wall",
+   "name": "Town House Back Wall",
+   "parts": [
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 0,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 2,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 3,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 1,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 0,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 7,
+     "y": 4,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 7,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 2,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 3,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 8,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 0,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 7,
+     "y": 11,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "plate_1x8",
+     "color": "white",
+     "x": 0,
+     "y": 14,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 0,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 2,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "window_1x2x2",
+     "color": "white",
+     "x": 3,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 5,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 6,
+     "y": 15,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 0,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 1,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x2",
+     "color": "dark_red",
+     "x": 5,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    },
+    {
+     "part": "brick_1x1",
+     "color": "dark_red",
+     "x": 7,
+     "y": 18,
+     "z": 0,
+     "rot": 0
+    }
+   ],
+   "uses": []
+  }
+ ],
+ "hash": "12696aac4b5f",
+ "source": {
+  "run": "2026-10-08_18-38-01-subbuilds-a-town-square-with-four-town-h",
+  "request": "a town square with four town houses, market stalls, a fountain, a clock tower, trees, benches, lamp posts and railings",
+  "at": "2026-10-08T18:47:07.502Z"
+ },
+ "cost": 0.0608,
+ "reused": 0
+}
