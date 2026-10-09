@@ -10,7 +10,7 @@ Claude (Anthropic's model) does the designing. BrickForge plans a large model as
 
 ## Inspiration
 
-This started from the [Claude Opus 5.5 launch clip](https://www.youtube.com/watch?v=lCR9epzSNGc).
+This started from the [Claude Opus 5.5 launch clip](https://www.youtube.com/watch?v=lCR9epzSNGc), which showed a model designed in connected bricks, with a full instruction manual, but not how it worked. From the footage I inferred a compile step and a connection checker, and the video's description later confirmed both. My first version missed that the designs were split into smaller, repeatable builds; spotting that led to sub-builds and the component library.
 
 ## Screenshots
 
@@ -175,6 +175,8 @@ More detail on all of this, with measurements, is in [docs/ENGINEERING.md](docs/
 BrickForge was built with [Claude Code](https://www.anthropic.com/claude-code). I designed the system: the sub-build pipeline, the component library, the validator and repair rules, the testing approach and what to measure. Claude Code wrote the code under that direction, tested it against a simulated Claude first, and ran the live tests with a budget cap.
 
 The whole project took **$44.09** of API calls, from the run logs and including every test run. $41.57 of that was spent after sub-builds were introduced (24 September to 9 October 2026), developing and testing the sub-build system.
+
+More about me and how I work: [harithg.com](https://harithg.com)
 
 ## Licence
 
