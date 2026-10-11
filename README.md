@@ -174,7 +174,7 @@ More detail on all of this, with measurements, is in [docs/ENGINEERING.md](docs/
 
 BrickForge was built with [Claude Code](https://www.anthropic.com/claude-code). I designed the system: the sub-build pipeline, the component library, the validator and repair rules, the testing approach and what to measure. Claude Code wrote the code under that direction, tested it against a simulated Claude first, and ran the live tests with a budget cap.
 
-The whole project took **$44.09** of API calls, from the run logs and including every test run. $41.57 of that was spent after sub-builds were introduced, developing and testing the sub-build system.
+The whole project took **$44.09** of API calls, from the run logs and including every test run. $41.57 of that was spent after sub-builds were introduced, developing and testing the sub-build system. On top of that, Claude Code ran on a $20 Claude Pro subscription, bringing the total to **$64.09**.
 
 More about me and how I work: [harithg.com](https://harithg.com)
 
